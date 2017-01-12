@@ -121,81 +121,23 @@
 # - commit an experimental exit from autotools hell
 #
 
-CMAKE_MINIMUM_REQUIRED(VERSION 2.4)
+CMAKE_MINIMUM_REQUIRED(VERSION 3.1.0)
 PROJECT(GNUitar)
 
-# Get the GCC version -- this regex is pathetic.
-EXEC_PROGRAM(${CMAKE_C_COMPILER} ARGS --version OUTPUT_VARIABLE _gcc_version_info)
-STRING(REGEX REPLACE "^[a-z.]+ \\(GCC\\) ([0-9]+\\.[0-9]+).*" "\\1" _gcc_version "${_gcc_version_info}")
+LIST(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
-# Check that we succeeded
-IF (NOT _gcc_version)
-    MESSAGE(FATAL_ERROR "*** error: I could not determine your GCC version.\n\nThe C compiler discovered by CMake was: ${CMAKE_C_COMPILER}.\nIts output for --version was:\n${_gcc_version_info}")
-ENDIF (NOT _gcc_version)
+IF(CMAKE_COMPILER_IS_GNUCC)
+    # TODO add -Werror -Wfatal-errors
+    SET(CMAKE_C_FLAGS "-Wall -Wextra")
+ENDIF(CMAKE_COMPILER_IS_GNUCC)
 
-MESSAGE("*** Detected GCC version: ${_gcc_version}\n")
-
-# Compute an integer representation of the GCC version number
-STRING(REGEX REPLACE "([0-9]+)\\.[0-9]+" "\\1" _gcc_version_major "${_gcc_version}")
-STRING(REGEX REPLACE "[0-9]+\\.([0-9]+)" "\\1" _gcc_version_minor "${_gcc_version}")
-MATH(EXPR _gcc_version "${_gcc_version_major} * 100 + ${_gcc_version_minor}")
-
-SET(OPT_FLAGS "-ffast-math")
-SET(WARNING_FLAGS "-Wall -Wbad-function-cast -Wcast-align -Wmissing-noreturn -Wredundant-decls -Winline -Wpointer-arith -Wmissing-prototypes")
-IF (_gcc_version GREATER 399) # cmake suckage for lacking >=
-    SET(OPT_FLAGS "${OPT_FLAGS} -frename-registers -ftree-vectorize")
-    SET(WARNING_FLAGS "${WARNING_FLAGS} -Wpointer-sign -Wunsafe-loop-optimizations -Wmissing-field-initializers")
-ENDIF (_gcc_version GREATER 399)
-
-# guess something rather conservative. We wamt SSE. hence we specify at least pentium3
-SET(ARCH_FLAGS "-march=pentium3")
-IF (UNIX) # IF (LINUX) ?
-    # read cpuinfo on linux to improve guess
-    FILE(READ "/proc/cpuinfo" _cpuinfo)
-    IF (_cpuinfo MATCHES "AuthenticAMD")
-        SET(ARCH_FLAGS "-march=athlon-xp")
-        IF (_cpuinfo MATCHES "Athlon\\(tm\\) 64")
-            SET(ARCH_FLAGS "-march=athlon64 -msse3")
-        ENDIF (_cpuinfo MATCHES "Athlon\\(tm\\) 64")
-    ENDIF (_cpuinfo MATCHES "AuthenticAMD")
-    IF (_cpuinfo MATCHES "GenuineIntel")
-        SET(ARCH_FLAGS "-march=pentium4 -mtune=prescott")
-    ENDIF (_cpuinfo MATCHES "GenuineIntel")
-ENDIF (UNIX)
-
-# user serviceable parts begin
-SET(CMAKE_BUILD_TYPE RELEASE)
 ADD_DEFINITIONS(-DFLOAT_DSP)
-# end of user serviceable parts
 
-MESSAGE("*** Note: I am assuming that these parameters generate valid code for you:\n    ${ARCH_FLAGS}\n")
+find_package(GTK2 REQUIRED)
 
-INCLUDE(UsePkgConfig)
-PKGCONFIG(gtk+-2.0    GTK2_INCLUDE_DIR    GTK2_LINK_DIR    GTK2_LINK_FLAGS    GTK2_CFLAGS)
-PKGCONFIG(gthread-2.0 GTHREAD_INCLUDE_DIR GTHREAD_LINK_DIR GTHREAD_LINK_FLAGS GTHREAD_CFLAGS)
+INCLUDE_DIRECTORIES("${GTK2_INCLUDE_DIRS}")
+ADD_DEFINITIONS(-DHAVE_GTK2)
 
-IF (GTK2_INCLUDE_DIR)
-    SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${GTK2_CFLAGS} ${GTHREAD_CFLAGS}")
-    SET(GTK_LIBRARIES ${GTK2_LINK_FLAGS} ${GTHREAD_LINK_FLAGS})
-    ADD_DEFINITIONS(-DHAVE_GTK2)
-    MESSAGE("*** GTK 2.x found and used as GUI\n")
-    SET(GTK2_FOUND 1)
-ENDIF (GTK2_INCLUDE_DIR)
-
-IF (NOT GTK2_FOUND)
-    FIND_PACKAGE(GTK)
-    IF (GTK_FOUND)
-        INCLUDE_DIRECTORIES(${GTK_INCLUDE_DIR})
-        ADD_DEFINITIONS(-DHAVE_GTK)
-        MESSAGE("*** GTK 1.x found and used as GUI\n")
-    ENDIF (GTK_FOUND)
-ENDIF (NOT GTK2_FOUND)
-
-IF (NOT GTK_FOUND AND NOT GTK2_FOUND)
-    MESSAGE(FATAL_ERROR "*** Error: please install gtk 2.x or gtk 1.x development files")
-ENDIF (NOT GTK_FOUND AND NOT GTK2_FOUND)
-
-SET(OTHER_LIBRARIES m)
 IF (UNIX)
     # for vasprintf
     ADD_DEFINITIONS(-D_GNU_SOURCE)
@@ -229,6 +171,13 @@ IF (UNIX)
     ELSE (SNDFILE_LIBRARY)
         MESSAGE("*** Warning: libsndfile not found -- .wav export not possible.")
     ENDIF (SNDFILE_LIBRARY)
+
+    SET(THREADS_PREFER_PTHREAD_FLAG ON)
+    FIND_PACKAGE(Threads REQUIRED)
+    SET(OTHER_LIBRARIES ${OTHER_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
+
+    SET(OTHER_LIBRARIES ${OTHER_LIBRARIES} m)
+
 ENDIF (UNIX)
 
 IF (WIN32)
@@ -281,7 +230,7 @@ ADD_EXECUTABLE(gnuitar
     src/audio-driver.h src/audio-driver.c src/audio-midi.h src/audio-midi.c
     src/effect.c src/effect.h)
 SET_TARGET_PROPERTIES(gnuitar PROPERTIES LINK_FLAGS "-Wl,--as-needed")
-TARGET_LINK_LIBRARIES(gnuitar ${GTK_LIBRARIES} ${OTHER_LIBRARIES})
+TARGET_LINK_LIBRARIES(gnuitar ${GTK2_LIBRARIES} ${OTHER_LIBRARIES})
 
 INSTALL(TARGETS gnuitar RUNTIME DESTINATION bin)
 MAKE_DIRECTORY("${CMAKE_INSTALL_PREFIX}/share/doc/gnuitar/docs")
