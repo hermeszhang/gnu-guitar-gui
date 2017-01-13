@@ -20,12 +20,33 @@
  * $Id$
  */
 
-#ifndef _GUI_H_
-#define _GUI_H_ 1
+#ifndef GNUITAR_GUI_H
+#define GNUITAR_GUI_H
 
 #include <gtk/gtk.h>
 #include "effect.h"
 #include "glib12-compat.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif /* __cplusplus */
+
+/** @defgroup gnuitar-gui GNUitar GUI
+ * Contains information on the GUI API
+ */
+
+/** The graphical interface for the GNUitar project.
+ * @ingroup gnuitar-gui
+ */
+
+typedef struct gnuitar_gui {
+    /** The top level window */
+    GtkWidget *mainWnd;
+} gnuitar_gui_t;
+
+int gnuitar_gui_init(gnuitar_gui_t * gui);
+
+void gnuitar_gui_done(gnuitar_gui_t * gui);
 
 #ifdef __cplusplus
 #define __GTKATTACHOPTIONS GtkAttachOptions
@@ -59,5 +80,9 @@ extern float master_volume;
 extern float input_volume;
 extern GtkObject* adj_input;
 extern GtkObject* adj_master;
+
+#ifdef __cplusplus
+} /* extern "C" { */
+#endif /* __cplusplus */
 
 #endif

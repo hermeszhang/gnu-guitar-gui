@@ -541,6 +541,43 @@
 #include "tracker.h"
 #include "utils.h"
 
+/* this is the global gui structure.
+ * it will be global until everthing here
+ * can be contained in the structure.
+ */
+
+gnuitar_gui_t gui;
+
+/** Initializes the GUI.
+ * @param gui An uninitialized GUI structure.
+ * @returns On success, zero.
+ *  On failure, a negative number.
+ * @ingroup gnuitar-gui
+ */
+
+int
+gnuitar_gui_init(gnuitar_gui_t * gui)
+{
+    gui->mainWnd = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+    if (gui->mainWnd == NULL) {
+        return -1;
+    }
+    return 0;
+}
+
+/** Releases resources created by the gui.
+ * @param gui A GUI initialized by @ref gnuitar_gui_init
+ * @ingroup gnuitar-gui
+ */
+
+void
+gnuitar_gui_done(gnuitar_gui_t * gui)
+{
+    if (gui->mainWnd != NULL) {
+        gtk_widget_destroy(gui->mainWnd);
+    }
+}
+
 #define VU_UPDATE_INTERVAL   100.0    /* ms */
 #define BANK_UPDATE_INTERVAL 20.0     /* ms */
 
@@ -1391,7 +1428,7 @@ sample_dlg(GtkWidget *widget, gpointer data)
     
     alsadevice_list = g_list_append(alsadevice_list, "hw:0,0");
     alsadevice_list = g_list_append(alsadevice_list, "default");
-    alsadevice_list = g_list_append(alsadevice_list, "guitar");
+    alsadevice_list = g_list_append(alsadevice_list, "gnuitar");
     alsadevice_list = g_list_append(alsadevice_list, "surround40");
     gtk_combo_set_popdown_strings(GTK_COMBO(sparams.alsadevice), alsadevice_list);
     g_list_free(alsadevice_list);
@@ -1664,6 +1701,7 @@ start_stop(GtkWidget *widget, gpointer data)
 void
 init_gui(void)
 {
+    gnuitar_gui_t gui;
     gchar          *tmp;
     GtkAccelGroup  *accel_group;
     GtkWidget      *vumeter_in;
@@ -1671,7 +1709,6 @@ init_gui(void)
     GtkWidget      *processor_scroll;
     GtkWidget	   *master;
     GtkWidget      *input;
-    GtkWidget      *mainWnd;
     GtkWidget      *tbl;
     GtkWidget      *menuBar;
     GtkWidget      *known_effects;
@@ -1707,15 +1744,19 @@ init_gui(void)
     GdkBitmap      *mask;
 #endif
     GtkStyle       *style;
-    
+
+    if (gnuitar_gui_init(&gui) < 0) {
+        gnuitar_printf("Failed to initialize graphical interface");
+        return;
+    }
+
     tmp = discover_preset_path();
     effects_dir = g_strdup_printf("%s" FILESEP "presetname.gnuitar", tmp);
     g_free(tmp);
 
-    mainWnd = gtk_window_new(GTK_WINDOW_TOPLEVEL);
-    gtk_widget_set_usize(mainWnd, 700, 450);
+    gtk_widget_set_usize(gui.mainWnd, 700, 450);
     tbl = gtk_table_new(7, 6, FALSE);
-    gtk_signal_connect(GTK_OBJECT(mainWnd), "destroy",
+    gtk_signal_connect(GTK_OBJECT(gui.mainWnd), "destroy",
 		       GTK_SIGNAL_FUNC(quit), NULL);
 
 
@@ -1727,7 +1768,7 @@ init_gui(void)
     item_factory = gtk_item_factory_new(GTK_TYPE_MENU_BAR, "<main>",
 					accel_group);
     gtk_item_factory_create_items(item_factory, nmenu_items, mainGui_menu, NULL);
-    gtk_window_add_accel_group(GTK_WINDOW(mainWnd), accel_group);
+    gtk_window_add_accel_group(GTK_WINDOW(gui.mainWnd), accel_group);
     menuBar = gtk_item_factory_get_widget(item_factory, "<main>");
 
     gtk_table_attach(GTK_TABLE(tbl), menuBar, 0, 6, 0, 1,
@@ -1798,8 +1839,8 @@ init_gui(void)
 		     __GTKATTACHOPTIONS(GTK_FILL | GTK_EXPAND), 0, 0);
 
 
-    gtk_container_add(GTK_CONTAINER(mainWnd), tbl);
-    gtk_window_set_title(GTK_WINDOW(mainWnd), "GNUitar");
+    gtk_container_add(GTK_CONTAINER(gui.mainWnd), tbl);
+    gtk_window_set_title(GTK_WINDOW(gui.mainWnd), "GNUitar");
 
     bank_add = gtk_button_new_with_label("Add preset...");
     gtk_tooltips_set_tip(tooltips,bank_add,"Load a file into the presets list.", NULL);
@@ -1953,7 +1994,7 @@ init_gui(void)
 		       GTK_SIGNAL_FUNC(update_master_volume), NULL);		       
     gtk_signal_connect(GTK_OBJECT(adj_input), "value_changed",
 		       GTK_SIGNAL_FUNC(update_input_volume), NULL);
-    gtk_widget_show_all(mainWnd);
+    gtk_widget_show_all(gui.mainWnd);
 
     g_timeout_add(VU_UPDATE_INTERVAL,   timeout_update_vumeter_in,  vumeter_in );
     g_timeout_add(VU_UPDATE_INTERVAL,   timeout_update_vumeter_out, vumeter_out);
@@ -1973,9 +2014,9 @@ init_gui(void)
 	SendMessage(window, WM_SETICON, ICON_SMALL, (LPARAM) small_icon);
 
 #else
-    style = gtk_widget_get_style(mainWnd);
-    app_icon = gdk_pixmap_create_from_xpm_d(mainWnd->window, &mask,
+    style = gtk_widget_get_style(gui.mainWnd);
+    app_icon = gdk_pixmap_create_from_xpm_d(gui.mainWnd->window, &mask,
 					    &style->white, (gchar **) gnuitar_xpm);
-    gdk_window_set_icon(mainWnd->window, mainWnd->window, app_icon, mask);
+    gdk_window_set_icon(gui.mainWnd->window, gui.mainWnd->window, app_icon, mask);
 #endif
 }
