@@ -578,6 +578,28 @@ gnuitar_gui_done(gnuitar_gui_t * gui)
     }
 }
 
+/** Sets the size of the top level window.
+ * @param gui An initialized gui
+ * @param width The width of the top level window.
+ *  Must not be greater than INT_MAX
+ * @param height The height of the top level window
+ *  Must not be greater than INT_MAX
+ * @returns On success, zero.
+ *  On failure, a negative number.
+ * @ingroup gnuitar-gui
+ */
+
+int
+gnuitar_gui_set_size(gnuitar_gui_t * gui, unsigned int width, unsigned int height)
+{
+    if ((width >= INT_MAX)
+     || (height >= INT_MAX)){
+        return -1;
+    }
+    gtk_widget_set_size_request(gui->mainWnd, (gint) width, (gint) height);
+    return 0;
+}
+
 #define VU_UPDATE_INTERVAL   100.0    /* ms */
 #define BANK_UPDATE_INTERVAL 20.0     /* ms */
 
@@ -1750,11 +1772,16 @@ init_gui(void)
         return;
     }
 
+    if (gnuitar_gui_set_size(&gui, 700, 450) < 0) {
+        gnuitar_printf("Failed to set window size");
+        gnuitar_gui_done(&gui);
+        return;
+    }
+
     tmp = discover_preset_path();
     effects_dir = g_strdup_printf("%s" FILESEP "presetname.gnuitar", tmp);
     g_free(tmp);
 
-    gtk_widget_set_usize(gui.mainWnd, 700, 450);
     tbl = gtk_table_new(7, 6, FALSE);
     gtk_signal_connect(GTK_OBJECT(gui.mainWnd), "destroy",
 		       GTK_SIGNAL_FUNC(quit), NULL);

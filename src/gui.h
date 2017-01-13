@@ -48,6 +48,8 @@ int gnuitar_gui_init(gnuitar_gui_t * gui);
 
 void gnuitar_gui_done(gnuitar_gui_t * gui);
 
+int gnuitar_gui_set_size(gnuitar_gui_t * gui, unsigned int width, unsigned int height);
+
 #ifdef __cplusplus
 #define __GTKATTACHOPTIONS GtkAttachOptions
 #else
