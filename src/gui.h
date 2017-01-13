@@ -85,4 +85,5 @@ extern GtkObject* adj_master;
 } /* extern "C" { */
 #endif /* __cplusplus */
 
-#endif
+#endif /* GNUITAR_GUI_H */
+
