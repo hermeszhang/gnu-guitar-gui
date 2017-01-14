@@ -83,7 +83,7 @@
  *   * distort2 -> overdrive
  *
  * Revision 1.11  2004/08/10 15:21:16  fonin
- * Support processing in float/int - type DSP_SAMPLE
+ * Support processing in float/int - type gnuitar_sample_t
  *
  * Revision 1.9  2004/07/07 19:18:42  fonin
  * GTK2 port
@@ -244,7 +244,7 @@ tremolo_filter(gnuitar_effect_t *p, data_block_t *db)
     double          vol, speed;
     int             count,
                     currchannel = 0;
-    DSP_SAMPLE     *s;
+    gnuitar_sample_t     *s;
 
     tp = p->params;
     s = db->data;

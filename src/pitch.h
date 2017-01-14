@@ -19,7 +19,7 @@ effect_t *   pitch_create(void);
 
 struct pitch_params {
     Backbuf_t      *history[MAX_CHANNELS];
-    DSP_SAMPLE     *channel_memory[MAX_CHANNELS], *output_memory[MAX_CHANNELS];
+    gnuitar_sample_t     *channel_memory[MAX_CHANNELS], *output_memory[MAX_CHANNELS];
     int memory_index;
     float output_pos, output_buffer_trigger;
     

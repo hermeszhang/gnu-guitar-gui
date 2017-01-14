@@ -231,7 +231,7 @@ typedef struct {
 
 typedef struct {
     Biquad_t        a1[MAX_CHANNELS], a2[MAX_CHANNELS];
-    DSP_SAMPLE      x0_tmp[MAX_CHANNELS];
+    gnuitar_sample_t      x0_tmp[MAX_CHANNELS];
 } Hilbert_t;
 
 /* Fs = sampling rate, Fc = center frequency, BW = bandwidth (octaves),
@@ -249,10 +249,10 @@ void     set_hsh_biquad(const double Fs, const double Fc, const double G, Biquad
 void     set_chebyshev1_biquad(double Fs, double Fc, double ripple,
 			       int lowpass, Biquad_t *f);
 
-void     hilbert_transform(const DSP_SAMPLE in, DSP_SAMPLE *x0, DSP_SAMPLE *x1, Hilbert_t *h, const int curr_channel);
+void     hilbert_transform(const gnuitar_sample_t in, gnuitar_sample_t *x0, gnuitar_sample_t *x1, Hilbert_t *h, const int curr_channel);
 void     hilbert_init(Hilbert_t *h);
-void     fir_interpolate_2x(DSP_SAMPLE *mem, const DSP_SAMPLE in, DSP_SAMPLE *o1, DSP_SAMPLE *o2);
-DSP_SAMPLE fir_decimate_2x(DSP_SAMPLE *mem, const DSP_SAMPLE in1, const DSP_SAMPLE in2);
+void     fir_interpolate_2x(gnuitar_sample_t *mem, const gnuitar_sample_t in, gnuitar_sample_t *o1, gnuitar_sample_t *o2);
+gnuitar_sample_t fir_decimate_2x(gnuitar_sample_t *mem, const gnuitar_sample_t in1, const gnuitar_sample_t in2);
 
 #if defined(__SSE__) && defined(FLOAT_DSP)
 
@@ -376,7 +376,7 @@ convolve_aligned (const float *a, const float *b, const int len)
 
 static inline float
 __attribute__ ((nonnull(1, 2)))
-convolve(const DSP_SAMPLE *a, const DSP_SAMPLE *b, const int len)
+convolve(const gnuitar_sample_t *a, const gnuitar_sample_t *b, const int len)
 {
     int i;
     /* a long int type would be needed to hold the value in integer dsp */
@@ -388,7 +388,7 @@ convolve(const DSP_SAMPLE *a, const DSP_SAMPLE *b, const int len)
 
 static inline float
 __attribute__ ((nonnull(1, 2)))
-convolve_aligned(const DSP_SAMPLE *a, const DSP_SAMPLE *b, const int len)
+convolve_aligned(const gnuitar_sample_t *a, const gnuitar_sample_t *b, const int len)
 {
     return convolve(a, b, len);
 }

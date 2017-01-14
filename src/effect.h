@@ -99,7 +99,7 @@ sin_lookup(float pos) {
     return sin_lookup_table[(int) (pos * (float) SIN_LOOKUP_SIZE)];
 }
 
-static inline DSP_SAMPLE
+static inline gnuitar_sample_t
 cos_lookup(float pos) {
     if (pos >= 0.75f)
         return sin_lookup(pos - 0.75f);

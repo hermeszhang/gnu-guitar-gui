@@ -63,7 +63,7 @@
  * - removed bunch of #ifdef HAVE_GTK/HAVE_GTK2 regarding window type
  *
  * Revision 1.12  2004/08/10 15:21:16  fonin
- * Support processing in float/int - type DSP_SAMPLE
+ * Support processing in float/int - type gnuitar_sample_t
  *
  * Revision 1.10  2004/07/07 19:18:42  fonin
  * GTK2 port
@@ -249,9 +249,9 @@ sustain_filter(gnuitar_effect_t *p, data_block_t *db)
 {
 
     int             count;
-    DSP_SAMPLE     *s;
+    gnuitar_sample_t     *s;
     struct sustain_params *ds;
-    DSP_SAMPLE      volAccum,
+    gnuitar_sample_t      volAccum,
                     tmp;
     float           CompW1;
     float           CompW2;

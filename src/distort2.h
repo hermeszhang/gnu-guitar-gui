@@ -32,7 +32,7 @@ struct distort2_params {
     float       drive, clip, treble;
     float 	last[MAX_CHANNELS];
 
-    DSP_SAMPLE  interpolate_firmem[MAX_CHANNELS][8];
+    gnuitar_sample_t  interpolate_firmem[MAX_CHANNELS][8];
     Biquad_t    feedback_minus_loop, output_bass_cut,
                 rolloff, treble_highpass;
 };

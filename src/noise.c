@@ -79,7 +79,7 @@
  * Added comments
  *
  * Revision 1.5  2004/08/10 15:07:31  fonin
- * Support processing in float/int - type DSP_SAMPLE
+ * Support processing in float/int - type gnuitar_sample_t
  *
  * Revision 1.4  2004/07/07 19:18:42  fonin
  * GTK2 port
@@ -341,7 +341,7 @@ noise_filter(gnuitar_effect_t *p, data_block_t *db)
 {
 
     int             	count;
-    DSP_SAMPLE     	*s;
+    gnuitar_sample_t     	*s;
     struct noise_params *dn;
     int                 hold_counter=0;    /* how much longer before we start 
 					     * to supress the signal */

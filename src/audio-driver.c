@@ -31,11 +31,11 @@
 #include "audio-dsound.h"
 
 #ifndef _WIN32
-DSP_SAMPLE      procbuf[MAX_BUFFER_SIZE * MAX_CHANNELS];
-DSP_SAMPLE      procbuf2[MAX_BUFFER_SIZE * MAX_CHANNELS];
+gnuitar_sample_t procbuf[MAX_BUFFER_SIZE * MAX_CHANNELS];
+gnuitar_sample_t procbuf2[MAX_BUFFER_SIZE * MAX_CHANNELS];
 #else
-DSP_SAMPLE      procbuf[MAX_BUFFER_SIZE / sizeof(SAMPLE16)];
-DSP_SAMPLE      procbuf2[MAX_BUFFER_SIZE / sizeof(SAMPLE16)];
+gnuitar_sample_t procbuf[MAX_BUFFER_SIZE / sizeof(SAMPLE16)];
+gnuitar_sample_t procbuf2[MAX_BUFFER_SIZE / sizeof(SAMPLE16)];
 #endif
 
 audio_driver_t  *audio_driver = NULL;

@@ -65,8 +65,8 @@ struct eqbank_params {
     double          *boosts;
     double           volume;
     Biquad_t        *filters;
-    DSP_SAMPLE      history_in[MAX_CHANNELS][8];
-    DSP_SAMPLE      history_out[MAX_CHANNELS][8];
+    gnuitar_sample_t      history_in[MAX_CHANNELS][8];
+    gnuitar_sample_t      history_out[MAX_CHANNELS][8];
 };
 
 

@@ -350,10 +350,10 @@ set_hsh_biquad(const double Fs, const double Fc, const double G, Biquad_t *f)
 
 /* input is input, output is x0 and x1 with 90° phase separation between them */
 void
-hilbert_transform(const DSP_SAMPLE input, DSP_SAMPLE *x0, DSP_SAMPLE *x1, Hilbert_t *h, const int curr_channel)
+hilbert_transform(const gnuitar_sample_t input, gnuitar_sample_t *x0, gnuitar_sample_t *x1, Hilbert_t *h, const int curr_channel)
 {
     int i;
-    DSP_SAMPLE x0i, x1i;
+    gnuitar_sample_t x0i, x1i;
 
     x0i = h->x0_tmp[curr_channel];
     h->x0_tmp[curr_channel] = input;
@@ -406,7 +406,7 @@ hilbert_init(Hilbert_t *h)
  * out2 is "delayed" by 3.5 samples.
  */
 void
-fir_interpolate_2x(DSP_SAMPLE *history, const DSP_SAMPLE in, DSP_SAMPLE *out1, DSP_SAMPLE *out2)
+fir_interpolate_2x(gnuitar_sample_t *history, const gnuitar_sample_t in, gnuitar_sample_t *out1, gnuitar_sample_t *out2)
 {
     *out1 = history[2];
     *out2 = 0.6147129043790 * (history[2] + history[3])
@@ -433,10 +433,10 @@ fir_interpolate_2x(DSP_SAMPLE *history, const DSP_SAMPLE in, DSP_SAMPLE *out1, D
  * It would also be possible to calculate decimator by reusing the interpolator code
  * and ignoring out1, but this is more efficient. The decimator also delays input by
  * 1.5 samples in output rate. */
-DSP_SAMPLE
-fir_decimate_2x(DSP_SAMPLE *history, const DSP_SAMPLE in1, const DSP_SAMPLE in2)
+gnuitar_sample_t
+fir_decimate_2x(gnuitar_sample_t *history, const gnuitar_sample_t in1, const gnuitar_sample_t in2)
 {
-    DSP_SAMPLE out;
+    gnuitar_sample_t out;
     
     out = 0.6147129043790 * (history[1] + history[2])
         - 0.1534261286990 * (history[0] + history[3])

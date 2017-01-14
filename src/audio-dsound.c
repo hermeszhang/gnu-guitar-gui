@@ -386,7 +386,7 @@ dsound_audio_thread(void *V)
             }
         }
         for (i = 0, j = 0, k = 0; i < count / sizeof(SAMPLE16); i++) {
-            DSP_SAMPLE      W = (SAMPLE32)db.data[i] >> 8;
+            gnuitar_sample_t      W = (SAMPLE32)db.data[i] >> 8;
             SAMPLE16       *curpos = NULL;
 
             if (j >= len1 && pos2 != NULL && k < len2) {

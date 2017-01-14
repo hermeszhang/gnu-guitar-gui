@@ -482,7 +482,7 @@ tuner_filter(gnuitar_effect_t *p, data_block_t *db)
 {
     struct tuner_params *params;
     int			i, j;
-    DSP_SAMPLE	       *s;
+    gnuitar_sample_t	       *s;
     float		power = 0,
 			freq = 0;
 #ifdef HAVE_FFTW3
@@ -501,7 +501,7 @@ tuner_filter(gnuitar_effect_t *p, data_block_t *db)
     params = p->params;
 
     for (i = 0; i < db->len; i += db->channels) {
-	DSP_SAMPLE newval = 0;
+	gnuitar_sample_t newval = 0;
 	for (j = 0; j < db->channels; j += 1) {
 	    newval += *s / db->channels;
             s++;
@@ -513,8 +513,8 @@ tuner_filter(gnuitar_effect_t *p, data_block_t *db)
 	params->oldval[1] = params->oldval[0];
 	params->oldval[0] = newval;
 	
-	newval = (params->oldval[2] + params->oldval[1] + params->oldval[1] + params->oldval[0]) / (DSP_SAMPLE) 4;
-        newval /= (DSP_SAMPLE) 256;
+	newval = (params->oldval[2] + params->oldval[1] + params->oldval[1] + params->oldval[0]) / (gnuitar_sample_t) 4;
+        newval /= (gnuitar_sample_t) 256;
 	
         power += newval * newval;
 	params->history->add(params->history, newval);
@@ -614,7 +614,7 @@ tuner_filter(gnuitar_effect_t *p, data_block_t *db)
         float diff = 0;
         float weight = 0;
         for (i = 0; i < COMPARE_LEN; i += 1) {
-            DSP_SAMPLE tmp = params->history->get(params->history, i) - params->history->get(params->history, i + loop_len);
+            gnuitar_sample_t tmp = params->history->get(params->history, i) - params->history->get(params->history, i + loop_len);
             float tmp2 = tmp * tmp;
             diff += tmp2;
             /* give up as soon as possible */

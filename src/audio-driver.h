@@ -49,8 +49,6 @@ typedef float gnuitar_sample_t;
 
 /* for compatibility */
 
-typedef gnuitar_sample_t DSP_SAMPLE;
-
 typedef int16_t SAMPLE16;
 
 typedef int32_t SAMPLE32;
@@ -104,21 +102,21 @@ extern unsigned int sample_rate;
 extern unsigned int buffer_size;
 
 #ifndef _WIN32
-    extern unsigned int fragments;
+extern unsigned int fragments;
 #else
-    extern unsigned int nbuffers;
-    extern unsigned int overrun_threshold;
+extern unsigned int nbuffers;
+extern unsigned int overrun_threshold;
 #endif
 
 #ifndef _WIN32
-extern DSP_SAMPLE       procbuf[MAX_BUFFER_SIZE * MAX_CHANNELS];
-extern DSP_SAMPLE       procbuf2[MAX_BUFFER_SIZE * MAX_CHANNELS];
+extern gnuitar_sample_t procbuf[MAX_BUFFER_SIZE * MAX_CHANNELS];
+extern gnuitar_sample_t procbuf2[MAX_BUFFER_SIZE * MAX_CHANNELS];
 #else
 /* sadly, Windows and Linux have a different idea what the size of the buffer is.
  * Linux world talks about size in frames because that is most convenient for ALSA
  * and JACK (but less so for OSS). */
-extern DSP_SAMPLE       procbuf[MAX_BUFFER_SIZE / sizeof(SAMPLE16)];
-extern DSP_SAMPLE       procbuf2[MAX_BUFFER_SIZE / sizeof(SAMPLE16)];
+extern gnuitar_sample_t procbuf[MAX_BUFFER_SIZE / sizeof(SAMPLE16)];
+extern gnuitar_sample_t procbuf2[MAX_BUFFER_SIZE / sizeof(SAMPLE16)];
 #endif
 
 void guess_audio_driver(void);

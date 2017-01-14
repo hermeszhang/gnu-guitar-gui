@@ -100,7 +100,7 @@
  * Workaround for crappy sound in .raw files - thanks Antti S. Lankila <alankila@bel.fi>
  *
  * Revision 1.9  2004/08/10 15:21:16  fonin
- * Support processing in float/int - type DSP_SAMPLE
+ * Support processing in float/int - type gnuitar_sample_t
  *
  * Revision 1.7  2003/03/09 20:58:47  fonin
  * Redesign for the new "change sampling params" feature.
@@ -244,7 +244,7 @@ tracker_done()
 
 
 void
-track_write(DSP_SAMPLE *s, int count)
+track_write(gnuitar_sample_t *s, int count)
 {
     SAMPLE16        tmp[MAX_BUFFER_SIZE];
     int             i;

@@ -77,7 +77,7 @@ rotary_filter(gnuitar_effect_t *p, data_block_t *db)
     struct rotary_params *params = p->params;
     int i;
     float pha, sinval = 0, cosval = 0;
-    DSP_SAMPLE *tmp;
+    gnuitar_sample_t *tmp;
     
     if (db->channels != 1 || n_output_channels < 2)
         return;
@@ -95,7 +95,7 @@ rotary_filter(gnuitar_effect_t *p, data_block_t *db)
 
     pha = params->phase;
     for (i = 0; i < db->len/2; i += 1) {
-        DSP_SAMPLE x0, x1, y0, y1;
+        gnuitar_sample_t x0, x1, y0, y1;
 
         /* update the approximation of sin and cos values to avoid
          * discontinuities between audio blocks */

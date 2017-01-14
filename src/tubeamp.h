@@ -51,7 +51,7 @@ struct tubeamp_params {
     /* effect state stuff */
     float       in[MAX_CHANNELS];
     /* convolution buffer */
-    DSP_SAMPLE  *buf[MAX_CHANNELS];
+    gnuitar_sample_t  *buf[MAX_CHANNELS];
     int_fast16_t    bufidx[MAX_CHANNELS];
 };
 

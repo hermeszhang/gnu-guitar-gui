@@ -130,7 +130,7 @@
  * Better presets
  *
  * Revision 1.12  2004/08/10 15:21:16  fonin
- * Support processing in float/int - type DSP_SAMPLE
+ * Support processing in float/int - type gnuitar_sample_t
  *
  * Revision 1.10  2004/07/07 19:18:42  fonin
  * GTK2 port
@@ -307,7 +307,7 @@ vibrato_init(gnuitar_effect_t *p)
 static void
 vibrato_filter(gnuitar_effect_t *p, data_block_t *db)
 {
-    DSP_SAMPLE     *s;
+    gnuitar_sample_t     *s;
     int             count;
     int		    curr_channel = 0;
     struct vibrato_params *vp;
@@ -327,7 +327,7 @@ vibrato_filter(gnuitar_effect_t *p, data_block_t *db)
      * itself is modulated by the period and depth parameters. */
     
     while (count) {
-        DSP_SAMPLE x0, x1;
+        gnuitar_sample_t x0, x1;
         float sinval, cosval;
         hilbert_transform(*s, &x0, &x1, &vp->hilbert, curr_channel);
         

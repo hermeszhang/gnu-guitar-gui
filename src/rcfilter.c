@@ -54,7 +54,7 @@
  * Code lickup
  *
  * Revision 1.6  2004/08/10 15:07:31  fonin
- * Support processing in float/int - type DSP_SAMPLE
+ * Support processing in float/int - type gnuitar_sample_t
  *
  * Revision 1.5  2003/03/09 21:02:18  fonin
  * Internal redesign for new "change sampling params" feature.
@@ -93,7 +93,7 @@ LC_filter(data_block_t *db, int filter_no, double freq,
                     d2i;
     int             t,
                     currchannel = 0;
-    DSP_SAMPLE     *sound = db->data;
+    gnuitar_sample_t     *sound = db->data;
 
     L = 50e-3;			/* 
 				 * like original crybaby wahwah, hehehe 
@@ -160,7 +160,7 @@ RC_filter(data_block_t *db, int mode, int filter_no,
                     di;
     int             t,
                     currchannel = 0;
-    DSP_SAMPLE     *sound = db->data;
+    gnuitar_sample_t     *sound = db->data;
     
     for (t = 0; t < db->len; t++) {
 	if(isnan(*sound))

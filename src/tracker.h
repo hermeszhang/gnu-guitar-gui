@@ -27,6 +27,6 @@
 
 extern void     tracker_out(const char *outfile);
 extern void     tracker_done(void);
-extern void     track_write(DSP_SAMPLE *s, int count);
+extern void     track_write(gnuitar_sample_t *s, int count);
 
 #endif

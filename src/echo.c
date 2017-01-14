@@ -74,7 +74,7 @@
  * - removed bunch of #ifdef HAVE_GTK/HAVE_GTK2 regarding window type
  *
  * Revision 1.11  2004/08/10 15:07:31  fonin
- * Support processing in float/int - type DSP_SAMPLE
+ * Support processing in float/int - type gnuitar_sample_t
  *
  * Revision 1.10  2004/07/07 19:18:42  fonin
  * GTK2 port
@@ -290,7 +290,7 @@ static void
 echo_filter_mono(effect_t *p, data_block_t *db)
 {
     int                 i, count, curr_channel = 0;
-    DSP_SAMPLE          *s, tmp;
+    gnuitar_sample_t          *s, tmp;
     double              in, out, echo_samples, echo_decay;
     struct echo_params  *params;
     int                 delay_lookup[MAX_ECHO_COUNT];
@@ -336,7 +336,7 @@ static void
 echo_filter_mc(effect_t *p, data_block_t *db)
 {
     int                 i, count, curr_channel = 0;
-    DSP_SAMPLE          *ins, *outs, tmp;
+    gnuitar_sample_t          *ins, *outs, tmp;
     double              in, out, echo_samples, echo_decay;
     struct echo_params  *params;
     int                 delay_lookup[MAX_ECHO_COUNT];

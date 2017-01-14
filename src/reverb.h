@@ -29,7 +29,7 @@
 effect_t *   reverb_create(void);
 
 struct reverbBuffer {
-    DSP_SAMPLE     *data;
+    gnuitar_sample_t     *data;
     int             nChunks;
     int             nCursor;
 };

@@ -507,10 +507,10 @@ distort2_filter(gnuitar_effect_t *p, data_block_t *db)
 
     int_fast32_t        i,count,bailout;
     int_fast8_t	        curr_channel = 0;
-    DSP_SAMPLE 	       *s;
+    gnuitar_sample_t 	       *s;
     struct distort2_params *dp = p->params;
     float x,y,x1,x2,f,df,dx,e1,e2;
-    DSP_SAMPLE upsample[UPSAMPLING_RATE];
+    gnuitar_sample_t upsample[UPSAMPLING_RATE];
     float DRIVE = (float) DRIVE_STATIC + dp->drive / 100.0f * (float) DRIVE_LOG;
     float mUt = (20.0f + 100.f - 70.f) * 1e-3f;
     /* correct Is with mUt to approximately keep drive the
@@ -544,10 +544,10 @@ distort2_filter(gnuitar_effect_t *p, data_block_t *db)
         fir_interpolate_2x(dp->interpolate_firmem[curr_channel],
                            *s, &upsample[2], &upsample[0]);
         /* estimate the rest, this should be good enough for our purposes. */
-        upsample[1] = (upsample[0] + upsample[2]) / (DSP_SAMPLE) 2;
+        upsample[1] = (upsample[0] + upsample[2]) / (gnuitar_sample_t) 2;
         /* looking into firmem is a gross violation of interface. This will
          * go away once I design fir_interpolate_4x. */
-        upsample[3] = ((DSP_SAMPLE) 3 * upsample[2] + dp->interpolate_firmem[curr_channel][2]) / (DSP_SAMPLE) 4;
+        upsample[3] = ((gnuitar_sample_t) 3 * upsample[2] + dp->interpolate_firmem[curr_channel][2]) / (gnuitar_sample_t) 4;
 
 	/* Now the actual upsampled processing */
 	for (i = 0; i < UPSAMPLING_RATE; i++)

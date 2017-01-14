@@ -200,7 +200,7 @@ max(int a, int b) {
  * offsets, allowing us to work realtime on somewhat worse hardware.
  * GNUitar is however becoming very SSE dependant. */
 static int
-estimate_best_correlation(DSP_SAMPLE *data, const int frames, const int alignoff, DSP_SAMPLE *ref, const int looplen)
+estimate_best_correlation(gnuitar_sample_t *data, const int frames, const int alignoff, gnuitar_sample_t *ref, const int looplen)
 {
     int_fast16_t i = alignoff, best = 0, apprx;
     float goodness = 0;
@@ -243,7 +243,7 @@ estimate_best_correlation(DSP_SAMPLE *data, const int frames, const int alignoff
 
 #ifdef __SSE__
 static void
-copy_to_output_buffer(DSP_SAMPLE *in, DSP_SAMPLE *out, float *wp, const int length)
+copy_to_output_buffer(gnuitar_sample_t *in, gnuitar_sample_t *out, float *wp, const int length)
 {
     const __m128 ones = { 1.f, 1.f, 1.f, 1.f };
     __m128 * __restrict__ out4 = (__m128 * __restrict__) out;
@@ -262,7 +262,7 @@ copy_to_output_buffer(DSP_SAMPLE *in, DSP_SAMPLE *out, float *wp, const int leng
 }
 #else
 static void
-copy_to_output_buffer(DSP_SAMPLE *in, DSP_SAMPLE *out, float *wp, const int length)
+copy_to_output_buffer(gnuitar_sample_t *in, gnuitar_sample_t *out, float *wp, const int length)
 {
     int_fast16_t i;
 
@@ -278,7 +278,7 @@ copy_to_output_buffer(DSP_SAMPLE *in, DSP_SAMPLE *out, float *wp, const int leng
 #endif
 
 static void
-resample_to_output(Backbuf_t *history, const int deststart, const int destend, DSP_SAMPLE *input, const int sourcelength)
+resample_to_output(Backbuf_t *history, const int deststart, const int destend, gnuitar_sample_t *input, const int sourcelength)
 {
     int_fast16_t i;
     const int_fast16_t destlength = destend - deststart;
@@ -298,7 +298,7 @@ static void
 pitch_filter(effect_t *p, data_block_t *db)
 {
     struct pitch_params *params = p->params;
-    DSP_SAMPLE *s = db->data;
+    gnuitar_sample_t *s = db->data;
     int count = db->len / db->channels;
     int i;
     float depth, Wet, Dry, output_inc;

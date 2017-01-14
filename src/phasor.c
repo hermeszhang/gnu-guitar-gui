@@ -354,7 +354,7 @@ static void
 phasor_filter_mono(gnuitar_effect_t *p, data_block_t *db)
 {
     struct phasor_params *params = p->params;
-    DSP_SAMPLE     *s, tmp;
+    gnuitar_sample_t     *s, tmp;
     int_fast16_t    count, curr_channel = 0, i;
     float           delay, Dry, Wet, f;
 
@@ -396,7 +396,7 @@ phasor_filter_stereo(gnuitar_effect_t *p, data_block_t *db)
     struct phasor_params *params = p->params;
     float f, Dry, Wet, sinval=0, cosval=0;
     int_fast16_t i;
-    DSP_SAMPLE *tmp;
+    gnuitar_sample_t *tmp;
     
     db->channels = 2;
     db->len *= 2;
@@ -404,7 +404,7 @@ phasor_filter_stereo(gnuitar_effect_t *p, data_block_t *db)
     Wet = params->drywet / 100.0;
     Dry = 1.f - Wet;
     for (i = 0; i < db->len / 2; i += 1) {
-        DSP_SAMPLE x0, x1, y0, y1;
+        gnuitar_sample_t x0, x1, y0, y1;
         if (i % PHASOR_UPDATE_INTERVAL == 0) { 
             f += 1000.0f / params->sweep_time / sample_rate * PHASOR_UPDATE_INTERVAL;
             if (f >= 1.0f)

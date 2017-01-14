@@ -85,7 +85,7 @@
  * - add some missing headers & fix all compiler warnings on gcc 4.0.1+ -Wall
  *
  * Revision 1.12  2004/08/10 15:07:31  fonin
- * Support processing in float/int - type DSP_SAMPLE
+ * Support processing in float/int - type gnuitar_sample_t
  *
  * Revision 1.11  2004/07/07 19:18:42  fonin
  * GTK2 port
@@ -313,7 +313,7 @@ delay_filter_mono(effect_t *p, data_block_t *db)
                     count,
                     current_delay = 0;
     double          current_decay, delay_inc, decay_fac;
-    DSP_SAMPLE     *s, newval;
+    gnuitar_sample_t     *s, newval;
     int             curr_channel = 0;
 
     s = db->data;
@@ -353,7 +353,7 @@ delay_filter_mc(effect_t *p, data_block_t *db)
                     count,
                     current_delay = 0;
     double          current_decay, delay_inc, decay_fac;
-    DSP_SAMPLE     *ins, *outs, newval;
+    gnuitar_sample_t     *ins, *outs, newval;
     int             curr_channel = 0;
 
     /* this is only good for mono and up to 4 channels */

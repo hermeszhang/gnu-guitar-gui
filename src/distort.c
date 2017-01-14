@@ -89,7 +89,7 @@
  * Better presets
  *
  * Revision 1.11  2004/08/10 15:07:31  fonin
- * Support processing in float/int - type DSP_SAMPLE
+ * Support processing in float/int - type gnuitar_sample_t
  *
  * Revision 1.10  2004/07/07 19:18:42  fonin
  * GTK2 port
@@ -305,7 +305,7 @@ distort_filter(gnuitar_effect_t *p, data_block_t *db)
 {
     int             count,
                     currchannel = 0;
-    DSP_SAMPLE     *s;
+    gnuitar_sample_t     *s;
     struct distort_params *dp;
     double	    t;
 

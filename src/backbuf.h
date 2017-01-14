@@ -23,9 +23,9 @@
 #ifndef _BACKBUF_H_
 #define _BACKBUF_H_ 1
 
-#include "audio-driver.h"   /* for DSP_SAMPLE */
+#include "audio-driver.h"   /* for gnuitar_sample_t */
 
-#define BUF_TYPE DSP_SAMPLE
+#define BUF_TYPE gnuitar_sample_t
 typedef struct Backbuf {
     BUF_TYPE       *storage;
     unsigned int    mask, nstor, curpos;

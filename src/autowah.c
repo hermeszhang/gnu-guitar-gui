@@ -163,7 +163,7 @@
  * Declaring dry[] in the autowah_filter as static fixes the 100% CPU usage on windows; also amplify coefficients changed from 1.5 to 1.0
  *
  * Revision 1.10  2004/08/10 15:07:31  fonin
- * Support processing in float/int - type DSP_SAMPLE
+ * Support processing in float/int - type gnuitar_sample_t
  *
  * Revision 1.9  2004/07/07 19:18:42  fonin
  * GTK2 port
@@ -484,7 +484,7 @@ autowah_filter(gnuitar_effect_t *p, data_block_t *db)
 
     ap = (struct autowah_params *) p->params;
 
-    memcpy(db->data_swap, db->data, db->len * sizeof(DSP_SAMPLE));
+    memcpy(db->data_swap, db->data, db->len * sizeof(gnuitar_sample_t));
 
     if (ap->sync == 1) { /* continuous sweep */
         /* recover from noncontinuous sweep */

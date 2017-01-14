@@ -25,7 +25,7 @@
  *   support multiple midi continuous controls.
  *
  * Revision 1.89  2006/08/15 15:46:00  alankila
- * - move typecast to not overflow DSP_SAMPLE if it is integer. Shit.
+ * - move typecast to not overflow gnuitar_sample_t if it is integer. Shit.
  *
  * Revision 1.88  2006/08/10 16:18:36  alankila
  * - improve const correctness and make gnuitar compile cleanly under
@@ -340,7 +340,7 @@
  * Few improvements with the effects save/load; fixed nasty bug with CR/LF translation when saving preset files on Win32
  *
  * Revision 1.16  2004/08/10 15:07:31  fonin
- * Support processing in float/int - type DSP_SAMPLE
+ * Support processing in float/int - type gnuitar_sample_t
  *
  * Revision 1.15  2003/12/28 10:16:08  fonin
  * Code lickup
@@ -458,10 +458,10 @@ void pump_cmdline(char **argv, int argc);
  * or so. */
 static void
 bias_elimination(data_block_t *db) {
-    static DSP_SAMPLE       bias_s[MAX_CHANNELS] = { 0, 0, 0, 0 };
+    static gnuitar_sample_t       bias_s[MAX_CHANNELS] = { 0, 0, 0, 0 };
     static int_least32_t    bias_n[MAX_CHANNELS] = { 10, 10, 10, 10 };
     int_fast16_t i, curr_channel = 0;
-    DSP_SAMPLE biasadj = bias_s[curr_channel] / bias_n[curr_channel];
+    gnuitar_sample_t biasadj = bias_s[curr_channel] / bias_n[curr_channel];
     
     for (i = 0; i < db->len; i += 1) {
         bias_s[curr_channel] += db->data[i];
@@ -471,8 +471,8 @@ bias_elimination(data_block_t *db) {
     }
     /* keep bias within limits of shortest type (int_least32_t) */
     for (i = 0; i < MAX_CHANNELS; i += 1) {
-	if (fabs(bias_s[i]) > (DSP_SAMPLE) 1E10 || bias_n[i] > (int_least32_t) 1E10) {
-	    bias_s[i] /= (DSP_SAMPLE) 2;
+	if (fabs(bias_s[i]) > (gnuitar_sample_t) 1E10 || bias_n[i] > (int_least32_t) 1E10) {
+	    bias_s[i] /= (gnuitar_sample_t) 2;
 	    bias_n[i] /= 2;
 	}
     }
@@ -482,7 +482,7 @@ bias_elimination(data_block_t *db) {
 static float
 vu_meter(data_block_t *db) {
     int             i;
-    DSP_SAMPLE      sample;
+    gnuitar_sample_t      sample;
     float           power = 0;
 
     for (i = 0; i < db->len; i += 1) {
@@ -521,7 +521,7 @@ adapt_to_output(data_block_t *db)
 {
     int             i;
     int             size = db->len;
-    DSP_SAMPLE     *s = db->data;
+    gnuitar_sample_t     *s = db->data;
 
     assert(db->channels <= n_output_channels);
 

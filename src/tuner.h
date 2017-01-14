@@ -95,7 +95,7 @@ struct tuner_params {
     
     /* signal processing helpers */
     float	    power;
-    DSP_SAMPLE	    oldval[3];
+    gnuitar_sample_t	    oldval[3];
     
     /* raw measurements */
     float	    freq_history[FREQ_SIZE];

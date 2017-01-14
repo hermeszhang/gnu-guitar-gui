@@ -198,7 +198,7 @@ static void
 reverb_filter(gnuitar_effect_t *p, data_block_t *db)
 {
     struct reverb_params *params = p->params;
-    DSP_SAMPLE     *s;
+    gnuitar_sample_t     *s;
     int             count,
                     c = 0; /* curr_channel */
     float           input, a, mono, Dry, Wet, Rgn, Delay, fsr;

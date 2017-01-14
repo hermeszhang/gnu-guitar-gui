@@ -115,7 +115,7 @@
  * - make dry % and wet % mixers do what they say
  *
  * Revision 1.12  2004/08/10 15:07:31  fonin
- * Support processing in float/int - type DSP_SAMPLE
+ * Support processing in float/int - type gnuitar_sample_t
  *
  * Revision 1.11  2004/07/07 19:18:42  fonin
  * GTK2 port
@@ -421,8 +421,8 @@ chorus_filter_mono(gnuitar_effect_t *p, data_block_t *db)
     struct chorus_params *cp;
     int             count, i, curr_channel = 0;
     double          dly, Speed, tmp_ang, Depth, BaseDelay, Dry, Wet, Rgn;
-    DSP_SAMPLE     *s;
-    DSP_SAMPLE      tmp, rgn;
+    gnuitar_sample_t     *s;
+    gnuitar_sample_t      tmp, rgn;
 
     cp = (struct chorus_params *) p->params;
 
@@ -477,8 +477,8 @@ chorus_filter_mc(gnuitar_effect_t *p, data_block_t *db)
     struct chorus_params *cp;
     int             i, count, curr_channel = 0;
     double          dly, Speed, tmp_ang, Depth, BaseDelay, Dry, Wet, Rgn;
-    DSP_SAMPLE     *outs, *ins;
-    DSP_SAMPLE      tmp, rgn;
+    gnuitar_sample_t     *outs, *ins;
+    gnuitar_sample_t      tmp, rgn;
 
     cp = (struct chorus_params *) p->params;
 

@@ -299,7 +299,7 @@ static void
 eqbank_filter(gnuitar_effect_t *p, data_block_t *db)
 {
     int                 count;
-    DSP_SAMPLE         *s;
+    gnuitar_sample_t         *s;
     struct eqbank_params *params = p->params;
     float		  ocoeff;
     int			  cchannel=0;
@@ -310,7 +310,7 @@ eqbank_filter(gnuitar_effect_t *p, data_block_t *db)
     ocoeff = pow(10, params->volume / 20.0);
     while (count) {
         int i;
-        DSP_SAMPLE out1, out2;
+        gnuitar_sample_t out1, out2;
         /* using 2x upsampling */
         fir_interpolate_2x(params->history_in[cchannel], *s, &out1, &out2);
 	for (i = 0; i < FB_NB; i++) {
