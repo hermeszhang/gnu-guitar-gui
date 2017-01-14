@@ -208,7 +208,7 @@ dsound_audio_thread(void *V)
                 pos2 = NULL;	/* pointers for DirectSound lock call */
     DWORD       wbufpos = 0,	/* current write position in the */
 		rbufpos = 0;	/* buffer (DirectSound) */
-    data_block_t db;
+    gnuitar_packet_t db;
 
     /*
      * Wait for a message sent to me by the audio driver

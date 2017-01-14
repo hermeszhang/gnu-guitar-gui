@@ -546,7 +546,7 @@ F_tube(float in, float r_i)
 }
 
 static void
-tubeamp_filter(gnuitar_effect_t *p, data_block_t *db)
+tubeamp_filter(gnuitar_effect_t *p, gnuitar_packet_t *db)
 {
     int_fast16_t i, j, k, curr_channel = 0;
     gnuitar_sample_t *ptr1;

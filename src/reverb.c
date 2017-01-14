@@ -195,7 +195,7 @@ comb_filter(double input, double factor, int delay, Backbuf_t *history)
 }
 
 static void
-reverb_filter(gnuitar_effect_t *p, data_block_t *db)
+reverb_filter(gnuitar_effect_t *p, gnuitar_packet_t *db)
 {
     struct reverb_params *params = p->params;
     gnuitar_sample_t     *s;

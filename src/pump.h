@@ -21,7 +21,7 @@ void gnuitar_pump_unref(gnuitar_pump_t * pump);
 
 extern volatile unsigned short write_track;
 
-void     pump_sample(data_block_t *db);
+void     pump_sample(gnuitar_packet_t *db);
 void     pump_start(void);
 void     pump_stop(void);
 void     save_pump(const char *fname);

@@ -68,7 +68,7 @@ prng(void)
  * distribution still looks like triangle. Idea and implementation borrowed from
  * JACK. */
 void
-triangular_dither(data_block_t *db, int16_t *target)
+triangular_dither(gnuitar_packet_t *db, int16_t *target)
 {
     static int32_t correlated_noise[MAX_CHANNELS] = { 0, 0, 0, 0 };
     int_fast16_t i, current_channel = 0;

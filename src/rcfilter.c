@@ -81,7 +81,7 @@
 #endif
 
 void
-LC_filter(data_block_t *db, int filter_no, double freq,
+LC_filter(gnuitar_packet_t *db, int filter_no, double freq,
 	  struct filter_data *pp)
 {
     double          R,
@@ -153,7 +153,7 @@ RC_set_freq(double f, struct filter_data *pp)
 }
 
 static void
-RC_filter(data_block_t *db, int mode, int filter_no,
+RC_filter(gnuitar_packet_t *db, int mode, int filter_no,
 	  struct filter_data *pp)
 {
     double          du,
@@ -192,7 +192,7 @@ RC_filter(data_block_t *db, int mode, int filter_no,
 }
 
 void
-RC_bandpass(data_block_t *db, struct filter_data *pp)
+RC_bandpass(gnuitar_packet_t *db, struct filter_data *pp)
 {
     int             a;
 
@@ -203,7 +203,7 @@ RC_bandpass(data_block_t *db, struct filter_data *pp)
 }
 
 void
-RC_highpass(data_block_t *db, struct filter_data *pp)
+RC_highpass(gnuitar_packet_t *db, struct filter_data *pp)
 {
     int             a;
 
@@ -212,7 +212,7 @@ RC_highpass(data_block_t *db, struct filter_data *pp)
 }
 
 void
-RC_lowpass(data_block_t *db, struct filter_data *pp)
+RC_lowpass(gnuitar_packet_t *db, struct filter_data *pp)
 {
     int             a;
 

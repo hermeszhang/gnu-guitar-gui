@@ -478,7 +478,7 @@ cmp_float(const void *a, const void *b)
 }
 
 static void
-tuner_filter(gnuitar_effect_t *p, data_block_t *db)
+tuner_filter(gnuitar_effect_t *p, gnuitar_packet_t *db)
 {
     struct tuner_params *params;
     int			i, j;

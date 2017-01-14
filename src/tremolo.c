@@ -238,7 +238,7 @@ tremolo_init(gnuitar_effect_t *p)
 }
 
 static void
-tremolo_filter(gnuitar_effect_t *p, data_block_t *db)
+tremolo_filter(gnuitar_effect_t *p, gnuitar_packet_t *db)
 {
     struct tremolo_params *tp;
     double          vol, speed;

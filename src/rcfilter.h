@@ -42,11 +42,11 @@ struct filter_data {
     double          di[MAX_FILTERS][2][MAX_CHANNELS];
 };
 
-extern void     LC_filter(data_block_t *db, int, double, struct filter_data *);
+extern void     LC_filter(gnuitar_packet_t *db, int, double, struct filter_data *);
 extern void     RC_setup(int times, double gain, struct filter_data *);
 extern void     RC_set_freq(double freq, struct filter_data *);
-extern void     RC_bandpass(data_block_t *db, struct filter_data *);
-extern void     RC_highpass(data_block_t *db, struct filter_data *);
-extern void     RC_lowpass(data_block_t *db, struct filter_data *);
+extern void     RC_bandpass(gnuitar_packet_t *db, struct filter_data *);
+extern void     RC_highpass(gnuitar_packet_t *db, struct filter_data *);
+extern void     RC_lowpass(gnuitar_packet_t *db, struct filter_data *);
 
 #endif

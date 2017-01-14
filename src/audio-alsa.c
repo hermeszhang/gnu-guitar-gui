@@ -331,7 +331,7 @@ alsa_audio_thread(void *V)
 {
     unsigned int            i;
     int                     inframes, outframes;
-    data_block_t db = {
+    gnuitar_packet_t db = {
         .data = procbuf,
         .data_swap = procbuf2,
         .len = buffer_size * n_output_channels,

@@ -194,7 +194,7 @@ process (jack_nframes_t nframes, void *arg)
 {
     int i, k;
     jack_nframes_t j;
-    data_block_t db = {
+    gnuitar_packet_t db = {
         .data = procbuf,
         .data_swap = procbuf2,
     };

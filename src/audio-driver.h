@@ -54,10 +54,6 @@ typedef struct gnuitar_packet {
     int_fast8_t     channels;
 } gnuitar_packet_t;
 
-/* for compatibility */
-
-typedef gnuitar_packet_t data_block_t;
-
 struct audio_driver_channels {
     unsigned int in, out;
 };
@@ -115,7 +111,7 @@ extern gnuitar_sample_t procbuf2[MAX_BUFFER_SIZE / sizeof(int16_t)];
 
 void guess_audio_driver(void);
 void set_audio_driver_from_str(const char const *str);
-void triangular_dither(data_block_t *db, int16_t *target);
+void triangular_dither(gnuitar_packet_t *db, int16_t *target);
 
 #endif /* GNUITAR_AUDIO_DRIVER_H */
 

@@ -305,7 +305,7 @@ vibrato_init(gnuitar_effect_t *p)
 }
 
 static void
-vibrato_filter(gnuitar_effect_t *p, data_block_t *db)
+vibrato_filter(gnuitar_effect_t *p, gnuitar_packet_t *db)
 {
     gnuitar_sample_t     *s;
     int             count;

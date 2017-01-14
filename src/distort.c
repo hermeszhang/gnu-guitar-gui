@@ -301,7 +301,7 @@ distort_init(gnuitar_effect_t *p)
 }
 
 static void
-distort_filter(gnuitar_effect_t *p, data_block_t *db)
+distort_filter(gnuitar_effect_t *p, gnuitar_packet_t *db)
 {
     int             count,
                     currchannel = 0;

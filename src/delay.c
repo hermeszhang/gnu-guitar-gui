@@ -306,7 +306,7 @@ delay_init(gnuitar_effect_t *p)
 }
 
 static void
-delay_filter_mono(effect_t *p, data_block_t *db)
+delay_filter_mono(effect_t *p, gnuitar_packet_t *db)
 {
     struct delay_params *dp = p->params;
     int             i,
@@ -346,7 +346,7 @@ delay_filter_mono(effect_t *p, data_block_t *db)
 
 /* this is a mono-to-N channel mixer */
 static void
-delay_filter_mc(effect_t *p, data_block_t *db)
+delay_filter_mc(effect_t *p, gnuitar_packet_t *db)
 {
     struct delay_params *dp = p->params;
     int             i,
@@ -399,7 +399,7 @@ delay_filter_mc(effect_t *p, data_block_t *db)
 }
 
 static void
-delay_filter(effect_t *p, data_block_t *db)
+delay_filter(effect_t *p, gnuitar_packet_t *db)
 {
     struct delay_params *params = p->params;
     if (params->multichannel && db->channels == 1 && n_output_channels > 1) {

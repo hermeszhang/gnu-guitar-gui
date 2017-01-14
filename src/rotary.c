@@ -72,7 +72,7 @@ rotary_init(gnuitar_effect_t *p)
 
 /* this is a single-channel to two-channel effect */
 static void
-rotary_filter(gnuitar_effect_t *p, data_block_t *db)
+rotary_filter(gnuitar_effect_t *p, gnuitar_packet_t *db)
 {
     struct rotary_params *params = p->params;
     int i;

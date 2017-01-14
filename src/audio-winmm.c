@@ -92,7 +92,7 @@ winmm_audio_thread(void *V)
     MSG             msg;
 
     /* read/write cursors and lengths for DS calls */
-    data_block_t db;
+    gnuitar_packet_t db;
 
     /*
      * Wait for a message sent to me by the audio driver

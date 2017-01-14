@@ -351,7 +351,7 @@ phasor_init(gnuitar_effect_t *p)
 }
 
 static void
-phasor_filter_mono(gnuitar_effect_t *p, data_block_t *db)
+phasor_filter_mono(gnuitar_effect_t *p, gnuitar_packet_t *db)
 {
     struct phasor_params *params = p->params;
     gnuitar_sample_t     *s, tmp;
@@ -391,7 +391,7 @@ phasor_filter_mono(gnuitar_effect_t *p, data_block_t *db)
 }
 
 static void
-phasor_filter_stereo(gnuitar_effect_t *p, data_block_t *db)
+phasor_filter_stereo(gnuitar_effect_t *p, gnuitar_packet_t *db)
 {
     struct phasor_params *params = p->params;
     float f, Dry, Wet, sinval=0, cosval=0;
@@ -427,7 +427,7 @@ phasor_filter_stereo(gnuitar_effect_t *p, data_block_t *db)
 }
 
 static void
-phasor_filter(gnuitar_effect_t *p, data_block_t *db)
+phasor_filter(gnuitar_effect_t *p, gnuitar_packet_t *db)
 {
     struct phasor_params *params = p->params;
 

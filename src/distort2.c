@@ -502,7 +502,7 @@ distort2_init(gnuitar_effect_t *p)
 }
 
 static void
-distort2_filter(gnuitar_effect_t *p, data_block_t *db)
+distort2_filter(gnuitar_effect_t *p, gnuitar_packet_t *db)
 {
 
     int_fast32_t        i,count,bailout;

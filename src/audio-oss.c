@@ -280,7 +280,7 @@ static void *
 oss_audio_thread(void *V)
 {
     int             count, i;
-    data_block_t db = {
+    gnuitar_packet_t db = {
         .data = procbuf,
         .data_swap = procbuf2,
         .len = buffer_size * 2 * n_output_channels

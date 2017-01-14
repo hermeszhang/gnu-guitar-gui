@@ -476,7 +476,7 @@ power2db(double power)
 }
 
 static void
-autowah_filter(gnuitar_effect_t *p, data_block_t *db)
+autowah_filter(gnuitar_effect_t *p, gnuitar_packet_t *db)
 {
     struct autowah_params *ap;
     int             i, curr_channel = 0, delay_time;

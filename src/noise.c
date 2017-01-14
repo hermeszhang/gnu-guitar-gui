@@ -337,7 +337,7 @@ noise_init(gnuitar_effect_t *p)
 }
 
 static void
-noise_filter(gnuitar_effect_t *p, data_block_t *db)
+noise_filter(gnuitar_effect_t *p, gnuitar_packet_t *db)
 {
 
     int             	count;

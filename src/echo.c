@@ -287,7 +287,7 @@ echo_init(gnuitar_effect_t *p)
 }
     
 static void
-echo_filter_mono(effect_t *p, data_block_t *db)
+echo_filter_mono(effect_t *p, gnuitar_packet_t *db)
 {
     int                 i, count, curr_channel = 0;
     gnuitar_sample_t          *s, tmp;
@@ -333,7 +333,7 @@ echo_filter_mono(effect_t *p, data_block_t *db)
 }
 
 static void
-echo_filter_mc(effect_t *p, data_block_t *db)
+echo_filter_mc(effect_t *p, gnuitar_packet_t *db)
 {
     int                 i, count, curr_channel = 0;
     gnuitar_sample_t          *ins, *outs, tmp;
@@ -392,7 +392,7 @@ echo_filter_mc(effect_t *p, data_block_t *db)
 }
 
 static void
-echo_filter(effect_t *p, data_block_t *db)
+echo_filter(effect_t *p, gnuitar_packet_t *db)
 {
     struct echo_params *params = p->params;
     if (params->multichannel && db->channels == 1 && n_output_channels > 1) {

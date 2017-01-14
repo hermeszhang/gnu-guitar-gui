@@ -295,7 +295,7 @@ resample_to_output(Backbuf_t *history, const int deststart, const int destend, g
 }
 
 static void
-pitch_filter(effect_t *p, data_block_t *db)
+pitch_filter(effect_t *p, gnuitar_packet_t *db)
 {
     struct pitch_params *params = p->params;
     gnuitar_sample_t *s = db->data;

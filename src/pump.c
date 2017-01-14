@@ -457,7 +457,7 @@ void pump_cmdline(char **argv, int argc);
  * compensate. Some soundcards would also need highpass filtering ~20 Hz
  * or so. */
 static void
-bias_elimination(data_block_t *db) {
+bias_elimination(gnuitar_packet_t *db) {
     static gnuitar_sample_t       bias_s[MAX_CHANNELS] = { 0, 0, 0, 0 };
     static int_least32_t    bias_n[MAX_CHANNELS] = { 10, 10, 10, 10 };
     int_fast16_t i, curr_channel = 0;
@@ -480,7 +480,7 @@ bias_elimination(data_block_t *db) {
 
 /* accumulate power estimate and monitor clipping */
 static float
-vu_meter(data_block_t *db) {
+vu_meter(gnuitar_packet_t *db) {
     int             i;
     gnuitar_sample_t      sample;
     float           power = 0;
@@ -495,7 +495,7 @@ vu_meter(data_block_t *db) {
 
 /* adjust master volume according to the main window slider and clip */
 static void
-adjust_master_volume(data_block_t *db) {
+adjust_master_volume(gnuitar_packet_t *db) {
     int		    i;
     float	    volume = pow(10, master_volume / 20.0);
 
@@ -507,7 +507,7 @@ adjust_master_volume(data_block_t *db) {
 }
 
 static void
-adjust_input_volume(data_block_t *db) {
+adjust_input_volume(gnuitar_packet_t *db) {
     int		    i;
     float	    volume = pow(10, input_volume / 20.0);
 
@@ -517,7 +517,7 @@ adjust_input_volume(data_block_t *db) {
 
 
 static void
-adapt_to_output(data_block_t *db)
+adapt_to_output(gnuitar_packet_t *db)
 {
     int             i;
     int             size = db->len;
@@ -573,7 +573,7 @@ adapt_to_output(data_block_t *db)
 static void
 run_effects(effect_t *effect, int idx, void *data) {
 
-    data_block_t *db = (data_block_t *) data;
+    gnuitar_packet_t *db = (gnuitar_packet_t *) data;
 
     (void) idx;
 
@@ -582,7 +582,7 @@ run_effects(effect_t *effect, int idx, void *data) {
 }
 
 void
-pump_sample(data_block_t *db)
+pump_sample(gnuitar_packet_t *db)
 {
     bias_elimination(db);
     adjust_input_volume(db);

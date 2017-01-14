@@ -44,7 +44,7 @@ typedef struct gnuitar_effect {
     void *params;
     void (*proc_init) (struct gnuitar_effect *);
     void (*proc_done) (struct gnuitar_effect *);
-    void (*proc_filter) (struct gnuitar_effect *, data_block_t *);
+    void (*proc_filter) (struct gnuitar_effect *, gnuitar_packet_t *);
     void (*proc_save) (struct gnuitar_effect *, GKeyFile *, gchar *);
     void (*proc_load) (struct gnuitar_effect *, GKeyFile *, gchar *, GError **error);
     short toggle;

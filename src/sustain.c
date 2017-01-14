@@ -245,7 +245,7 @@ sustain_init(gnuitar_effect_t *p)
 }
 
 static void
-sustain_filter(gnuitar_effect_t *p, data_block_t *db)
+sustain_filter(gnuitar_effect_t *p, gnuitar_packet_t *db)
 {
 
     int             count;

@@ -115,7 +115,7 @@ amp_init(gnuitar_effect_t *p)
 }
 
 static void
-amp_filter(effect_t *p, data_block_t *db)
+amp_filter(effect_t *p, gnuitar_packet_t *db)
 {
     struct amp_params *params = p->params;
     int             i;
