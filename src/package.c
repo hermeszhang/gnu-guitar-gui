@@ -123,7 +123,7 @@ gnuitar_package_get_effect_count(const gnuitar_package_t *package)
  */
 
 const char *
-gnuitar_package_get_name(const gnuitar_package_t *package, unsigned int index)
+gnuitar_package_get_effect_name(const gnuitar_package_t *package, unsigned int index)
 {
     if (index >= package->effects_count) {
         return NULL;
