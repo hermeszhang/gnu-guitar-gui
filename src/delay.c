@@ -166,6 +166,7 @@ update_delay_repeat(GtkAdjustment *adj, struct delay_params *params)
 static void
 toggle_delay_multichannel(void *bullshit, struct delay_params *params)
 {
+    (void) bullshit;
     params->multichannel = !params->multichannel;
 }
 

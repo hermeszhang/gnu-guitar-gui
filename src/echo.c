@@ -146,6 +146,7 @@ update_echo_size(GtkAdjustment *adj, struct echo_params *params)
 static void
 toggle_echo_multichannel(void *bullshit, struct echo_params *params)
 {
+    (void) bullshit;
     params->multichannel = !params->multichannel;
 }
 

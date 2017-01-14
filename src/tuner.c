@@ -264,6 +264,8 @@ static void update_layout(GtkWidget *widget, gpointer data);
 
 static void
 ignored_event(void *whatever, void *whatever2) {
+    (void) whatever;
+    (void) whatever2;
     return;
 }
 
@@ -353,10 +355,13 @@ update_layout(GtkWidget *widget, gpointer data) {
     struct tuner_params *params = data;
     int i;
     const char *tmp=NULL;
-    
+
+    (void) widget;
+
     tmp = gtk_entry_get_text(GTK_ENTRY(GTK_COMBO(params->layout_combo)->entry));
-    if(tmp == NULL)
-	return;
+    if (tmp == NULL) {
+        return;
+    }
 
     for (i = 0; layout_names[i] != NULL; i += 1) {
 	if (strcmp(tmp, layout_names[i]) == 0) {

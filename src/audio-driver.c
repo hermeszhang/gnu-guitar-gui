@@ -46,7 +46,7 @@ unsigned short  n_input_channels = 1;
 unsigned short  n_output_channels = 2;
 unsigned int    sample_rate = 44100;
 unsigned int    buffer_size = MIN_BUFFER_SIZE * 2;
-my_mutex        effectlist_lock = NULL;
+gnuitar_mutex_t effectlist_lock;
 #ifndef _WIN32
 unsigned int    fragments = 2;
 #else

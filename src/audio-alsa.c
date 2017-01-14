@@ -341,7 +341,9 @@ alsa_audio_thread(void *V)
     SAMPLE32 *rdbuf32;
     SAMPLE16 *wrbuf16;
     SAMPLE32 *wrbuf32;
-    
+
+    (void) V;
+
     /* frame counts are always the same to both read and write */
     while (keepthreadrunning) {
         /* this is technically typepunning but we never mix the pointers;
@@ -598,7 +600,7 @@ alsa_configure_audio(snd_pcm_t *device, unsigned int *fragments, unsigned int *f
 static int
 alsa_midi_init(void)
 {
-    int client_id, port_id;
+    int port_id;
 
     if (snd_seq_open(&sequencer_handle, "default", SND_SEQ_OPEN_INPUT, 0) < 0) {
         sequencer_handle = NULL; /* just to be sure */
@@ -606,7 +608,6 @@ alsa_midi_init(void)
         return 1;
     }
     snd_seq_set_client_name(sequencer_handle, "GNUitar");
-    client_id = snd_seq_client_id(sequencer_handle);
     
     if ((port_id = snd_seq_create_simple_port(sequencer_handle, "input",
                     SND_SEQ_PORT_CAP_WRITE | SND_SEQ_PORT_CAP_SUBS_WRITE,

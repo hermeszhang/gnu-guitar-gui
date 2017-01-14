@@ -445,10 +445,6 @@ noise_load(struct effect *p, LOAD_ARGS)
 static void
 noise_done(struct effect *p)
 {
-    struct noise_params *dp;
-
-    dp = (struct noise_params *) p->params;
-
     free(p->params);
     gtk_widget_destroy(p->control);
     free(p);

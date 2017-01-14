@@ -35,7 +35,7 @@
  *
  * Revision 1.6  2005/08/28 14:04:04  alankila
  * - OSS copypaste error fix
- * - remove my_log2 in favour of doing pow, trunc, log.
+ * - remove gnuitar_log2 in favour of doing pow, trunc, log.
  * - OSS driver rounds buffer sizes to suitable values by itself now. There's
  *   a precedent in tuning user parameters automatically in ALSA code. The
  *   new behaviour rounds buffer size down, though.
@@ -46,13 +46,13 @@
  * - fix effects that contain assumptions about absolute sample values
  *
  * Revision 1.4  2003/05/30 12:49:23  fonin
- * log2() renamed to my_log2() since log2 is a reserved word on MacOS X.
+ * log2() renamed to gnuitar_log2() since log2 is a reserved word on MacOS X.
  *
  * Revision 1.3  2003/04/16 18:40:56  fonin
- * my_itoa() is defined for Windows also.
+ * gnuitar_itoa() is defined for Windows also.
  *
  * Revision 1.2  2003/04/11 18:33:56  fonin
- * my_itoa() moved to utils.h.
+ * gnuitar_itoa() moved to utils.h.
  *
  * Revision 1.1  2003/03/09 21:00:32  fonin
  * Utility constants and functions.
@@ -61,40 +61,46 @@
 #include "utils.h"
 
 #ifndef _WIN32
-inline void my_create_mutex(my_mutex* m) {
-    *m=g_mutex_new();
+
+inline void gnuitar_mutex_init(gnuitar_mutex_t *m) {
+    g_mutex_init(m);
 }
 
-inline void my_lock_mutex(my_mutex m) {
+inline void gnuitar_mutex_done(gnuitar_mutex_t *m) {
+    g_mutex_clear(m);
+}
+
+inline void gnuitar_mutex_lock(gnuitar_mutex_t *m) {
     g_mutex_lock(m);
 }
 
-inline void my_unlock_mutex(my_mutex m) {
+inline void gnuitar_mutex_unlock(gnuitar_mutex_t *m) {
     g_mutex_unlock(m);
 }
 
-inline void my_close_mutex(my_mutex m) {
-    g_mutex_free(m);
+#else /* _WIN32 */
+
+inline void gnuitar_mutex_init(gnuitar_mutex_t *m) {
+    *m = CreateMutex(NULL, FALSE, NULL);
 }
 
-#else
-
-inline void my_create_mutex(my_mutex* m) {
-    *m=CreateMutex(NULL,FALSE,NULL);
-}
-
-inline void my_lock_mutex(my_mutex m) {
-    if(m)
-        WaitForSingleObject(m,INFINITE);
-}
-
-inline void my_unlock_mutex(my_mutex m) {
-    if(m)
-        ReleaseMutex(m);
-}
-
-inline void my_close_mutex(my_mutex m) {
-    if(m)
+inline void gnuitar_mutex_done(gnuitar_mutex_t *m) {
+    if (m) {
         CloseHandle(m);
+    }
 }
-#endif
+
+inline void gnuitar_mutex_lock(gnuitar_mutex_t *m) {
+    if (m) {
+        WaitForSingleObject(m, INFINITE);
+    }
+}
+
+inline void gnuitar_mutex_unlock(gnuitar_mutex_t *m) {
+    if (m) {
+        ReleaseMutex(m);
+    }
+}
+
+#endif /* _WIN32 */
+

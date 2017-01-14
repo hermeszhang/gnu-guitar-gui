@@ -431,8 +431,9 @@ main(int argc, char **argv)
      *
      * We shouldn't need to initialize gtk/gdk mutex because our audio thread 
      * does not participate in the GUI. */
-    g_thread_init(NULL);
+
     gtk_init(&argc, &argv);
+
     load_settings();
 
     /* choose audio driver if not given in config */

@@ -42,7 +42,7 @@
 
 static effect_t       *effects[MAX_EFFECTS];
 static int             effects_n = 0;
-static my_mutex        effectlist_lock;
+static gnuitar_mutex_t effectlist_lock;
 
 struct effect_creator {
     const char           *str;
@@ -105,7 +105,7 @@ effect_list_find_by_name(const char *name)
 void
 effect_start(void)
 {
-    my_create_mutex(&effectlist_lock);
+    gnuitar_mutex_init(&effectlist_lock);
     effects_n = 0;
     memset(effects, 0, sizeof(effects));
 }
@@ -114,7 +114,7 @@ void
 effect_stop(void)
 {
     effect_clear();
-    my_close_mutex(effectlist_lock);
+    gnuitar_mutex_done(&effectlist_lock);
 }
 
 /* almost lockless effect destroy */
@@ -123,10 +123,10 @@ effect_clear(void)
 {
     int old_n, i;
 
-    my_lock_mutex(effectlist_lock);
+    gnuitar_mutex_lock(&effectlist_lock);
     old_n = effects_n;
     effects_n = 0;
-    my_unlock_mutex(effectlist_lock);
+    gnuitar_mutex_unlock(&effectlist_lock);
 
     for (i = 0; i < old_n; i++)
 	effects[i]->proc_done(effects[i]);
@@ -138,12 +138,12 @@ effect_find(const effect_t *target)
 {
     int i;
 
-    my_lock_mutex(effectlist_lock);
+    gnuitar_mutex_lock(&effectlist_lock);
     for (i = 0; i < effects_n; i++) {
         if (effects[i] == target)
             break;
     }
-    my_unlock_mutex(effectlist_lock);
+    gnuitar_mutex_unlock(&effectlist_lock);
     /* no such effect? */
     if (i == effects_n)
         return -1;
@@ -155,7 +155,7 @@ effect_t *
 effect_delete(int i)
 {
     effect_t *effect = NULL;
-    my_lock_mutex(effectlist_lock);
+    gnuitar_mutex_lock(&effectlist_lock);
     if (i < effects_n) {
         effects_n -= 1;
         effect = effects[i];
@@ -163,7 +163,7 @@ effect_delete(int i)
             effects[i] = effects[i+1];
         effects[effects_n] = NULL;
     }
-    my_unlock_mutex(effectlist_lock);
+    gnuitar_mutex_unlock(&effectlist_lock);
     return effect;
 }
 
@@ -180,7 +180,7 @@ effect_move(const int start, const int end)
     if (start < 0 || start >= effects_n || end < 0 || end >= effects_n || start == end)
         return 0;
 
-    my_lock_mutex(effectlist_lock);
+    gnuitar_mutex_lock(&effectlist_lock);
     if (start < end) {
         swap = effects[start];
         for (i = start; i < end; i += 1)
@@ -192,7 +192,7 @@ effect_move(const int start, const int end)
             effects[i] = effects[i-1];
         effects[end] = swap;
     }
-    my_unlock_mutex(effectlist_lock);
+    gnuitar_mutex_unlock(&effectlist_lock);
     return 1;
 }
 
@@ -202,7 +202,7 @@ effect_insert(effect_t *effect, const int curr_row)
 {
     int i, idx;
 
-    my_lock_mutex(effectlist_lock);
+    gnuitar_mutex_lock(&effectlist_lock);
     if (curr_row >= 0 && curr_row < effects_n) {
 	idx = curr_row + 1;
 	for (i = effects_n; i > idx; i--) {
@@ -214,7 +214,7 @@ effect_insert(effect_t *effect, const int curr_row)
 	effects_n += 1;
     }
     effects[idx] = effect;
-    my_unlock_mutex(effectlist_lock);
+    gnuitar_mutex_unlock(&effectlist_lock);
 
     return idx;
 }
@@ -224,11 +224,11 @@ void
 effect_iterate(void (*func)(effect_t *effect, int idx, void *data), void *data)
 {
     int i;
-    my_lock_mutex(effectlist_lock);
+    gnuitar_mutex_lock(&effectlist_lock);
     for (i = 0; i < effects_n; i += 1) {
         func(effects[i], i, data);
     }
-    my_unlock_mutex(effectlist_lock);
+    gnuitar_mutex_unlock(&effectlist_lock);
 }
 
 /* construct and destroy effects */

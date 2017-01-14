@@ -239,7 +239,7 @@ oss_midi_event(void)
      * other buttons are pressed. */
     while (current < maxevents) {
         /* if overflow, seek until beginning of new midi event */
-        if (! midi_events[current] & 0x80) {
+        if (!(midi_events[current] & 0x80)) {
             current += 1;
             continue;
         }
@@ -287,6 +287,8 @@ oss_audio_thread(void *V)
     };
     fd_set read_fds;
     struct timeval read_timeout;
+
+    (void) V;
 
     while (keepthreadrunning) {
 	/* keep on reading and discard if select says we can read.

@@ -220,6 +220,7 @@ update_phasor_drywet(GtkAdjustment *adj, struct phasor_params *params)
 static void
 toggle_stereo(GtkWidget *w, struct phasor_params *params)
 {
+    (void) w;
     params->stereo = !params->stereo;
 }
 

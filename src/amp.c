@@ -130,10 +130,6 @@ amp_filter(effect_t *p, data_block_t *db)
 static void
 amp_done(struct effect *p)
 {
-    struct amp_params *dp;
-
-    dp = (struct amp_params *) p->params;
-
     free(p->params);
     gtk_widget_destroy(p->control);
     free(p);

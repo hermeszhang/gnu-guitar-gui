@@ -40,8 +40,12 @@ extern "C" {
  */
 
 typedef struct gnuitar_gui {
+    GtkAccelGroup *accel_group;
     /** The top level window */
     GtkWidget *mainWnd;
+    GtkWidget *menuBar;
+    GtkWidget *tbl;
+    GtkItemFactory *item_factory;
 } gnuitar_gui_t;
 
 int gnuitar_gui_init(gnuitar_gui_t * gui);

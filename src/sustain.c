@@ -327,10 +327,6 @@ sustain_load(struct effect *p, LOAD_ARGS)
 static void
 sustain_done(struct effect *p)
 {
-    struct sustain_params *dp;
-
-    dp = (struct sustain_params *) p->params;
-
     free(p->params);
     gtk_widget_destroy(p->control);
     free(p);

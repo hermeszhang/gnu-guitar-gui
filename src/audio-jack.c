@@ -198,7 +198,9 @@ process (jack_nframes_t nframes, void *arg)
         .data = procbuf,
         .data_swap = procbuf2,
     };
-    
+
+    (void) arg;
+
     if (! audio_driver->enabled)
         return 0;
     
@@ -269,12 +271,14 @@ jack_finish_sound(void)
 static void
 jack_shutdown (void *arg)
 {
+    (void) arg;
     jack_finish_sound();
 }
 
 static int
-update_sample_rate(jack_nframes_t nframes, void *args)
+update_sample_rate(jack_nframes_t nframes, void * arg)
 {
+    (void) arg;
     sample_rate = nframes;
     return 0;
 }
@@ -284,7 +288,7 @@ update_sample_rate(jack_nframes_t nframes, void *args)
 static int
 alsa_midi_init(void)
 {
-    int client_id, port_id;
+    int port_id;
 
     if (snd_seq_open(&sequencer_handle, "default", SND_SEQ_OPEN_INPUT, 0) < 0) {
         sequencer_handle = NULL; /* just to be sure */
@@ -292,7 +296,6 @@ alsa_midi_init(void)
         return 1;
     }
     snd_seq_set_client_name(sequencer_handle, "GNUitar");
-    client_id = snd_seq_client_id(sequencer_handle);
     
     if ((port_id = snd_seq_create_simple_port(sequencer_handle, "input",
                     SND_SEQ_PORT_CAP_WRITE | SND_SEQ_PORT_CAP_SUBS_WRITE,

@@ -209,6 +209,7 @@ update_chorus_regen(GtkAdjustment *adj, struct chorus_params *params)
 static void
 toggle_chorus_multichannel(void *bullshit, struct chorus_params *params)
 {
+    (void) bullshit;
     params->multichannel = !params->multichannel;
 }
 

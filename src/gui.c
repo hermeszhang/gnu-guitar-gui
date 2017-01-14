@@ -541,12 +541,51 @@
 #include "tracker.h"
 #include "utils.h"
 
+static void add_pressed(GtkWidget *, gpointer);
+static void bank_start_save(GtkWidget *, gpointer);
+static void bank_start_load(GtkWidget *, gpointer);
+static void quit(GtkWidget *, gpointer);
+static void about_dlg(void);
+static void help_contents(void);
+
+/** Initializes the menu for the gui.
+ * @param gui A gui structure.
+ * @returns Zero on success, a negative number on failure.
+ * @ingroup gnuitar-gui
+ */
+
+static int gnuitar_gui_init_menu(gnuitar_gui_t *gui);
+
+/** A callback function for options window.
+ * This function is called when the Options item is clicked.
+ * @param widget The options menu item widget
+ * @param data Always NULL, but available to pass data to callback
+ */
+
+static void gnuitar_gui_options_entry(GtkWidget *widget, gpointer data);
+
 /* this is the global gui structure.
  * it will be global until everthing here
  * can be contained in the structure.
  */
 
-gnuitar_gui_t gui;
+gnuitar_gui_t global_gui;
+
+/** This contains pointers to the entry points for all the menu items.
+ */
+
+static GtkItemFactoryEntry mainGui_menu[] = {
+    {"/_File", "<alt>F", NULL, 0, "<Branch>", NULL},
+    {"/File/_Open Layout", "<control>O", (GtkSignalFunc) bank_start_load, 0, NULL, NULL},
+    {"/File/_Save Layout", "<control>S", (GtkSignalFunc) bank_start_save, 0, NULL, NULL},
+    {"/File/sep1", NULL, NULL, 0, "<Separator>", NULL},
+    {"/File/E_xit", "<control>Q", (GtkSignalFunc) quit, 0, NULL, NULL},
+    {"/_Options", "<alt>O", NULL, 0, "<Branch>", NULL},
+    {"/Options/O_ptions", "<control>P", (GtkSignalFunc) gnuitar_gui_options_entry, 0, NULL, NULL},
+    {"/_Help", NULL, NULL, 0, "<LastBranch>", NULL},
+    {"/_Help/Contents", NULL, (GtkSignalFunc) help_contents, 0, NULL, NULL},
+    {"/_Help/About", NULL, (GtkSignalFunc) about_dlg, 0, NULL, NULL}
+};
 
 /** Initializes the GUI.
  * @param gui An uninitialized GUI structure.
@@ -556,12 +595,22 @@ gnuitar_gui_t gui;
  */
 
 int
-gnuitar_gui_init(gnuitar_gui_t * gui)
+gnuitar_gui_init(gnuitar_gui_t *gui)
 {
+    memset(gui, 0, sizeof(*gui));
+
     gui->mainWnd = gtk_window_new(GTK_WINDOW_TOPLEVEL);
     if (gui->mainWnd == NULL) {
         return -1;
     }
+
+    gtk_signal_connect(GTK_OBJECT(gui->mainWnd), "destroy", GTK_SIGNAL_FUNC(quit), NULL);
+
+    if (gnuitar_gui_init_menu(gui) < 0) {
+        gnuitar_gui_done(gui);
+        return -2;
+    }
+
     return 0;
 }
 
@@ -571,7 +620,7 @@ gnuitar_gui_init(gnuitar_gui_t * gui)
  */
 
 void
-gnuitar_gui_done(gnuitar_gui_t * gui)
+gnuitar_gui_done(gnuitar_gui_t *gui)
 {
     if (gui->mainWnd != NULL) {
         gtk_widget_destroy(gui->mainWnd);
@@ -590,7 +639,7 @@ gnuitar_gui_done(gnuitar_gui_t * gui)
  */
 
 int
-gnuitar_gui_set_size(gnuitar_gui_t * gui, unsigned int width, unsigned int height)
+gnuitar_gui_set_size(gnuitar_gui_t *gui, unsigned int width, unsigned int height)
 {
     if ((width >= INT_MAX)
      || (height >= INT_MAX)){
@@ -600,43 +649,61 @@ gnuitar_gui_set_size(gnuitar_gui_t * gui, unsigned int width, unsigned int heigh
     return 0;
 }
 
+static int
+gnuitar_gui_init_menu(gnuitar_gui_t *gui)
+{
+    gint nmenu_items = sizeof(mainGui_menu) / sizeof(mainGui_menu[0]);
+
+    gui->tbl = gtk_table_new(7, 6, FALSE);
+    if (gui->tbl == NULL) {
+        return -1;
+    }
+
+    /*
+     * make menu
+     */
+    gui->accel_group = gtk_accel_group_new();
+    if (gui->accel_group == NULL) {
+        return -2;
+    }
+
+    gui->item_factory = gtk_item_factory_new(GTK_TYPE_MENU_BAR, "<main>", gui->accel_group);
+    if (gui->item_factory == NULL) {
+        return -3;
+    }
+
+    gtk_item_factory_create_items(gui->item_factory, nmenu_items, mainGui_menu, NULL);
+
+    gtk_window_add_accel_group(GTK_WINDOW(gui->mainWnd), gui->accel_group);
+
+    gui->menuBar = gtk_item_factory_get_widget(gui->item_factory, "<main>");
+    if (gui->menuBar == NULL) {
+        return -4;
+    }
+
+    gtk_table_attach(GTK_TABLE(gui->tbl), gui->menuBar, 0, 6, 0, 1, __GTKATTACHOPTIONS(GTK_FILL | GTK_EXPAND | GTK_SHRINK), __GTKATTACHOPTIONS(0), 0, 0);
+
+    /* disable options menu */
+    if (audio_driver) {
+        gtk_widget_set_sensitive(GTK_WIDGET(gtk_item_factory_get_widget(gui->item_factory, "/Options/Options")), FALSE);
+    }
+
+    return 0;
+}
+
 #define VU_UPDATE_INTERVAL   100.0    /* ms */
 #define BANK_UPDATE_INTERVAL 20.0     /* ms */
-
-static void     add_pressed(GtkWidget *, gpointer);
-static void     bank_start_save(GtkWidget *, gpointer);
-static void     bank_start_load(GtkWidget *, gpointer);
-static void     sample_dlg(GtkWidget *, gpointer);
-static void     update_sampling_params(GtkWidget *, gpointer);
-static void     update_sampling_params_and_close_dialog(GtkWidget *, gpointer);
-static void     quit(GtkWidget *, gpointer);
-static void     about_dlg(void);
-static void     help_contents(void);
 
 static GtkWidget      *tracker;
 static GtkWidget      *bank;
 static GtkTooltips    *tooltips;
-static GtkItemFactory *item_factory;
 static GtkWidget      *status_text = NULL;
 static GtkWidget      *status_window = NULL;
 static gchar *effects_dir = NULL;
 
-static GtkItemFactoryEntry mainGui_menu[] = {
-    {"/_File", "<alt>F", NULL, 0, "<Branch>", NULL},
+static void update_sampling_params(GtkWidget *, gpointer);
+static void update_sampling_params_and_close_dialog(GtkWidget *, gpointer);
 
-    {"/File/_Open Layout", "<control>O",
-     (GtkSignalFunc) bank_start_load, 0, NULL, NULL},
-    {"/File/_Save Layout", "<control>S", (GtkSignalFunc) bank_start_save,
-     0, NULL, NULL},
-    {"/File/sep1", NULL, NULL, 0, "<Separator>", NULL},
-    {"/File/E_xit", "<control>Q", (GtkSignalFunc) quit, 0, NULL, NULL},
-    {"/_Options", "<alt>O", NULL, 0, "<Branch>", NULL},
-    {"/Options/O_ptions", "<control>P",
-     (GtkSignalFunc) sample_dlg, 0, NULL, NULL},
-    {"/_Help", NULL, NULL, 0, "<LastBranch>", NULL},
-    {"/_Help/Contents", NULL, (GtkSignalFunc) help_contents, 0, NULL, NULL},
-    {"/_Help/About", NULL, (GtkSignalFunc) about_dlg, 0, NULL, NULL}
-};
 /* some public GUI widgets */
 GtkWidget      *processor;
 /* master volume and its current value */
@@ -707,6 +774,9 @@ quit(GtkWidget * widget, gpointer data)
 {
     gchar *presetpath;
     gchar *filename;
+
+    (void) widget;
+    (void) data;
 
     /* on quit, save settings... */
     presetpath = discover_preset_path();
@@ -884,6 +954,7 @@ help_contents(void)
 void
 toggle_effect(GtkWidget *widget, effect_t *p)
 {
+    (void) widget;
     p->toggle = !p->toggle;
 }
 
@@ -892,6 +963,9 @@ delete_event(GtkWidget * widget, GdkEvent * event, gpointer data)
 {
     effect_t       *effect = data;
     int             i;
+
+    (void) widget;
+    (void) event;
 
     i = effect_find(effect);
     if (i == -1) {
@@ -908,6 +982,10 @@ static void
 selectrow_processor(GtkWidget *widget, gint row, gint col,
 		    GdkEventButton *event, gpointer data)
 {
+    (void) widget;
+    (void) col;
+    (void) event;
+    (void) data;
     curr_row = row;
 }
 
@@ -916,6 +994,10 @@ selectrow_bank(GtkWidget *widget, gint row, gint col,
 		    GdkEventButton *event, gpointer data)
 {
     gchar *fname;
+
+    (void) widget;
+    (void) data;
+    (void) col;
 
     bank_row = row;
     if (event && event->type == GDK_2BUTTON_PRESS) {
@@ -932,6 +1014,8 @@ selectrow_effects(GtkWidget *widget, gint row, gint col,
 		  GdkEventButton *event, gpointer data)
 {
     effects_row = row;
+    (void) widget;
+    (void) col;
     /* doubleclick */
     if (event && event->type == GDK_2BUTTON_PRESS) {
         add_pressed(NULL, data);
@@ -941,6 +1025,8 @@ selectrow_effects(GtkWidget *widget, gint row, gint col,
 static void
 rowmove_processor(GtkWidget *widget, gint start, gint end, gpointer data)
 {
+    (void) widget;
+    (void) data;
     effect_move(start, end);
 }
 
@@ -949,8 +1035,11 @@ up_pressed(GtkWidget *widget, gpointer data)
 {
     gchar          *name_above, *name_selected;
 
+    (void) widget;
+    (void) data;
+
     if (effect_move(curr_row, curr_row - 1)) {
-	gtk_clist_freeze(GTK_CLIST(processor));
+        gtk_clist_freeze(GTK_CLIST(processor));
         gtk_clist_get_text(GTK_CLIST(processor), curr_row-1, 0, &name_above);
         gtk_clist_get_text(GTK_CLIST(processor), curr_row, 0, &name_selected);
         name_above    = strdup(name_above);
@@ -961,7 +1050,7 @@ up_pressed(GtkWidget *widget, gpointer data)
         free(name_selected);
 
         gtk_clist_select_row(GTK_CLIST(processor), curr_row-1, 0);
-	gtk_clist_thaw(GTK_CLIST(processor));
+        gtk_clist_thaw(GTK_CLIST(processor));
     }
 }
 
@@ -969,6 +1058,9 @@ static void
 down_pressed(GtkWidget *widget, gpointer data)
 {
     gchar          *name_below, *name_selected;
+
+    (void) widget;
+    (void) data;
 
     if (effect_move(curr_row, curr_row + 1)) {
 	gtk_clist_freeze(GTK_CLIST(processor));
@@ -990,6 +1082,8 @@ static void
 del_pressed(GtkWidget *widget, gpointer data)
 {
     effect_t *effect = effect_delete(curr_row);
+    (void) widget;
+    (void) data;
     if (effect)
         effect_destroy(effect);
     gtk_clist_remove(GTK_CLIST(processor), curr_row);
@@ -1002,6 +1096,8 @@ add_pressed(GtkWidget *widget, gpointer data)
     int             idx;
     gchar          *name;
     GtkWidget      *known_effects = data;
+
+    (void) widget;
 
     effect_t *effect = effect_create(effects_row);
     idx = effect_insert(effect, curr_row);
@@ -1061,6 +1157,7 @@ bank_perform_add(GtkWidget *widget, GtkFileSelection *filesel)
     char	    *name;
     /* this cast is to shut up const qualifier ignore due to
      * differences between gcc, mingw and msvc++. */ 
+    (void) widget;
     name = (char *) gtk_file_selection_get_filename(GTK_FILE_SELECTION(filesel));
     bank_append_entry(name);
     gtk_widget_destroy(GTK_WIDGET(filesel));
@@ -1069,6 +1166,7 @@ bank_perform_add(GtkWidget *widget, GtkFileSelection *filesel)
 static void
 destroy_widget(GtkWidget *widget, GtkWidget *gallowman)
 {
+    (void) widget;
     gtk_widget_destroy(gallowman);
 }
 
@@ -1076,6 +1174,9 @@ static void
 bank_add_pressed(GtkWidget * widget, gpointer data)
 {
     GtkWidget      *filesel;
+
+    (void) widget;
+    (void) data;
 
     filesel = gtk_file_selection_new("Select preset to add");
     if (effects_dir)
@@ -1097,11 +1198,14 @@ bank_del_pressed(GtkWidget * widget, gpointer data)
     int bank_len;
     bank_len=GTK_CLIST(bank)->rows;
 
+    (void) widget;
+    (void) data;
+
     if (bank_row >= 0 && bank_row < bank_len) {
-	gtk_clist_remove(GTK_CLIST(bank), bank_row);
-	if (bank_row == bank_len - 1)
-	    bank_row--;
-	gtk_clist_select_row(GTK_CLIST(bank), bank_row, 0);
+        gtk_clist_remove(GTK_CLIST(bank), bank_row);
+        if (bank_row == bank_len - 1)
+            bank_row--;
+        gtk_clist_select_row(GTK_CLIST(bank), bank_row, 0);
     }
 }
 
@@ -1110,6 +1214,9 @@ bank_switch_pressed(GtkWidget *widget, gpointer data)
 {
     char           *fname;
     int             rows;
+
+    (void) widget;
+    (void) data;
 
     rows = GTK_CLIST(bank)->rows;
     if (! rows)
@@ -1127,6 +1234,7 @@ static void
 bank_perform_save(GtkWidget * widget, GtkFileSelection * filesel)
 {
     const gchar *path = gtk_file_selection_get_filename(GTK_FILE_SELECTION(filesel));
+    (void) widget;
     save_pump(path);
     if (effects_dir)
         g_free(effects_dir);
@@ -1138,6 +1246,9 @@ static void
 bank_start_save(GtkWidget * widget, gpointer data)
 {
     GtkWidget      *filesel;
+
+    (void) widget;
+    (void) data;
 
     filesel = gtk_file_selection_new("Save current effect settings");
     if (effects_dir)
@@ -1157,6 +1268,7 @@ static void
 bank_perform_load(GtkWidget * widget, GtkFileSelection * filesel)
 {
     const gchar *path = gtk_file_selection_get_filename(GTK_FILE_SELECTION(filesel));
+    (void) widget;
     load_pump(path);
     if (effects_dir)
         g_free(effects_dir);
@@ -1168,6 +1280,9 @@ static void
 bank_start_load(GtkWidget * widget, gpointer data)
 {
     GtkWidget      *filesel;
+
+    (void) widget;
+    (void) data;
 
     filesel = gtk_file_selection_new("Load effect settings");
     if (effects_dir)
@@ -1187,10 +1302,11 @@ static void
 start_tracker(GtkWidget * widget, GtkFileSelection * filesel)
 {
     const char		*name;
+    (void) widget;
     name = gtk_file_selection_get_filename(GTK_FILE_SELECTION(filesel));
     if (name != NULL) {
-	tracker_out(name);
-	write_track = 1;
+        tracker_out(name);
+        write_track = 1;
     }
     gtk_widget_destroy(GTK_WIDGET(filesel));
 }
@@ -1198,6 +1314,7 @@ start_tracker(GtkWidget * widget, GtkFileSelection * filesel)
 static void
 cancel_tracker(GtkWidget * widget, GtkFileSelection * filesel)
 {
+    (void) widget;
     gtk_widget_destroy(GTK_WIDGET(filesel));
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(tracker), 0);
 }
@@ -1208,6 +1325,8 @@ tracker_pressed(GtkWidget * widget, gpointer data)
     GtkWidget      *filesel;
     time_t          t;
     char            defaultname[80];
+
+    (void) data;
 
     if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(widget))) {
         time(&t);
@@ -1299,6 +1418,8 @@ timeout_update_bank(gpointer whatever) {
     int program;
     char *fname;
 
+    (void) whatever;
+
     program = midi_get_program();
     if (program < 0)
         return TRUE;
@@ -1314,11 +1435,13 @@ timeout_update_bank(gpointer whatever) {
 
 static void
 update_master_volume(GtkAdjustment *adj, void *nothing) {
+    (void) nothing;
     master_volume = adj->value;
 }
 
 static void
 update_input_volume(GtkAdjustment *adj, void *nothing) {
+    (void) nothing;
     input_volume = adj->value;
 }
 
@@ -1368,6 +1491,8 @@ update_driver(GtkWidget *widget, gpointer data)
     const char *tmp;
     sample_params_t *sparams = (sample_params_t *) data;
 
+    (void) widget;
+
     tmp = gtk_entry_get_text(GTK_ENTRY(GTK_COMBO(sparams->driver)->entry));
     if (tmp == NULL)
 	return;
@@ -1390,7 +1515,7 @@ update_threshold(GtkWidget * widget, gpointer threshold)
  * Sampling parameters dialog
  */
 static void
-sample_dlg(GtkWidget *widget, gpointer data)
+gnuitar_gui_options_entry(GtkWidget *widget, gpointer data)
 {
     static sample_params_t sparams;
     GtkWidget      *sp_table;
@@ -1416,8 +1541,9 @@ sample_dlg(GtkWidget *widget, gpointer data)
 #endif
     GList          *drivers_list = NULL;
     GtkObject      *latency_adj;
-    GtkSpinButton  *dummy1;
-    GtkEntry       *dummy2;
+
+    (void) widget;
+    (void) data;
 
     sparams.dialog = gtk_window_new(GTK_WINDOW_DIALOG);
     gtk_window_set_title(GTK_WINDOW(sparams.dialog),
@@ -1506,8 +1632,6 @@ sample_dlg(GtkWidget *widget, gpointer data)
 			   MIN_BUFFER_SIZE, MIN_BUFFER_SIZE, 0);
     sparams.latency =
 	gtk_spin_button_new(GTK_ADJUSTMENT(latency_adj), 1, 0);
-    dummy1 = GTK_SPIN_BUTTON(sparams.latency);
-    dummy2 = &(dummy1->entry);
     gtk_table_attach(GTK_TABLE(sp_table), sparams.latency, 3, 4, 1, 2,
                      TBLOPT, TBLOPT, 3, 3);
 
@@ -1625,14 +1749,15 @@ update_sampling_params(GtkWidget * dialog, gpointer data)
     sample_params_t *sparams = data;
 #ifdef HAVE_ALSA
     const char *tmp=NULL;
-
     tmp = gtk_entry_get_text(GTK_ENTRY(GTK_COMBO(sparams->alsadevice)->entry));
     if (tmp == NULL || strlen(tmp) == 0) {
-	strcpy(alsadevice_str, "default");
+        strcpy(alsadevice_str, "default");
     } else {
-	strncpy(alsadevice_str, tmp, sizeof(alsadevice_str)-1);
+        strncpy(alsadevice_str, tmp, sizeof(alsadevice_str)-1);
     }
 #endif    
+    (void) dialog;
+    (void) data;
     buffer_size = gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(sparams->latency));
     /* for certain audio drivers, make the fragment size to be a multiple
      * of the MIN_BUFFER_SIZE */
@@ -1672,12 +1797,15 @@ start_stop(GtkWidget *widget, gpointer data)
 {
     int error;
 
+    (void) data;
+    (void) widget;
+
     /* without audio driver, we can't allow user to proceed */
     if (! audio_driver) {
         gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(widget), 0);
 	gtk_widget_set_sensitive(GTK_WIDGET
 				 (gtk_item_factory_get_widget
-				  (item_factory, "/Options/Options")), TRUE);
+				  (global_gui.item_factory, "/Options/Options")), TRUE);
 	gtk_label_set_text(GTK_LABEL(GTK_BIN(widget)->child),
                            "ERROR\nNo audio driver");
         return;
@@ -1690,7 +1818,7 @@ start_stop(GtkWidget *widget, gpointer data)
             /* GTK+ will call us again in response of set_active event */
 	    gtk_widget_set_sensitive(GTK_WIDGET
 				 (gtk_item_factory_get_widget
-				  (item_factory, "/Options/Options")),
+				  (global_gui.item_factory, "/Options/Options")),
 				 !audio_driver->enabled);
             gtk_label_set_text(GTK_LABEL(GTK_BIN(widget)->child),
                     audio_driver->enabled ? "Stop" : "ERROR\nSee debug log");
@@ -1704,7 +1832,7 @@ start_stop(GtkWidget *widget, gpointer data)
 
 	gtk_widget_set_sensitive(GTK_WIDGET
 				 (gtk_item_factory_get_widget
-				  (item_factory, "/Options/Options")),
+				  (global_gui.item_factory, "/Options/Options")),
 				 !audio_driver->enabled);
 	gtk_label_set_text(GTK_LABEL(GTK_BIN(widget)->child),
                     audio_driver->enabled ? "Stop" : "ERROR\nSee debug log");
@@ -1714,7 +1842,7 @@ start_stop(GtkWidget *widget, gpointer data)
 	audio_driver->finish();
 	gtk_widget_set_sensitive(GTK_WIDGET
 				 (gtk_item_factory_get_widget
-				  (item_factory, "/Options/Options")),
+				  (global_gui.item_factory, "/Options/Options")),
 				 TRUE);
 	gtk_label_set_text(GTK_LABEL(GTK_BIN(widget)->child), "Start");
     }
@@ -1723,16 +1851,12 @@ start_stop(GtkWidget *widget, gpointer data)
 void
 init_gui(void)
 {
-    gnuitar_gui_t gui;
     gchar          *tmp;
-    GtkAccelGroup  *accel_group;
     GtkWidget      *vumeter_in;
     GtkWidget      *vumeter_out;
     GtkWidget      *processor_scroll;
     GtkWidget	   *master;
     GtkWidget      *input;
-    GtkWidget      *tbl;
-    GtkWidget      *menuBar;
     GtkWidget      *known_effects;
     GtkWidget      *effect_scroll;
     GtkWidget      *bank_scroll;
@@ -1747,8 +1871,6 @@ init_gui(void)
     GtkWidget      *volume_label;
     GtkWidget      *input_label;
 
-    gint            nmenu_items =
-	sizeof(mainGui_menu) / sizeof(mainGui_menu[0]);
     char     *processor_titles[] = { "Current effects", NULL };
     char     *effects_titles[] = { "Known effects", NULL };
     char     *bank_titles[] = { "Preset list", NULL };
@@ -1767,50 +1889,20 @@ init_gui(void)
 #endif
     GtkStyle       *style;
 
-    if (gnuitar_gui_init(&gui) < 0) {
+    if (gnuitar_gui_init(&global_gui) < 0) {
         gnuitar_printf("Failed to initialize graphical interface");
         return;
     }
 
-    if (gnuitar_gui_set_size(&gui, 700, 450) < 0) {
+    if (gnuitar_gui_set_size(&global_gui, 700, 450) < 0) {
         gnuitar_printf("Failed to set window size");
-        gnuitar_gui_done(&gui);
+        gnuitar_gui_done(&global_gui);
         return;
     }
 
     tmp = discover_preset_path();
     effects_dir = g_strdup_printf("%s" FILESEP "presetname.gnuitar", tmp);
     g_free(tmp);
-
-    tbl = gtk_table_new(7, 6, FALSE);
-    gtk_signal_connect(GTK_OBJECT(gui.mainWnd), "destroy",
-		       GTK_SIGNAL_FUNC(quit), NULL);
-
-
-    /*
-     * make menu
-     */
-    accel_group = gtk_accel_group_new();
-
-    item_factory = gtk_item_factory_new(GTK_TYPE_MENU_BAR, "<main>",
-					accel_group);
-    gtk_item_factory_create_items(item_factory, nmenu_items, mainGui_menu, NULL);
-    gtk_window_add_accel_group(GTK_WINDOW(gui.mainWnd), accel_group);
-    menuBar = gtk_item_factory_get_widget(item_factory, "<main>");
-
-    gtk_table_attach(GTK_TABLE(tbl), menuBar, 0, 6, 0, 1,
-		     __GTKATTACHOPTIONS(GTK_FILL | GTK_EXPAND |
-					GTK_SHRINK),
-		     __GTKATTACHOPTIONS(0), 0, 0);
-    /*
-     * disable options menu
-     */
-    if (audio_driver)
-        gtk_widget_set_sensitive(GTK_WIDGET
-                                 (gtk_item_factory_get_widget
-                                  (item_factory, "/Options/Options")), FALSE);
-
-
 
     tooltips=gtk_tooltips_new();
 
@@ -1853,21 +1945,21 @@ init_gui(void)
 	"Use \"Add preset\" button to add more presets to the list." \
 	"Use \"Cycle presets\" to go through the list of available presets.", NULL);
 
-    gtk_table_attach(GTK_TABLE(tbl), processor_scroll, 3, 4, 1, 5,
+    gtk_table_attach(GTK_TABLE(global_gui.tbl), processor_scroll, 3, 4, 1, 5,
 		     __GTKATTACHOPTIONS(GTK_FILL | GTK_EXPAND),
 		     __GTKATTACHOPTIONS(GTK_FILL | GTK_EXPAND), 0, 0);
 
-    gtk_table_attach(GTK_TABLE(tbl), effect_scroll, 5, 6, 1, 5,
+    gtk_table_attach(GTK_TABLE(global_gui.tbl), effect_scroll, 5, 6, 1, 5,
 		     __GTKATTACHOPTIONS(GTK_FILL | GTK_EXPAND),
 		     __GTKATTACHOPTIONS(GTK_FILL | GTK_EXPAND), 0, 0);
 
-    gtk_table_attach(GTK_TABLE(tbl), bank_scroll, 1, 2, 1, 5,
+    gtk_table_attach(GTK_TABLE(global_gui.tbl), bank_scroll, 1, 2, 1, 5,
 		     __GTKATTACHOPTIONS(GTK_FILL | GTK_EXPAND),
 		     __GTKATTACHOPTIONS(GTK_FILL | GTK_EXPAND), 0, 0);
 
 
-    gtk_container_add(GTK_CONTAINER(gui.mainWnd), tbl);
-    gtk_window_set_title(GTK_WINDOW(gui.mainWnd), "GNUitar");
+    gtk_container_add(GTK_CONTAINER(global_gui.mainWnd), global_gui.tbl);
+    gtk_window_set_title(GTK_WINDOW(global_gui.mainWnd), "GNUitar");
 
     bank_add = gtk_button_new_with_label("Add preset...");
     gtk_tooltips_set_tip(tooltips,bank_add,"Load a file into the presets list.", NULL);
@@ -1953,43 +2045,43 @@ init_gui(void)
     
     gtk_widget_set_sensitive(GTK_WIDGET(
                                 gtk_item_factory_get_widget(
-                                    item_factory, "/Options/Options")),
+                                    global_gui.item_factory, "/Options/Options")),
 			     !audio_driver || !audio_driver->enabled);
     gtk_label_set_text(GTK_LABEL(GTK_BIN(start)->child),
                     audio_driver && audio_driver->enabled ? "Stop" : "ERROR\nPush to retry");
     
-    gtk_table_attach(GTK_TABLE(tbl), status_window, 0 ,7, 7, 9,
+    gtk_table_attach(GTK_TABLE(global_gui.tbl), status_window, 0 ,7, 7, 9,
     		     __GTKATTACHOPTIONS(GTK_SHRINK | GTK_FILL),
 		     __GTKATTACHOPTIONS(GTK_SHRINK | GTK_FILL), 5, 5);
 
-    gtk_table_attach(GTK_TABLE(tbl), bank_add, 0, 1, 1, 2,
+    gtk_table_attach(GTK_TABLE(global_gui.tbl), bank_add, 0, 1, 1, 2,
 		     __GTKATTACHOPTIONS(0), __GTKATTACHOPTIONS(0), 5, 5);
-    gtk_table_attach(GTK_TABLE(tbl), bank_del, 0, 1, 2, 3,
+    gtk_table_attach(GTK_TABLE(global_gui.tbl), bank_del, 0, 1, 2, 3,
 		     __GTKATTACHOPTIONS(0), __GTKATTACHOPTIONS(0), 5, 5);
-    gtk_table_attach(GTK_TABLE(tbl), bank_switch, 0, 1, 4, 5,
+    gtk_table_attach(GTK_TABLE(global_gui.tbl), bank_switch, 0, 1, 4, 5,
 		     __GTKATTACHOPTIONS(GTK_SHRINK | GTK_FILL),
 		     __GTKATTACHOPTIONS(GTK_SHRINK | GTK_FILL), 5, 5);
-    gtk_table_attach(GTK_TABLE(tbl), start, 0, 1, 3, 4,
+    gtk_table_attach(GTK_TABLE(global_gui.tbl), start, 0, 1, 3, 4,
 		     __GTKATTACHOPTIONS(GTK_SHRINK | GTK_FILL),
 		     __GTKATTACHOPTIONS(GTK_SHRINK | GTK_FILL), 5, 5);
 
-    gtk_table_attach(GTK_TABLE(tbl), up, 2, 3, 1, 2, __GTKATTACHOPTIONS(0),
+    gtk_table_attach(GTK_TABLE(global_gui.tbl), up, 2, 3, 1, 2, __GTKATTACHOPTIONS(0),
 		     __GTKATTACHOPTIONS(0), 5, 5);
-    gtk_table_attach(GTK_TABLE(tbl), down, 2, 3, 2, 3,
+    gtk_table_attach(GTK_TABLE(global_gui.tbl), down, 2, 3, 2, 3,
 		     __GTKATTACHOPTIONS(0), __GTKATTACHOPTIONS(0), 5, 5);
-    gtk_table_attach(GTK_TABLE(tbl), del, 2, 3, 3, 4,
+    gtk_table_attach(GTK_TABLE(global_gui.tbl), del, 2, 3, 3, 4,
 		     __GTKATTACHOPTIONS(0), __GTKATTACHOPTIONS(0), 5, 5);
-    gtk_table_attach(GTK_TABLE(tbl), add, 4, 5, 1, 2,
+    gtk_table_attach(GTK_TABLE(global_gui.tbl), add, 4, 5, 1, 2,
 		     __GTKATTACHOPTIONS(0), __GTKATTACHOPTIONS(0), 5, 5);
-    gtk_table_attach(GTK_TABLE(tbl), tracker, 0, 1, 5, 7,
+    gtk_table_attach(GTK_TABLE(global_gui.tbl), tracker, 0, 1, 5, 7,
 		     __GTKATTACHOPTIONS(0), __GTKATTACHOPTIONS(0), 2, 2);
-    gtk_table_attach(GTK_TABLE(tbl), vumeter_in, 1, 3, 5, 6, __GTKATTACHOPTIONS(GTK_FILL | GTK_EXPAND | GTK_SHRINK), __GTKATTACHOPTIONS(0), 2, 2);
-    gtk_table_attach(GTK_TABLE(tbl), vumeter_out, 1, 3, 6, 7, __GTKATTACHOPTIONS(GTK_FILL | GTK_EXPAND | GTK_SHRINK), __GTKATTACHOPTIONS(0), 2, 2);
-    gtk_table_attach(GTK_TABLE(tbl), input, 4, 6, 5, 6, __GTKATTACHOPTIONS(GTK_FILL | GTK_EXPAND | GTK_SHRINK), __GTKATTACHOPTIONS(0), 2, 2);
-    gtk_table_attach(GTK_TABLE(tbl), master, 4, 6, 6, 7, __GTKATTACHOPTIONS(GTK_FILL | GTK_EXPAND | GTK_SHRINK), __GTKATTACHOPTIONS(0), 2, 2);
+    gtk_table_attach(GTK_TABLE(global_gui.tbl), vumeter_in, 1, 3, 5, 6, __GTKATTACHOPTIONS(GTK_FILL | GTK_EXPAND | GTK_SHRINK), __GTKATTACHOPTIONS(0), 2, 2);
+    gtk_table_attach(GTK_TABLE(global_gui.tbl), vumeter_out, 1, 3, 6, 7, __GTKATTACHOPTIONS(GTK_FILL | GTK_EXPAND | GTK_SHRINK), __GTKATTACHOPTIONS(0), 2, 2);
+    gtk_table_attach(GTK_TABLE(global_gui.tbl), input, 4, 6, 5, 6, __GTKATTACHOPTIONS(GTK_FILL | GTK_EXPAND | GTK_SHRINK), __GTKATTACHOPTIONS(0), 2, 2);
+    gtk_table_attach(GTK_TABLE(global_gui.tbl), master, 4, 6, 6, 7, __GTKATTACHOPTIONS(GTK_FILL | GTK_EXPAND | GTK_SHRINK), __GTKATTACHOPTIONS(0), 2, 2);
 
-    gtk_table_attach(GTK_TABLE(tbl), volume_label, 3, 4, 6, 7, __GTKATTACHOPTIONS(GTK_FILL | GTK_EXPAND | GTK_SHRINK), __GTKATTACHOPTIONS(0), 2, 2);
-    gtk_table_attach(GTK_TABLE(tbl), input_label, 3, 4, 5, 6, __GTKATTACHOPTIONS(GTK_FILL | GTK_EXPAND | GTK_SHRINK), __GTKATTACHOPTIONS(0), 2, 2);
+    gtk_table_attach(GTK_TABLE(global_gui.tbl), volume_label, 3, 4, 6, 7, __GTKATTACHOPTIONS(GTK_FILL | GTK_EXPAND | GTK_SHRINK), __GTKATTACHOPTIONS(0), 2, 2);
+    gtk_table_attach(GTK_TABLE(global_gui.tbl), input_label, 3, 4, 5, 6, __GTKATTACHOPTIONS(GTK_FILL | GTK_EXPAND | GTK_SHRINK), __GTKATTACHOPTIONS(0), 2, 2);
 
     gtk_signal_connect(GTK_OBJECT(bank_add), "clicked",
 		       GTK_SIGNAL_FUNC(bank_add_pressed), NULL);
@@ -2021,7 +2113,7 @@ init_gui(void)
 		       GTK_SIGNAL_FUNC(update_master_volume), NULL);		       
     gtk_signal_connect(GTK_OBJECT(adj_input), "value_changed",
 		       GTK_SIGNAL_FUNC(update_input_volume), NULL);
-    gtk_widget_show_all(gui.mainWnd);
+    gtk_widget_show_all(global_gui.mainWnd);
 
     g_timeout_add(VU_UPDATE_INTERVAL,   timeout_update_vumeter_in,  vumeter_in );
     g_timeout_add(VU_UPDATE_INTERVAL,   timeout_update_vumeter_out, vumeter_out);
@@ -2041,9 +2133,10 @@ init_gui(void)
 	SendMessage(window, WM_SETICON, ICON_SMALL, (LPARAM) small_icon);
 
 #else
-    style = gtk_widget_get_style(gui.mainWnd);
-    app_icon = gdk_pixmap_create_from_xpm_d(gui.mainWnd->window, &mask,
+    style = gtk_widget_get_style(global_gui.mainWnd);
+    app_icon = gdk_pixmap_create_from_xpm_d(global_gui.mainWnd->window, &mask,
 					    &style->white, (gchar **) gnuitar_xpm);
-    gdk_window_set_icon(gui.mainWnd->window, gui.mainWnd->window, app_icon, mask);
+    gdk_window_set_icon(global_gui.mainWnd->window, global_gui.mainWnd->window, app_icon, mask);
 #endif
 }
+

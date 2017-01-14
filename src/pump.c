@@ -541,7 +541,11 @@ adapt_to_output(data_block_t *db)
 /* function called on each effect during processing */
 static void
 run_effects(effect_t *effect, int idx, void *data) {
+
     data_block_t *db = (data_block_t *) data;
+
+    (void) idx;
+
     if (effect->toggle)
         effect->proc_filter(effect, db);
 }

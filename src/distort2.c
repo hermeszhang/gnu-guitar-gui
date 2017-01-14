@@ -615,9 +615,6 @@ distort2_filter(struct effect *p, data_block_t *db)
 static void
 distort2_done(struct effect *p)
 {
-    struct distort2_params *ap;
-
-    ap = (struct distort2_params *) p->params;
     gnuitar_free(p->params);
     gtk_widget_destroy(p->control);
     free(p);

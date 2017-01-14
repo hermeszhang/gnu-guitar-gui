@@ -20,43 +20,56 @@
  * $Id$
  */
 
-#ifndef _UTILS_H_
-#define _UTILS_H_ 1
+#ifndef GNUITAR_UTILS_H
+#define GNUITAR_UTILS_H
 
 #include <math.h>
+
 #ifdef _WIN32
-#   ifndef M_PI
-#       define M_PI 3.1415926535897932384626433832795
-#   endif
-#   ifndef  R_OK
-#       define  R_OK 04
-#   endif
-#   ifndef  X_OK
-#       define  X_OK 01
-#   endif
-#   ifndef  F_OK
-#       define  F_OK 00
-#   endif
-#   define FILESEP "\\"
-#   ifndef isnan
-#       define isnan _isnan
-#   endif
 
-#   include <windows.h>
-typedef HANDLE  my_mutex;
-
-#else
-#   define FILESEP "/"
-
-#   include <glib.h>
-typedef GMutex* my_mutex;
-
+#ifndef M_PI
+#define M_PI 3.1415926535897932384626433832795
 #endif
 
-extern void     my_create_mutex(my_mutex*);
-extern void     my_lock_mutex(my_mutex);
-extern void     my_unlock_mutex(my_mutex);
-extern void     my_close_mutex(my_mutex);
-
+#ifndef  R_OK
+#define  R_OK 04
 #endif
+
+#ifndef  X_OK
+#define  X_OK 01
+#endif
+
+#ifndef  F_OK
+#define  F_OK 00
+#endif
+
+#define FILESEP "\\"
+
+#ifndef isnan
+#define isnan _isnan
+#endif
+
+#include <windows.h>
+
+typedef HANDLE gnuitar_mutex;
+
+#else /* _WIN32 */
+
+#define FILESEP "/"
+
+#include <glib.h>
+
+typedef GMutex gnuitar_mutex_t;
+
+#endif /* _WIN32 */
+
+void gnuitar_mutex_init(gnuitar_mutex_t *mutex);
+
+void gnuitar_mutex_done(gnuitar_mutex_t *mutex);
+
+void gnuitar_mutex_lock(gnuitar_mutex_t *mutex);
+
+void gnuitar_mutex_unlock(gnuitar_mutex_t *mutex);
+
+#endif /* GNUITAR_UTILS_H */
 
