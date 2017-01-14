@@ -45,19 +45,19 @@
 
 #define MAX_SAMPLE (32767 << 8)
 
-#ifdef FLOAT_DSP
-typedef float gnuitar_sample_t;
-#else
-typedef int32_t gnuitar_sample_t;
-#endif
+typedef double gnuitar_sample_t;
 
 /* for compatibility */
 
 typedef gnuitar_sample_t DSP_SAMPLE;
 
+typedef int16_t SAMPLE16;
+
+typedef int32_t SAMPLE32;
+
 typedef struct gnuitar_packet {
-    DSP_SAMPLE * __restrict__ data;
-    DSP_SAMPLE * __restrict__ data_swap;
+    gnuitar_sample_t * __restrict__ data;
+    gnuitar_sample_t * __restrict__ data_swap;
     int_fast32_t    len;
     int_fast8_t     channels;
 } gnuitar_packet_t;
@@ -86,13 +86,10 @@ void gnuitar_audio_driver_done(gnuitar_audio_driver_t * driver);
 
 typedef gnuitar_audio_driver_t audio_driver_t;
 
-extern audio_driver_t *audio_driver;
-
-typedef int16_t  SAMPLE16;
-typedef int32_t  SAMPLE32;
+extern gnuitar_audio_driver_t *audio_driver;
 
 #ifdef _WIN32
-    #define MAX_BUFFERS	1024	/* number of input/output sound buffers */
+#define MAX_BUFFERS 1024 /* number of input/output sound buffers */
 #endif
 
 #define MIN_BUFFER_SIZE 128
@@ -128,4 +125,5 @@ void guess_audio_driver(void);
 void set_audio_driver_from_str(const char const *str);
 void triangular_dither(data_block_t *db, SAMPLE16 *target);
 
-#endif
+#endif /* GNUITAR_AUDIO_DRIVER_H */
+
