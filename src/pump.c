@@ -451,8 +451,6 @@ volatile unsigned short  write_track = 0;
 /* sin table */
 float sin_lookup_table[SIN_LOOKUP_SIZE + 1];
 
-void pump_cmdline(char **argv, int argc);
-
 /* If the long-term average of input data does not exactly equal to 0,
  * compensate. Some soundcards would also need highpass filtering ~20 Hz
  * or so. */
@@ -622,12 +620,15 @@ load_initial_state(char **argv, int argc)
     GList *list = NULL;
     GList *cur;
 
+    (void) argv;
+    (void) argc;
+
     dir = opendir(path);
     if (dir == NULL) {
         if (errno == ENOENT) {
             /* doesn't exist, create it */
 #ifdef _WIN32
-	    mkdir(path);
+            mkdir(path);
 #else
             mkdir(path, 0777);
 #endif
@@ -670,8 +671,6 @@ load_initial_state(char **argv, int argc)
     }
     /* free GList memory */
     g_list_free(list);
-
-    pump_cmdline(argv, argc);
 }
 
 void
@@ -789,28 +788,6 @@ pump_start(void)
     master_volume = 0.0;
     input_volume = 0.0;
     write_track = 0;
-}
-
-void
-pump_cmdline(char **argv, int argc)
-{
-    int i;
-
-    if (argc == 1) {
-	printf("Possible effects:\n");
-        effect_list_print_all();
-    }
-    for (i = 1; i < argc; i++) {
-        effect_t *effect;
-        int k = effect_list_find_by_name(argv[i]);
-        if (k == -1) {
-	    gnuitar_printf("%s is not a known effect\n", argv[i]);
-            continue;
-        }
-        effect = effect_create(k);
-        effect_insert(effect, -1);
-        gtk_clist_append(GTK_CLIST(processor), &argv[i]);
-    }
 }
 
 void
