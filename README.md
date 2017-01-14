@@ -1,32 +1,36 @@
 GNUitar
 =======
 
-Guitar processor software
+The GNU Guitar Effects Processor
 
 ### What is GNUitar ?
 
 GNUitar is a real-time sound effects software that allows you to use
 your computer as a guitar processor. It has GTK+ based interface. It
 can be compiled on any flavor of UNIX that have GTK+ 1.2, 2.0, Glib,
-pthreads and OSS sound driver. It also works on Windows. This program
-was inspired by two earlier works:
-  * Ele 0.1 by Morris Slutsky
-    [1] http://www-personal.umich.edu/~mslutsky/elepage/index.html
-  * Guitar FX Processor by Marin Vlah
-    [2] http://fly.srk.fer.hr/~mvlah/fx_processor.html
+pthreads and OSS sound driver. It also works on Windows.
+
+It was originally written by Max Rudensky.
+
+This program was inspired by two earlier works:
+ - [Ele]([1] http://www-personal.umich.edu/~mslutsky/elepage/index.html) by Morris Slutsky
+ - Guitar FX Processor by Marin Vlah
 
 GNUitar is free software and is distributed under GNU GPL license.
 
-GNUitar is pronounced like "GNU Guitar". English is not my native
-language, so when I invented this word I did not think how it should
-be pronounced. Unless someone has a better idea, let's pronounce it
-like this for now.
+GNUitar is pronounced like "GNU Guitar".
+
+If you don't know how to pronounce GNU, read [this](https://www.gnu.org/gnu/pronunciation.en.html)
 
 ### Download
 
-[3] http://www.gnuitar.com/downloads.php
-[4] http://freshmeat.net/projects/gnuitar
-[5] http://sourceforge.net/projects/gnuitar
+The project use to have a website, but has since been replaced with another unrelated website.
+
+Don't bother visiting gnuitar.com, it's not the original site.
+
+The original project was originally hosted as a CVS repository on SourceForge.
+
+Here's a link to the original project on [SourceForge](http://sourceforge.net/projects/gnuitar) and [free(code)](http://freecode.com/projects/gnuitar)
 
 #### Requirements
 
@@ -519,7 +523,7 @@ thickest strings the longest.
   * Windows version is not very stable yet. There could be problems
     with memory leaks and with sound initialisation/closing.
 
-Send bug reports to [9]fonin at gnuitar dot com.
+Report a bug on [GitHub](https://github.com/gnuitar/gnuitar/issues/new)
 
 ### About Free Software Development
 
