@@ -384,6 +384,18 @@ test_linux_cpufreq()
 }
 #endif
 
+static void
+gnuitar_print_effects(gnuitar_package_t * package)
+{
+    unsigned int i;
+    unsigned int count;
+    count = gnuitar_package_get_effect_count(package);
+    for (i = 0; i < count; i++) {
+        const char * name = gnuitar_package_get_effect_name(package, i);
+        gnuitar_printf("effect %u: %s\n", i, name);
+    }
+}
+
 int
 main(int argc, char **argv)
 {
@@ -398,6 +410,8 @@ main(int argc, char **argv)
         gnuitar_printf("Failed to create builtin package\n");
         return EXIT_FAILURE;
     }
+
+    gnuitar_print_effects(builtin_package);
 
     max_priority = sched_get_priority_max(SCHED_FIFO);
     p.sched_priority = max_priority/2;
