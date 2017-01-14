@@ -163,7 +163,7 @@ is_prime(int n)
 }
 
 static void
-echo_init(struct effect *p)
+echo_init(gnuitar_effect_t *p)
 {
     struct echo_params *params;
 
@@ -403,7 +403,7 @@ echo_filter(effect_t *p, data_block_t *db)
 }
 
 static void
-echo_done(struct effect *p)
+echo_done(gnuitar_effect_t *p)
 {
     struct echo_params *params;
     int             i, j;
@@ -420,7 +420,7 @@ echo_done(struct effect *p)
 }
 
 static void
-echo_save(struct effect *p, SAVE_ARGS)
+echo_save(gnuitar_effect_t *p, SAVE_ARGS)
 {
     struct echo_params *params = p->params;
 
@@ -431,7 +431,7 @@ echo_save(struct effect *p, SAVE_ARGS)
 }
 
 static void
-echo_load(struct effect *p, LOAD_ARGS)
+echo_load(gnuitar_effect_t *p, LOAD_ARGS)
 {
     struct echo_params *params = p->params;
 

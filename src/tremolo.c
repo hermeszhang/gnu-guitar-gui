@@ -142,7 +142,7 @@ update_tremolo_amplitude(GtkAdjustment * adj,
 }
 
 static void
-tremolo_init(struct effect *p)
+tremolo_init(gnuitar_effect_t *p)
 {
     struct tremolo_params *ptremolo;
 
@@ -238,7 +238,7 @@ tremolo_init(struct effect *p)
 }
 
 static void
-tremolo_filter(struct effect *p, data_block_t *db)
+tremolo_filter(gnuitar_effect_t *p, data_block_t *db)
 {
     struct tremolo_params *tp;
     double          vol, speed;
@@ -270,7 +270,7 @@ tremolo_filter(struct effect *p, data_block_t *db)
 }
 
 static void
-tremolo_done(struct effect *p)
+tremolo_done(gnuitar_effect_t *p)
 {
     struct tremolo_params *tp;
     tp = (struct tremolo_params *) p->params;
@@ -281,7 +281,7 @@ tremolo_done(struct effect *p)
 }
 
 static void
-tremolo_save(struct effect *p, SAVE_ARGS)
+tremolo_save(gnuitar_effect_t *p, SAVE_ARGS)
 {
     struct tremolo_params *params = p->params;
 
@@ -290,7 +290,7 @@ tremolo_save(struct effect *p, SAVE_ARGS)
 }
 
 static void
-tremolo_load(struct effect *p, LOAD_ARGS)
+tremolo_load(gnuitar_effect_t *p, LOAD_ARGS)
 {
     struct tremolo_params *params = p->params;
 

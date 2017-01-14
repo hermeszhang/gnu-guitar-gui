@@ -46,9 +46,8 @@ update_amp_power(GtkAdjustment *adj, struct amp_params *params)
     params->amp_power = adj->value;
 }
 
-
 static void
-amp_init(struct effect *p)
+amp_init(gnuitar_effect_t *p)
 {
     struct amp_params *pamp;
 
@@ -128,7 +127,7 @@ amp_filter(effect_t *p, data_block_t *db)
 }
 
 static void
-amp_done(struct effect *p)
+amp_done(gnuitar_effect_t *p)
 {
     free(p->params);
     gtk_widget_destroy(p->control);
@@ -136,7 +135,7 @@ amp_done(struct effect *p)
 }
 
 static void
-amp_save(struct effect *p, SAVE_ARGS)
+amp_save(gnuitar_effect_t *p, SAVE_ARGS)
 {
     struct amp_params *params = p->params;
 
@@ -144,7 +143,7 @@ amp_save(struct effect *p, SAVE_ARGS)
 }
 
 static void
-amp_load(struct effect *p, LOAD_ARGS)
+amp_load(gnuitar_effect_t *p, LOAD_ARGS)
 {
     struct amp_params *params = p->params;
 

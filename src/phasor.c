@@ -225,7 +225,7 @@ toggle_stereo(GtkWidget *w, struct phasor_params *params)
 }
 
 static void
-phasor_init(struct effect *p)
+phasor_init(gnuitar_effect_t *p)
 {
     struct phasor_params *params;
 
@@ -351,7 +351,7 @@ phasor_init(struct effect *p)
 }
 
 static void
-phasor_filter_mono(struct effect *p, data_block_t *db)
+phasor_filter_mono(gnuitar_effect_t *p, data_block_t *db)
 {
     struct phasor_params *params = p->params;
     DSP_SAMPLE     *s, tmp;
@@ -391,7 +391,7 @@ phasor_filter_mono(struct effect *p, data_block_t *db)
 }
 
 static void
-phasor_filter_stereo(struct effect *p, data_block_t *db)
+phasor_filter_stereo(gnuitar_effect_t *p, data_block_t *db)
 {
     struct phasor_params *params = p->params;
     float f, Dry, Wet, sinval=0, cosval=0;
@@ -427,7 +427,7 @@ phasor_filter_stereo(struct effect *p, data_block_t *db)
 }
 
 static void
-phasor_filter(struct effect *p, data_block_t *db)
+phasor_filter(gnuitar_effect_t *p, data_block_t *db)
 {
     struct phasor_params *params = p->params;
 
@@ -444,7 +444,7 @@ phasor_filter(struct effect *p, data_block_t *db)
 }
 
 static void
-phasor_done(struct effect *p)
+phasor_done(gnuitar_effect_t *p)
 {
     gnuitar_free(p->params);
     gtk_widget_destroy(p->control);
@@ -452,7 +452,7 @@ phasor_done(struct effect *p)
 }
 
 static void
-phasor_save(struct effect *p, SAVE_ARGS)
+phasor_save(gnuitar_effect_t *p, SAVE_ARGS)
 {
     struct phasor_params *params = p->params;
 
@@ -463,7 +463,7 @@ phasor_save(struct effect *p, SAVE_ARGS)
 }
 
 static void
-phasor_load(struct effect *p, LOAD_ARGS)
+phasor_load(gnuitar_effect_t *p, LOAD_ARGS)
 {
     struct phasor_params *params = p->params;
 

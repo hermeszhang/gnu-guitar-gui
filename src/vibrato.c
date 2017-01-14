@@ -192,7 +192,7 @@ update_vibrato_base(GtkAdjustment * adj, struct vibrato_params *params)
 }
 
 static void
-vibrato_init(struct effect *p)
+vibrato_init(gnuitar_effect_t *p)
 {
     struct vibrato_params *pvibrato;
 
@@ -305,7 +305,7 @@ vibrato_init(struct effect *p)
 }
 
 static void
-vibrato_filter(struct effect *p, data_block_t *db)
+vibrato_filter(gnuitar_effect_t *p, data_block_t *db)
 {
     DSP_SAMPLE     *s;
     int             count;
@@ -354,7 +354,7 @@ vibrato_filter(struct effect *p, data_block_t *db)
 }
 
 static void
-vibrato_done(struct effect *p)
+vibrato_done(gnuitar_effect_t *p)
 {
     gnuitar_free(p->params);
     gtk_widget_destroy(p->control);
@@ -362,7 +362,7 @@ vibrato_done(struct effect *p)
 }
 
 static void
-vibrato_save(struct effect *p, SAVE_ARGS)
+vibrato_save(gnuitar_effect_t *p, SAVE_ARGS)
 {
     struct vibrato_params *params = p->params;
 
@@ -372,7 +372,7 @@ vibrato_save(struct effect *p, SAVE_ARGS)
 }
 
 static void
-vibrato_load(struct effect *p, LOAD_ARGS)
+vibrato_load(gnuitar_effect_t *p, LOAD_ARGS)
 {
     struct vibrato_params *params = p->params;
 

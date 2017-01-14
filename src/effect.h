@@ -40,17 +40,20 @@
 #include "audio-driver.h"
 #include "utils.h"
 
-struct effect {
-    void           *params;
-    void            (*proc_init) (struct effect *);
-    void            (*proc_done) (struct effect *);
-    void            (*proc_filter) (struct effect *, data_block_t *);
-    void            (*proc_save) (struct effect *, GKeyFile *, gchar *);
-    void            (*proc_load) (struct effect *, GKeyFile *, gchar *, GError **error);
-    short           toggle;
-    GtkWidget      *control;
-};
-typedef struct effect effect_t;
+typedef struct gnuitar_effect {
+    void *params;
+    void (*proc_init) (struct gnuitar_effect *);
+    void (*proc_done) (struct gnuitar_effect *);
+    void (*proc_filter) (struct gnuitar_effect *, data_block_t *);
+    void (*proc_save) (struct gnuitar_effect *, GKeyFile *, gchar *);
+    void (*proc_load) (struct gnuitar_effect *, GKeyFile *, gchar *, GError **error);
+    short toggle;
+    GtkWidget *control;
+} gnuitar_effect_t;
+
+/* for compatibility */
+
+typedef struct gnuitar_effect effect_t;
 
 #ifdef __GNUC__
 #define unlikely(x) __builtin_expect((x), 0)

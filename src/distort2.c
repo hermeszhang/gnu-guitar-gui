@@ -391,7 +391,7 @@ update_distort2_treble(GtkAdjustment *adj, struct distort2_params *params)
 }
 
 static void
-distort2_init(struct effect *p)
+distort2_init(gnuitar_effect_t *p)
 {
     struct distort2_params *pdistort;
 
@@ -502,7 +502,7 @@ distort2_init(struct effect *p)
 }
 
 static void
-distort2_filter(struct effect *p, data_block_t *db)
+distort2_filter(gnuitar_effect_t *p, data_block_t *db)
 {
 
     int_fast32_t        i,count,bailout;
@@ -613,7 +613,7 @@ distort2_filter(struct effect *p, data_block_t *db)
 }
 
 static void
-distort2_done(struct effect *p)
+distort2_done(gnuitar_effect_t *p)
 {
     gnuitar_free(p->params);
     gtk_widget_destroy(p->control);
@@ -621,7 +621,7 @@ distort2_done(struct effect *p)
 }
 
 static void
-distort2_save(struct effect *p, SAVE_ARGS)
+distort2_save(gnuitar_effect_t *p, SAVE_ARGS)
 {
     struct distort2_params *params = p->params;
 
@@ -631,7 +631,7 @@ distort2_save(struct effect *p, SAVE_ARGS)
 }
 
 static void
-distort2_load(struct effect *p, LOAD_ARGS)
+distort2_load(gnuitar_effect_t *p, LOAD_ARGS)
 {
     struct distort2_params *params = p->params;
 

@@ -53,7 +53,7 @@ update_reverb_regen(GtkAdjustment *adj, struct reverb_params *params)
 }
 
 static void
-reverb_init(struct effect *p)
+reverb_init(gnuitar_effect_t *p)
 {
     struct reverb_params *preverb;
 
@@ -195,7 +195,7 @@ comb_filter(double input, double factor, int delay, Backbuf_t *history)
 }
 
 static void
-reverb_filter(struct effect *p, data_block_t *db)
+reverb_filter(gnuitar_effect_t *p, data_block_t *db)
 {
     struct reverb_params *params = p->params;
     DSP_SAMPLE     *s;
@@ -270,7 +270,7 @@ reverb_filter(struct effect *p, data_block_t *db)
 }
 
 static void
-reverb_done(struct effect *p)
+reverb_done(gnuitar_effect_t *p)
 {
     struct reverb_params *dr;
     int             i;
@@ -291,7 +291,7 @@ reverb_done(struct effect *p)
 }
 
 static void
-reverb_save(struct effect *p, SAVE_ARGS)
+reverb_save(gnuitar_effect_t *p, SAVE_ARGS)
 {
     struct reverb_params *params = p->params;
 
@@ -301,7 +301,7 @@ reverb_save(struct effect *p, SAVE_ARGS)
 }
 
 static void
-reverb_load(struct effect *p, LOAD_ARGS)
+reverb_load(gnuitar_effect_t *p, LOAD_ARGS)
 {
     struct reverb_params *params = p->params;
 

@@ -327,7 +327,7 @@ static void tblattach(GtkWidget *table, GtkWidget *widget, int x, int y) {
 }
 
 static void
-autowah_init(struct effect *p)
+autowah_init(gnuitar_effect_t *p)
 {
     int i;
     struct autowah_params *params = p->params;
@@ -476,7 +476,7 @@ power2db(double power)
 }
 
 static void
-autowah_filter(struct effect *p, data_block_t *db)
+autowah_filter(gnuitar_effect_t *p, data_block_t *db)
 {
     struct autowah_params *ap;
     int             i, curr_channel = 0, delay_time;
@@ -635,7 +635,7 @@ autowah_filter(struct effect *p, data_block_t *db)
 }
 
 static void
-autowah_done(struct effect *p)
+autowah_done(gnuitar_effect_t *p)
 {
     struct autowah_params *params = p->params;
 

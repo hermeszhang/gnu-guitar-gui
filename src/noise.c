@@ -140,7 +140,7 @@ update_noise_attack(GtkAdjustment * adj, struct noise_params *params)
 }
 
 static void
-noise_init(struct effect *p)
+noise_init(gnuitar_effect_t *p)
 {
     struct noise_params *pnoise;
 
@@ -337,7 +337,7 @@ noise_init(struct effect *p)
 }
 
 static void
-noise_filter(struct effect *p, data_block_t *db)
+noise_filter(gnuitar_effect_t *p, data_block_t *db)
 {
 
     int             	count;
@@ -419,7 +419,7 @@ noise_filter(struct effect *p, data_block_t *db)
 }
 
 static void
-noise_save(struct effect *p, SAVE_ARGS)
+noise_save(gnuitar_effect_t *p, SAVE_ARGS)
 {
     struct noise_params *params = p->params;
 
@@ -431,7 +431,7 @@ noise_save(struct effect *p, SAVE_ARGS)
 }
 
 static void
-noise_load(struct effect *p, LOAD_ARGS)
+noise_load(gnuitar_effect_t *p, LOAD_ARGS)
 {
     struct noise_params *params = p->params;
 
@@ -443,7 +443,7 @@ noise_load(struct effect *p, LOAD_ARGS)
 }
 
 static void
-noise_done(struct effect *p)
+noise_done(gnuitar_effect_t *p)
 {
     free(p->params);
     gtk_widget_destroy(p->control);

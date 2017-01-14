@@ -45,7 +45,7 @@
 
 #define MAX_SAMPLE (32767 << 8)
 
-typedef double gnuitar_sample_t;
+typedef float gnuitar_sample_t;
 
 /* for compatibility */
 

@@ -416,7 +416,7 @@ static void tblattach(GtkWidget *table, GtkWidget *widget, int x, int y) {
 }
 
 static void
-tubeamp_init(struct effect *p)
+tubeamp_init(gnuitar_effect_t *p)
 {
     int i;
     GtkWidget      *w, *table;
@@ -546,7 +546,7 @@ F_tube(float in, float r_i)
 }
 
 static void
-tubeamp_filter(struct effect *p, data_block_t *db)
+tubeamp_filter(gnuitar_effect_t *p, data_block_t *db)
 {
     int_fast16_t i, j, k, curr_channel = 0;
     DSP_SAMPLE *ptr1;
@@ -603,7 +603,7 @@ tubeamp_filter(struct effect *p, data_block_t *db)
 }
 
 static void
-tubeamp_done(struct effect *p)
+tubeamp_done(gnuitar_effect_t *p)
 {
     struct tubeamp_params *params = p->params;
     int i;
@@ -616,7 +616,7 @@ tubeamp_done(struct effect *p)
 }
 
 static void
-tubeamp_save(struct effect *p, SAVE_ARGS)
+tubeamp_save(gnuitar_effect_t *p, SAVE_ARGS)
 {
     struct tubeamp_params *params = p->params;
     SAVE_INT("stages", params->stages);
@@ -631,7 +631,7 @@ tubeamp_save(struct effect *p, SAVE_ARGS)
 }
 
 static void
-tubeamp_load(struct effect *p, LOAD_ARGS)
+tubeamp_load(gnuitar_effect_t *p, LOAD_ARGS)
 {
     struct tubeamp_params *params = p->params;
     LOAD_INT("stages", params->stages);

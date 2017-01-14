@@ -126,7 +126,7 @@ update_sustain_gate(GtkAdjustment * adj, struct sustain_params *params)
 }
 
 static void
-sustain_init(struct effect *p)
+sustain_init(gnuitar_effect_t *p)
 {
     struct sustain_params *psustain;
 
@@ -245,7 +245,7 @@ sustain_init(struct effect *p)
 }
 
 static void
-sustain_filter(struct effect *p, data_block_t *db)
+sustain_filter(gnuitar_effect_t *p, data_block_t *db)
 {
 
     int             count;
@@ -305,7 +305,7 @@ sustain_filter(struct effect *p, data_block_t *db)
 }
 
 static void
-sustain_save(struct effect *p, SAVE_ARGS)
+sustain_save(gnuitar_effect_t *p, SAVE_ARGS)
 {
     struct sustain_params *params = p->params;
 
@@ -315,7 +315,7 @@ sustain_save(struct effect *p, SAVE_ARGS)
 }
 
 static void
-sustain_load(struct effect *p, LOAD_ARGS)
+sustain_load(gnuitar_effect_t *p, LOAD_ARGS)
 {
     struct sustain_params *params = p->params;
 
@@ -325,7 +325,7 @@ sustain_load(struct effect *p, LOAD_ARGS)
 }
 
 static void
-sustain_done(struct effect *p)
+sustain_done(gnuitar_effect_t *p)
 {
     free(p->params);
     gtk_widget_destroy(p->control);

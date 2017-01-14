@@ -22,7 +22,7 @@ update_speed(GtkAdjustment *adj, struct rotary_params *params)
 }
 
 static void
-rotary_init(struct effect *p)
+rotary_init(gnuitar_effect_t *p)
 {
     GtkWidget      *w;
     GtkObject      *o;
@@ -72,7 +72,7 @@ rotary_init(struct effect *p)
 
 /* this is a single-channel to two-channel effect */
 static void
-rotary_filter(struct effect *p, data_block_t *db)
+rotary_filter(gnuitar_effect_t *p, data_block_t *db)
 {
     struct rotary_params *params = p->params;
     int i;
@@ -128,7 +128,7 @@ rotary_filter(struct effect *p, data_block_t *db)
 }
 
 static void
-rotary_done(struct effect *p)
+rotary_done(gnuitar_effect_t *p)
 {
     gnuitar_free(p->params);
     gtk_widget_destroy(p->control);
@@ -136,14 +136,14 @@ rotary_done(struct effect *p)
 }
 
 static void
-rotary_save(struct effect *p, SAVE_ARGS)
+rotary_save(gnuitar_effect_t *p, SAVE_ARGS)
 {
     struct rotary_params *params = p->params;
     SAVE_INT("speed", params->speed);
 }
 
 static void
-rotary_load(struct effect *p, LOAD_ARGS)
+rotary_load(gnuitar_effect_t *p, LOAD_ARGS)
 {
     struct rotary_params *params = p->params;
     LOAD_INT("speed", params->speed);

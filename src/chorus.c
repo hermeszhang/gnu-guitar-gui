@@ -214,7 +214,7 @@ toggle_chorus_multichannel(void *bullshit, struct chorus_params *params)
 }
 
 static void
-chorus_init(struct effect *p)
+chorus_init(gnuitar_effect_t *p)
 {
     struct chorus_params *pchorus;
 
@@ -416,7 +416,7 @@ chorus_init(struct effect *p)
 }
 
 static void
-chorus_filter_mono(struct effect *p, data_block_t *db)
+chorus_filter_mono(gnuitar_effect_t *p, data_block_t *db)
 {
     struct chorus_params *cp;
     int             count, i, curr_channel = 0;
@@ -472,7 +472,7 @@ chorus_filter_mono(struct effect *p, data_block_t *db)
 
 /* mono to N */
 static void
-chorus_filter_mc(struct effect *p, data_block_t *db)
+chorus_filter_mc(gnuitar_effect_t *p, data_block_t *db)
 {
     struct chorus_params *cp;
     int             i, count, curr_channel = 0;
@@ -530,7 +530,7 @@ chorus_filter_mc(struct effect *p, data_block_t *db)
 }
 
 static void
-chorus_filter(struct effect *p, data_block_t *db)
+chorus_filter(gnuitar_effect_t *p, data_block_t *db)
 {
     struct chorus_params *params = p->params;
     
@@ -542,7 +542,7 @@ chorus_filter(struct effect *p, data_block_t *db)
 }
 
 static void
-chorus_done(struct effect *p)
+chorus_done(gnuitar_effect_t *p)
 {
     struct chorus_params *cp;
     int             i;
@@ -557,7 +557,7 @@ chorus_done(struct effect *p)
 }
 
 static void
-chorus_save(struct effect *p, SAVE_ARGS)
+chorus_save(gnuitar_effect_t *p, SAVE_ARGS)
 {
     struct chorus_params *params = p->params;
 
@@ -571,7 +571,7 @@ chorus_save(struct effect *p, SAVE_ARGS)
 }
 
 static void
-chorus_load(struct effect *p, LOAD_ARGS)
+chorus_load(gnuitar_effect_t *p, LOAD_ARGS)
 {
     struct chorus_params *params = p->params;
 

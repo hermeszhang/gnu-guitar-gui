@@ -189,7 +189,7 @@ update_eqbank_volume(GtkAdjustment * adj, struct eqbank_params *p)
 }
 
 static void
-eqbank_init(struct effect *p)
+eqbank_init(gnuitar_effect_t *p)
 {
     struct eqbank_params *peq;
 
@@ -296,7 +296,7 @@ eqbank_init(struct effect *p)
 }
 
 static void
-eqbank_filter(struct effect *p, data_block_t *db)
+eqbank_filter(gnuitar_effect_t *p, data_block_t *db)
 {
     int                 count;
     DSP_SAMPLE         *s;
@@ -328,7 +328,7 @@ eqbank_filter(struct effect *p, data_block_t *db)
 }
 
 static void
-eqbank_done(struct effect *p)
+eqbank_done(gnuitar_effect_t *p)
 {
     struct eqbank_params *params = p->params;
 	
@@ -340,7 +340,7 @@ eqbank_done(struct effect *p)
 }
 
 static void
-eqbank_save(struct effect *p, SAVE_ARGS)
+eqbank_save(gnuitar_effect_t *p, SAVE_ARGS)
 {
     struct eqbank_params *params = p->params;
     gchar *label;
@@ -355,7 +355,7 @@ eqbank_save(struct effect *p, SAVE_ARGS)
 }
 
 static void
-eqbank_load(struct effect *p, LOAD_ARGS)
+eqbank_load(gnuitar_effect_t *p, LOAD_ARGS)
 {
     struct eqbank_params *params = p->params;
     gchar *label;

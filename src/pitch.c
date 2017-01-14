@@ -74,7 +74,7 @@ update_pitch_drywet(GtkAdjustment *adj, struct pitch_params *params)
 }
 
 static void
-pitch_init(struct effect *p)
+pitch_init(gnuitar_effect_t *p)
 {
     struct pitch_params *params = p->params;
 
@@ -397,7 +397,7 @@ pitch_filter(effect_t *p, data_block_t *db)
 }
 
 static void
-pitch_done(struct effect *p)
+pitch_done(gnuitar_effect_t *p)
 {
     struct pitch_params *params = p->params;
     int i;

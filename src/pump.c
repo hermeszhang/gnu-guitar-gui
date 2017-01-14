@@ -415,6 +415,37 @@
 #include "tracker.h"
 #include "utils.h"
 
+void
+gnuitar_pump_init(gnuitar_pump_t *pump)
+{
+    pump->ref_count = 1;
+    pump->effects = NULL;
+    pump->n_effects = 0;
+}
+
+void
+gnuitar_pump_ref(gnuitar_pump_t *pump)
+{
+    pump->ref_count++;
+}
+
+void
+gnuitar_pump_unref(gnuitar_pump_t *pump)
+{
+    size_t i;
+    if (pump->ref_count <= 0) {
+        return;
+    }
+    pump->ref_count--;
+    if (pump->ref_count > 0) {
+        return;
+    }
+    for (i = 0; i < pump->n_effects; i++) {
+        /* TODO destroy effects here */
+    }
+    free(pump->effects);
+}
+
 /* flag for whether we are creating .wav */
 volatile unsigned short  write_track = 0;
 /* sin table */

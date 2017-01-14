@@ -388,7 +388,7 @@ update_layout(GtkWidget *widget, gpointer data) {
 static gboolean
 timeout_update_label(gpointer gp)
 {
-    struct effect *p = gp;
+    gnuitar_effect_t *p = gp;
     struct tuner_params *params = p->params;
     gchar  *gtmp;
     double halfnotes;
@@ -478,7 +478,7 @@ cmp_float(const void *a, const void *b)
 }
 
 static void
-tuner_filter(struct effect *p, data_block_t *db)
+tuner_filter(gnuitar_effect_t *p, data_block_t *db)
 {
     struct tuner_params *params;
     int			i, j;

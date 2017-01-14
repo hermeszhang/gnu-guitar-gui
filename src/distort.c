@@ -160,7 +160,7 @@ update_distort_lowpass(GtkAdjustment * adj, struct distort_params *params)
 }
 
 static void
-distort_init(struct effect *p)
+distort_init(gnuitar_effect_t *p)
 {
     struct distort_params *pdistort;
 
@@ -301,7 +301,7 @@ distort_init(struct effect *p)
 }
 
 static void
-distort_filter(struct effect *p, data_block_t *db)
+distort_filter(gnuitar_effect_t *p, data_block_t *db)
 {
     int             count,
                     currchannel = 0;
@@ -355,7 +355,7 @@ distort_filter(struct effect *p, data_block_t *db)
 }
 
 static void
-distort_done(struct effect *p)
+distort_done(gnuitar_effect_t *p)
 {
     free(p->params);
     gtk_widget_destroy(p->control);
@@ -363,7 +363,7 @@ distort_done(struct effect *p)
 }
 
 static void
-distort_save(struct effect *p, SAVE_ARGS)
+distort_save(gnuitar_effect_t *p, SAVE_ARGS)
 {
     struct distort_params *params = p->params;
 
@@ -374,7 +374,7 @@ distort_save(struct effect *p, SAVE_ARGS)
 }
 
 static void
-distort_load(struct effect *p, LOAD_ARGS)
+distort_load(gnuitar_effect_t *p, LOAD_ARGS)
 {
     struct distort_params *params = p->params;
 

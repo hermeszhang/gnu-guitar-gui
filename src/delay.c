@@ -171,7 +171,7 @@ toggle_delay_multichannel(void *bullshit, struct delay_params *params)
 }
 
 static void
-delay_init(struct effect *p)
+delay_init(gnuitar_effect_t *p)
 {
     struct delay_params *pdelay;
 
@@ -410,7 +410,7 @@ delay_filter(effect_t *p, data_block_t *db)
 }
 
 static void
-delay_done(struct effect *p)
+delay_done(gnuitar_effect_t *p)
 {
     struct delay_params *dp;
     int i;
@@ -425,7 +425,7 @@ delay_done(struct effect *p)
 }
 
 static void
-delay_save(struct effect *p, SAVE_ARGS)
+delay_save(gnuitar_effect_t *p, SAVE_ARGS)
 {
     struct delay_params *params = p->params;
 
@@ -436,7 +436,7 @@ delay_save(struct effect *p, SAVE_ARGS)
 }
 
 static void
-delay_load(struct effect *p, LOAD_ARGS)
+delay_load(gnuitar_effect_t *p, LOAD_ARGS)
 {
     struct delay_params *params = p->params;
 
