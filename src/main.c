@@ -463,7 +463,7 @@ main(int argc, char **argv)
         guess_audio_driver();
     }
     if (audio_driver == NULL)
-	gnuitar_printf("warning: no usable audio driver found.\n");
+        gnuitar_printf("warning: no usable audio driver found.\n");
 
     pump_start();
     if (audio_driver && (error = audio_driver->init()) != ERR_NOERROR) {
