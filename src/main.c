@@ -339,6 +339,7 @@
 #include "pump.h"
 #include "gui.h"
 #include "audio-driver.h"
+#include "package.h"
 
 #ifdef __SSE__
 #include <xmmintrin.h>
@@ -391,7 +392,13 @@ main(int argc, char **argv)
     int             max_priority;
     struct sched_param p;
     sigset_t ignore_set;
-    
+
+    builtin_package = gnuitar_package_open(NULL);
+    if (builtin_package == NULL) {
+        gnuitar_printf("Failed to create builtin package\n");
+        return EXIT_FAILURE;
+    }
+
     max_priority = sched_get_priority_max(SCHED_FIFO);
     p.sched_priority = max_priority/2;
 
@@ -458,6 +465,8 @@ main(int argc, char **argv)
 
     pump_stop();
     save_settings();
+
+    gnuitar_package_decref(builtin_package);
 
     return ERR_NOERROR;
 }
