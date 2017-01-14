@@ -46,30 +46,45 @@
 #define MAX_SAMPLE (32767 << 8)
 
 #ifdef FLOAT_DSP
-typedef float           DSP_SAMPLE;
+typedef float gnuitar_sample_t;
 #else
-typedef int32_t         DSP_SAMPLE;
+typedef int32_t gnuitar_sample_t;
 #endif
 
-typedef struct {
+/* for compatibility */
+
+typedef gnuitar_sample_t DSP_SAMPLE;
+
+typedef struct gnuitar_packet {
     DSP_SAMPLE * __restrict__ data;
     DSP_SAMPLE * __restrict__ data_swap;
     int_fast32_t    len;
     int_fast8_t     channels;
-} data_block_t;
+} gnuitar_packet_t;
+
+/* for compatibility */
+
+typedef gnuitar_packet_t data_block_t;
 
 struct audio_driver_channels {
     unsigned int in, out;
 };
 
-typedef struct {
+typedef struct gnuitar_audio_driver {
     const char *str;
-    int     enabled;
+    int enabled;
     const struct audio_driver_channels *channels;
-    
-    int     (*init)(void);
-    void    (*finish)(void);
-} audio_driver_t;
+    int (*init)(void);
+    void (*finish)(void);
+} gnuitar_audio_driver_t;
+
+void gnuitar_audio_driver_init(gnuitar_audio_driver_t * driver);
+
+void gnuitar_audio_driver_done(gnuitar_audio_driver_t * driver);
+
+/* for compatibility */
+
+typedef gnuitar_audio_driver_t audio_driver_t;
 
 extern audio_driver_t *audio_driver;
 
