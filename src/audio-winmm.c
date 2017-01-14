@@ -82,8 +82,8 @@ static int      active_in_buffers = 0,
 static void     serror(DWORD err, TCHAR * str);
 
 static unsigned int bits = 16;
-static SAMPLE16 wrbuf16[MIN_BUFFER_SIZE * MAX_BUFFERS / sizeof(SAMPLE16)];
-static SAMPLE16 rdbuf16[MIN_BUFFER_SIZE * MAX_BUFFERS / sizeof(SAMPLE16)];
+static int16_t wrbuf16[MIN_BUFFER_SIZE * MAX_BUFFERS / sizeof(int16_t)];
+static int16_t rdbuf16[MIN_BUFFER_SIZE * MAX_BUFFERS / sizeof(int16_t)];
 
 static DWORD WINAPI
 winmm_audio_thread(void *V)
@@ -124,7 +124,7 @@ winmm_audio_thread(void *V)
                     //WAVEHDR *twh;
                     //twh = (WAVEHDR*) msg.lParam;
                     for (i = 0; i < count; i++)
-                        procbuf[i] = ((SAMPLE16 *) (((WAVEHDR *) msg.lParam)->lpData))[i] << 8;
+                        procbuf[i] = ((int16_t *) (((WAVEHDR *) msg.lParam)->lpData))[i] << 8;
 
                     /*
                      * find unused output buffer and queue it to output
@@ -143,7 +143,7 @@ winmm_audio_thread(void *V)
                         db.len = count;
                         db.channels = n_input_channels;
                         pump_sample(&db);
-                        triangular_dither(&db, (SAMPLE16 *) (write_header[hdr_avail].lpData));
+                        triangular_dither(&db, (int16_t *) (write_header[hdr_avail].lpData));
 
                         err = waveOutWrite(out, &write_header[hdr_avail],sizeof(WAVEHDR));
                         if (err) {

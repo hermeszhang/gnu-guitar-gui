@@ -197,7 +197,7 @@
 #include "utils.h"
 #include "pump.h"
 
-static SAMPLE16 *rwbuf = NULL;
+static int16_t *rwbuf = NULL;
 static int fd = 0, midi_fd = 0;
 
 static volatile int keepthreadrunning = 0;

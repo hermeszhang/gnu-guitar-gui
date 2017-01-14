@@ -265,7 +265,7 @@
  * - fix mutex cleanup at exit
  *
  * Revision 1.31  2005/08/27 19:05:43  alankila
- * - introduce SAMPLE16 and SAMPLE32 types, and switch
+ * - introduce int16_t and SAMPLE32 types, and switch
  *
  * Revision 1.30  2005/08/27 18:11:35  alankila
  * - support 32-bit sampling

@@ -311,23 +311,23 @@ dsound_audio_thread(void *V)
         count = len1 + len2;
 
         /* copying the data block */
-        for (i = 0, j = 0, k = 0; i < count / sizeof(SAMPLE16); i++) {
-            SAMPLE16       *curpos = NULL;
+        for (i = 0, j = 0, k = 0; i < count / sizeof(int16_t); i++) {
+            int16_t       *curpos = NULL;
 
             if (j >= len1 && pos2 != NULL && k < len2) {
                 curpos = pos2 + k;
-                k += sizeof(SAMPLE16);
+                k += sizeof(int16_t);
             } else if (pos1 != NULL) {
                 curpos = pos1 + j;
-                j += sizeof(SAMPLE16);
+                j += sizeof(int16_t);
             } else {
                 /* curpos is rubbish if neither condition is true */
                 continue;
             }
             procbuf[i] = *curpos << 8;
         }
-        res = IDirectSoundCaptureBuffer_Unlock(cbuffer, pos1, /*j * sizeof(SAMPLE16)*/len1, pos2,
-							   /*k * sizeof(SAMPLE16)*/len2);
+        res = IDirectSoundCaptureBuffer_Unlock(cbuffer, pos1, /*j * sizeof(int16_t)*/len1, pos2,
+							   /*k * sizeof(int16_t)*/len2);
         if (res != DS_OK)
             dserror(res, "\nunlock:");
 
@@ -335,7 +335,7 @@ dsound_audio_thread(void *V)
         /* process the sound */
         db.data = procbuf;
         db.data_swap = procbuf2;
-        db.len = count/sizeof(SAMPLE16);
+        db.len = count/sizeof(int16_t);
         db.channels = n_input_channels;
         pump_sample(&db);
         //triangular_dither(&db);
@@ -385,16 +385,16 @@ dsound_audio_thread(void *V)
                 break;
             }
         }
-        for (i = 0, j = 0, k = 0; i < count / sizeof(SAMPLE16); i++) {
+        for (i = 0, j = 0, k = 0; i < count / sizeof(int16_t); i++) {
             gnuitar_sample_t      W = (SAMPLE32)db.data[i] >> 8;
-            SAMPLE16       *curpos = NULL;
+            int16_t       *curpos = NULL;
 
             if (j >= len1 && pos2 != NULL && k < len2) {
                 curpos = pos2 + k;
-                k += sizeof(SAMPLE16);
+                k += sizeof(int16_t);
             } else if (pos1 != NULL) {
                 curpos = pos1 + j;
-                j += sizeof(SAMPLE16);
+                j += sizeof(int16_t);
             } else {
                 /* curpos is rubbish if neither condition is true */
                 continue;

@@ -189,7 +189,7 @@
  * switch to GMutex that is also available on win32
  *
  * Revision 1.37  2005/08/27 19:05:43  alankila
- * - introduce SAMPLE16 and SAMPLE32 types, and switch
+ * - introduce int16_t and SAMPLE32 types, and switch
  *
  * Revision 1.36  2005/08/27 18:11:35  alankila
  * - support 32-bit sampling

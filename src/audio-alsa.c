@@ -241,7 +241,7 @@
  * switch to GMutex that is also available on win32
  *
  * Revision 1.5  2005/08/27 19:05:43  alankila
- * - introduce SAMPLE16 and SAMPLE32 types, and switch
+ * - introduce int16_t and int32_t types, and switch
  *
  * Revision 1.4  2005/08/27 18:11:35  alankila
  * - support 32-bit sampling
@@ -337,10 +337,10 @@ alsa_audio_thread(void *V)
         .len = buffer_size * n_output_channels,
         .channels = n_output_channels
     };
-    SAMPLE16 *rdbuf16;
-    SAMPLE32 *rdbuf32;
-    SAMPLE16 *wrbuf16;
-    SAMPLE32 *wrbuf32;
+    int16_t *rdbuf16;
+    int32_t *rdbuf32;
+    int16_t *wrbuf16;
+    int32_t *wrbuf32;
 
     (void) V;
 
@@ -386,7 +386,7 @@ alsa_audio_thread(void *V)
         /* prepare output */
 	if (playback_bits == 32) {
 	    for (i = 0; i < db.len; i++)
-		wrbuf32[i] = (SAMPLE32) db.data[i] << 8;
+		wrbuf32[i] = (int32_t) db.data[i] << 8;
         } else {
             triangular_dither(&db, wrbuf16);
         }

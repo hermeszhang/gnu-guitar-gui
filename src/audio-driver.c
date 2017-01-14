@@ -34,8 +34,8 @@
 gnuitar_sample_t procbuf[MAX_BUFFER_SIZE * MAX_CHANNELS];
 gnuitar_sample_t procbuf2[MAX_BUFFER_SIZE * MAX_CHANNELS];
 #else
-gnuitar_sample_t procbuf[MAX_BUFFER_SIZE / sizeof(SAMPLE16)];
-gnuitar_sample_t procbuf2[MAX_BUFFER_SIZE / sizeof(SAMPLE16)];
+gnuitar_sample_t procbuf[MAX_BUFFER_SIZE / sizeof(int16_t)];
+gnuitar_sample_t procbuf2[MAX_BUFFER_SIZE / sizeof(int16_t)];
 #endif
 
 audio_driver_t  *audio_driver = NULL;
@@ -68,14 +68,14 @@ prng(void)
  * distribution still looks like triangle. Idea and implementation borrowed from
  * JACK. */
 void
-triangular_dither(data_block_t *db, SAMPLE16 *target)
+triangular_dither(data_block_t *db, int16_t *target)
 {
-    static SAMPLE32 correlated_noise[MAX_CHANNELS] = { 0, 0, 0, 0 };
+    static int32_t correlated_noise[MAX_CHANNELS] = { 0, 0, 0, 0 };
     int_fast16_t i, current_channel = 0;
     
     for (i = 0; i < db->len; i += 1) {
-        SAMPLE32 tmp = db->data[i];
-        SAMPLE32 noise = (prng() & 0x1ff) - 256; /* -256 to 255 */
+        int32_t tmp = db->data[i];
+        int32_t noise = (prng() & 0x1ff) - 256; /* -256 to 255 */
         
         tmp += noise - correlated_noise[current_channel];
         correlated_noise[current_channel] = noise;

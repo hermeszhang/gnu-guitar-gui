@@ -144,7 +144,7 @@
  * Objectify backbuf, correct naming and make it a typedef.
  *
  * Revision 1.8  2005/08/28 21:45:30  fonin
- * Added type casting for >> operations on SAMPLE16/32 vars, to shut up MSVC
+ * Added type casting for >> operations on int16_t/32 vars, to shut up MSVC
  *
  * Revision 1.7  2005/08/27 18:11:35  alankila
  * - support 32-bit sampling

@@ -71,10 +71,10 @@
  * - effects can now change channel counts
  *
  * Revision 1.16  2005/08/28 21:45:30  fonin
- * Added type casting for >> operations on SAMPLE16/32 vars, to shut up MSVC
+ * Added type casting for >> operations on int16_t/32 vars, to shut up MSVC
  *
  * Revision 1.15  2005/08/27 19:05:43  alankila
- * - introduce SAMPLE16 and SAMPLE32 types, and switch
+ * - introduce int16_t and int32_t types, and switch
  *
  * Revision 1.14  2005/08/27 18:11:35  alankila
  * - support 32-bit sampling
@@ -246,24 +246,24 @@ tracker_done()
 void
 track_write(gnuitar_sample_t *s, int count)
 {
-    SAMPLE16        tmp[MAX_BUFFER_SIZE];
+    int16_t        tmp[MAX_BUFFER_SIZE];
     int             i;
 
     /*
      * Convert to 16bit raw data
      */
     for (i = 0; i < count; i++)
-       tmp[i] = (SAMPLE32)s[i] >> 8;
+       tmp[i] = (int32_t)s[i] >> 8;
 
 #ifndef _WIN32
 #ifdef HAVE_SNDFILE
     if (sf_write_short(fout, tmp, count) != count)
         gnuitar_printf( "Error writing samples: %s\n", sf_strerror(fout));
 #else
-    write(fout, tmp, sizeof(SAMPLE16) * count);
+    write(fout, tmp, sizeof(int16_t) * count);
 #endif
 #else
     if (fout != NULL)
-	mmioWrite(fout, tmp, sizeof(SAMPLE16) * count);
+	mmioWrite(fout, tmp, sizeof(int16_t) * count);
 #endif
 }

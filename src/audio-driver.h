@@ -47,12 +47,6 @@
 
 typedef float gnuitar_sample_t;
 
-/* for compatibility */
-
-typedef int16_t SAMPLE16;
-
-typedef int32_t SAMPLE32;
-
 typedef struct gnuitar_packet {
     gnuitar_sample_t * __restrict__ data;
     gnuitar_sample_t * __restrict__ data_swap;
@@ -115,13 +109,13 @@ extern gnuitar_sample_t procbuf2[MAX_BUFFER_SIZE * MAX_CHANNELS];
 /* sadly, Windows and Linux have a different idea what the size of the buffer is.
  * Linux world talks about size in frames because that is most convenient for ALSA
  * and JACK (but less so for OSS). */
-extern gnuitar_sample_t procbuf[MAX_BUFFER_SIZE / sizeof(SAMPLE16)];
-extern gnuitar_sample_t procbuf2[MAX_BUFFER_SIZE / sizeof(SAMPLE16)];
+extern gnuitar_sample_t procbuf[MAX_BUFFER_SIZE / sizeof(int16_t)];
+extern gnuitar_sample_t procbuf2[MAX_BUFFER_SIZE / sizeof(int16_t)];
 #endif
 
 void guess_audio_driver(void);
 void set_audio_driver_from_str(const char const *str);
-void triangular_dither(data_block_t *db, SAMPLE16 *target);
+void triangular_dither(data_block_t *db, int16_t *target);
 
 #endif /* GNUITAR_AUDIO_DRIVER_H */
 
