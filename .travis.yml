@@ -4,6 +4,13 @@ compiler:
   - gcc
   - clang
 
+addons:
+  apt:
+    packages:
+      - libgtk2.0-dev
+      - libasound2-dev
+      - libjack-dev
+
 script:
   - bash scripts/cmake-build.sh
 
