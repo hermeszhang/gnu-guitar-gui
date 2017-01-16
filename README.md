@@ -1,6 +1,8 @@
 GNUitar
 =======
 
+[![Travis Badge](https://travis-ci.org/gnuitar/gnuitar.svg?branch=master)](https://travis-ci.org/gnuitar/gnuitar)
+
 The GNU Guitar Effects Processor
 
 ### What is GNUitar ?
