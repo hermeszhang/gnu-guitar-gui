@@ -6,7 +6,10 @@ compiler:
 
 addons:
   apt:
+    sources:
+      - ubuntu-toolchain-r-test
     packages:
+      - cmake
       - libgtk2.0-dev
       - libasound2-dev
       - libjack-dev
