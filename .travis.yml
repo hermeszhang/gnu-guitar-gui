@@ -5,5 +5,5 @@ compiler:
   - clang
 
 script:
-  - bash scripts/autotools-build.sh
+  - bach scripts/cmake-build.sh
 
