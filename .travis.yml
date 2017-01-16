@@ -5,5 +5,5 @@ compiler:
   - clang
 
 script:
-  - bach scripts/cmake-build.sh
+  - bash scripts/cmake-build.sh
 
