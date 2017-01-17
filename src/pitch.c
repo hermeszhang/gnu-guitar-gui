@@ -299,8 +299,8 @@ pitch_filter(effect_t *p, gnuitar_packet_t *db)
 {
     struct pitch_params *params = p->params;
     gnuitar_sample_t *s = db->data;
-    int count = db->len / db->channels;
-    int i;
+    unsigned int count = db->len / db->channels;
+    unsigned int i;
     float depth, Wet, Dry, output_inc;
 
     depth = powf(2.f, (params->halfnote + params->finetune) / 12.f);
