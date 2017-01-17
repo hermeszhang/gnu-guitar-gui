@@ -118,8 +118,8 @@ static void
 amp_filter(effect_t *p, gnuitar_packet_t *db)
 {
     struct amp_params *params = p->params;
-    int             i;
-    float           power;
+    unsigned int i;
+    float power;
 
     power = pow(10, params->amp_power / 20.0);
     for (i = 0; i < db->len; i++)
