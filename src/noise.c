@@ -117,14 +117,15 @@ update_noise_threshold(GtkAdjustment * adj, struct noise_params *params)
 static void
 update_noise_hold(GtkAdjustment * adj, struct noise_params *params)
 {
-    params->hold_time = (int) adj->value * sample_rate / 1000;
+    /* TODO remove hard coded sample rate */
+    params->hold_time = (int) adj->value * 48000 / 1000;
 }
 
 static void
 update_noise_release(GtkAdjustment * adj, struct noise_params *params)
 {
     params->release_time =
-	(int) adj->value * sample_rate / 1000;
+	(int) adj->value * 48000 / 1000;
 }
 
 static void
@@ -136,7 +137,7 @@ update_noise_hyst(GtkAdjustment * adj, struct noise_params *params)
 static void
 update_noise_attack(GtkAdjustment * adj, struct noise_params *params)
 {
-    params->attack = (int) adj->value * sample_rate / 1000;
+    params->attack = (int) adj->value * 48000 / 1000;
 }
 
 static void
@@ -210,7 +211,7 @@ noise_init(gnuitar_effect_t *p)
 
     adj_hold =
 	gtk_adjustment_new(pnoise->hold_time * 1000 /
-			   sample_rate, 0.0, 201.0, 1.0, 1.0,
+			   48000, 0.0, 201.0, 1.0, 1.0,
 			   1.0);
     hold_label = gtk_label_new("Hold\nms");
     gtk_table_attach(GTK_TABLE(parmTable), hold_label, 3, 4, 0, 1,
@@ -235,7 +236,7 @@ noise_init(gnuitar_effect_t *p)
 
     adj_release =
 	gtk_adjustment_new(pnoise->release_time * 1000 /
-			   sample_rate, 0.0, 15001.0, 1.0,
+			   48000, 0.0, 15001.0, 1.0,
 			   1.0, 1.0);
     release_label = gtk_label_new("Release\nms");
     gtk_table_attach(GTK_TABLE(parmTable), release_label, 5, 6, 0, 1,
@@ -260,7 +261,7 @@ noise_init(gnuitar_effect_t *p)
 
     adj_attack =
 	gtk_adjustment_new(pnoise->attack * 1000 /
-			   sample_rate, 0.0, 4001.0, 1.0,
+			   48000, 0.0, 4001.0, 1.0,
 			   1.0, 1.0);
     attack_label = gtk_label_new("Attack\nms");
     gtk_table_attach(GTK_TABLE(parmTable), attack_label, 7, 8, 0, 1,
@@ -340,20 +341,20 @@ static void
 noise_filter(gnuitar_effect_t *p, gnuitar_packet_t *db)
 {
 
-    int             	count;
-    gnuitar_sample_t     	*s;
+    unsigned int count;
+    gnuitar_sample_t *s;
     struct noise_params *dn;
-    int                 hold_counter=0;    /* how much longer before we start 
-					     * to supress the signal */
-    int                 release_counter=0; /* how much longer before we 
-					     * fade out to nothing - 
-					     * fadeout counter */
-    float    	        release_amp = 1.0;
-    float	        attack_amp = 1.0;
-    int                 attack_counter = 0;
-    short               fadeout = 0;	/* if non-zero, we use hysteresis to
-					 * suppress the sound.
-					 * Otherwise, we use the threshold.  */
+    /* how much longer before we start to supress the signal */
+    unsigned int hold_counter = 0;
+    /* how much longer before we fade out to nothing - fadeout counter */
+    unsigned int release_counter = 0;
+    float release_amp = 1.0;
+    float attack_amp = 1.0;
+    unsigned int attack_counter = 0;
+    short fadeout = 0;
+    /* if non-zero, we use hysteresis to suppress the sound.
+     * Otherwise, we use the threshold.
+     */
 
     dn = (struct noise_params *) p->params;
 
@@ -467,9 +468,9 @@ noise_create()
 
     pnoise = p->params;
     pnoise->threshold = 500;
-    pnoise->hold_time = 2 * sample_rate / 1000;
-    pnoise->release_time = 500 * sample_rate / 1000;
-    pnoise->attack = 0 * sample_rate / 1000;
+    pnoise->hold_time = 2 * 48000 / 1000;
+    pnoise->release_time = 500 * 48000 / 1000;
+    pnoise->attack = 0 * 48000 / 1000;
     pnoise->hysteresis = 410;
 
     return p;
