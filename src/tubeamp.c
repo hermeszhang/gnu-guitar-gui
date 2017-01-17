@@ -548,15 +548,15 @@ F_tube(float in, float r_i)
 static void
 tubeamp_filter(gnuitar_effect_t *p, gnuitar_packet_t *db)
 {
-    int_fast16_t i, j, k, curr_channel = 0;
+    uint_fast16_t i, j, k, curr_channel = 0;
     gnuitar_sample_t *ptr1;
     struct tubeamp_params *params = p->params;
     float gain;
 
     /* update bq states from tone controls */
-    set_lsh_biquad(sample_rate * UPSAMPLE_RATIO, 500, params->tone_bass, &params->bq_bass);
-    set_peq_biquad(sample_rate * UPSAMPLE_RATIO, 650, 500.0, params->tone_middle, &params->bq_middle);
-    set_hsh_biquad(sample_rate * UPSAMPLE_RATIO, 800, params->tone_treble, &params->bq_treble);
+    set_lsh_biquad(db->rate * UPSAMPLE_RATIO, 500, params->tone_bass, &params->bq_bass);
+    set_peq_biquad(db->rate * UPSAMPLE_RATIO, 650, 500.0, params->tone_middle, &params->bq_middle);
+    set_hsh_biquad(db->rate * UPSAMPLE_RATIO, 800, params->tone_treble, &params->bq_treble);
 
     gain = pow(10.f, params->gain / 20.f);
     
@@ -644,9 +644,9 @@ tubeamp_load(gnuitar_effect_t *p, LOAD_ARGS)
     LOAD_DOUBLE("tone_middle", params->tone_middle);
     LOAD_DOUBLE("tone_treble", params->tone_treble);
 
-    if (params->impulse_model < 0 || params->impulse_model > 1)
+    if (params->impulse_model > 1)
         params->impulse_model = 0;
-    if (params->impulse_quality < 0 || params->impulse_quality > 2)
+    if (params->impulse_quality > 2)
         params->impulse_quality = 1;
 }
 
@@ -657,6 +657,11 @@ tubeamp_create()
     float tmp;
     effect_t   *p;
     struct tubeamp_params *params;
+    gnuitar_format_t format;
+
+    if (gnuitar_audio_driver_get_format(audio_driver, &format) != 0) {
+        gnuitar_format_defaults(&format);
+    }
 
     p = calloc(1, sizeof(effect_t)); 
     params = p->params = gnuitar_memalign(1, sizeof(struct tubeamp_params));
@@ -680,29 +685,29 @@ tubeamp_create()
     /* configure the various stages */
     params->r_i[0] = 68e3 / 3000;
     params->r_k_p[0] = 2700 / 100000.0;
-    set_chebyshev1_biquad(sample_rate * UPSAMPLE_RATIO, 22570, 0.0, TRUE, &params->lowpass[0]);
-    set_rc_lowpass_biquad(sample_rate * UPSAMPLE_RATIO, 86, &params->biaslowpass[0]);
-    set_rc_highpass_biquad(sample_rate * UPSAMPLE_RATIO, 37, &params->highpass[0]);
+    set_chebyshev1_biquad(format.rate * UPSAMPLE_RATIO, 22570, 0.0, TRUE, &params->lowpass[0]);
+    set_rc_lowpass_biquad(format.rate * UPSAMPLE_RATIO, 86, &params->biaslowpass[0]);
+    set_rc_highpass_biquad(format.rate * UPSAMPLE_RATIO, 37, &params->highpass[0]);
     
     params->r_i[1] = 250e3 / 3000;
     params->r_k_p[1] = 1500 / 100000.0;
-    set_chebyshev1_biquad(sample_rate * UPSAMPLE_RATIO, 6531, 0.0, TRUE, &params->lowpass[1]);
-    set_rc_lowpass_biquad(sample_rate * UPSAMPLE_RATIO, 132, &params->biaslowpass[1]);
-    set_rc_highpass_biquad(sample_rate * UPSAMPLE_RATIO, 37, &params->highpass[1]);
+    set_chebyshev1_biquad(format.rate * UPSAMPLE_RATIO, 6531, 0.0, TRUE, &params->lowpass[1]);
+    set_rc_lowpass_biquad(format.rate * UPSAMPLE_RATIO, 132, &params->biaslowpass[1]);
+    set_rc_highpass_biquad(format.rate * UPSAMPLE_RATIO, 37, &params->highpass[1]);
     
     params->r_i[2] = 250e3 / 3000;
     params->r_k_p[2] = 820 / 1000000.0;
-    set_chebyshev1_biquad(sample_rate * UPSAMPLE_RATIO, 6531, 0.0, TRUE, &params->lowpass[2]);
-    set_rc_lowpass_biquad(sample_rate * UPSAMPLE_RATIO, 194, &params->biaslowpass[2]);
-    set_rc_highpass_biquad(sample_rate * UPSAMPLE_RATIO, 37, &params->highpass[2]);
+    set_chebyshev1_biquad(format.rate * UPSAMPLE_RATIO, 6531, 0.0, TRUE, &params->lowpass[2]);
+    set_rc_lowpass_biquad(format.rate * UPSAMPLE_RATIO, 194, &params->biaslowpass[2]);
+    set_rc_highpass_biquad(format.rate * UPSAMPLE_RATIO, 37, &params->highpass[2]);
     
     params->r_i[3] = 250e3 / 3000;
     params->r_k_p[3] = 820 / 100000.0;
-    set_chebyshev1_biquad(sample_rate * UPSAMPLE_RATIO, 6531, 0.0, TRUE, &params->lowpass[3]);
-    set_rc_lowpass_biquad(sample_rate * UPSAMPLE_RATIO, 250, &params->biaslowpass[3]);
-    set_rc_highpass_biquad(sample_rate * UPSAMPLE_RATIO, 37, &params->highpass[3]);
+    set_chebyshev1_biquad(format.rate * UPSAMPLE_RATIO, 6531, 0.0, TRUE, &params->lowpass[3]);
+    set_rc_lowpass_biquad(format.rate * UPSAMPLE_RATIO, 250, &params->biaslowpass[3]);
+    set_rc_highpass_biquad(format.rate * UPSAMPLE_RATIO, 37, &params->highpass[3]);
 
-    set_chebyshev1_biquad(sample_rate * UPSAMPLE_RATIO, 12000, 10.0, TRUE, &params->decimation_filter);
+    set_chebyshev1_biquad(format.rate * UPSAMPLE_RATIO, 12000, 10.0, TRUE, &params->decimation_filter);
 
 #define STEEPNESS   3e-3
 #define SCALE       1e2
