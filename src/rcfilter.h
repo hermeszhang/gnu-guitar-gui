@@ -37,8 +37,7 @@ struct filter_data {
                     amplify,
                     R,
                     C,
-                    invR,
-                    dt_div_C;
+                    invR;
     double          di[MAX_FILTERS][2][MAX_CHANNELS];
 };
 
