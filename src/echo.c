@@ -165,6 +165,8 @@ is_prime(int n)
 static void
 echo_init(gnuitar_effect_t *p)
 {
+    gnuitar_format_t format;
+
     struct echo_params *params;
 
     GtkWidget      *decay;
@@ -183,6 +185,10 @@ echo_init(gnuitar_effect_t *p)
     GtkWidget      *parmTable;
 
     params = p->params;
+
+    if (gnuitar_audio_driver_get_format(audio_driver, &format) != 0) {
+        gnuitar_format_defaults(&format);
+    }
 
     /*
      * GUI Init
@@ -257,7 +263,7 @@ echo_init(gnuitar_effect_t *p)
 		     __GTKATTACHOPTIONS
 		     (GTK_FILL | GTK_EXPAND | GTK_SHRINK), 0, 0);
 
-    if (n_output_channels > 1 && n_input_channels == 1) {
+    if (format.output_channels > 1 && format.input_channels == 1) {
         mcbutton = gtk_check_button_new_with_label("Multichannel");
         if (params->multichannel)
             gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(mcbutton), TRUE);
@@ -289,8 +295,8 @@ echo_init(gnuitar_effect_t *p)
 static void
 echo_filter_mono(effect_t *p, gnuitar_packet_t *db)
 {
-    int                 i, count, curr_channel = 0;
-    gnuitar_sample_t          *s, tmp;
+    unsigned int        i, count, curr_channel = 0;
+    gnuitar_sample_t    *s, tmp;
     double              in, out, echo_samples, echo_decay;
     struct echo_params  *params;
     int                 delay_lookup[MAX_ECHO_COUNT];
@@ -301,12 +307,12 @@ echo_filter_mono(effect_t *p, gnuitar_packet_t *db)
 
     params = p->params;
 
-    echo_samples = params->echo_size / 1000.0 * sample_rate;
+    echo_samples = params->echo_size / 1000.0 * db->rate;
     echo_decay = params->echo_decay / 100.0;
     
     for (i = 0; i < params->echoes; i += 1) {
-	delay_lookup[i]   = echo_samples * params->size_factor[i];
-	decay_lookup[i]   = pow(echo_decay, params->decay_factor[i]);
+        delay_lookup[i] = echo_samples * params->size_factor[i];
+        decay_lookup[i] = pow(echo_decay, params->decay_factor[i]);
     }
     while (count) {
         /* mix current input into the various echo buffers at their
@@ -314,7 +320,7 @@ echo_filter_mono(effect_t *p, gnuitar_packet_t *db)
         in = *s;
         out = in;
         for (i = 0; i < params->echoes; i += 1) {
-	    tmp = params->history[curr_channel][i]->get(params->history[curr_channel][i], delay_lookup[i]) * decay_lookup[i];
+            tmp = params->history[curr_channel][i]->get(params->history[curr_channel][i], delay_lookup[i]) * decay_lookup[i];
             out += tmp;
             if (params->echoes > 1) {
                 if (i > 1)
@@ -325,7 +331,7 @@ echo_filter_mono(effect_t *p, gnuitar_packet_t *db)
             params->history[curr_channel][i]->add(params->history[curr_channel][i], in + tmp);
         }
         *s = out;
-        
+
         curr_channel = (curr_channel + 1) % db->channels; 
         s++;
         count--;
@@ -335,7 +341,7 @@ echo_filter_mono(effect_t *p, gnuitar_packet_t *db)
 static void
 echo_filter_mc(effect_t *p, gnuitar_packet_t *db)
 {
-    int                 i, count, curr_channel = 0;
+    unsigned int i, count, curr_channel = 0;
     gnuitar_sample_t          *ins, *outs, tmp;
     double              in, out, echo_samples, echo_decay;
     struct echo_params  *params;
@@ -351,11 +357,8 @@ echo_filter_mc(effect_t *p, gnuitar_packet_t *db)
     count = db->len;
     
     params = p->params;
-    echo_samples = params->echo_size / 1000.0 * sample_rate;
+    echo_samples = params->echo_size / 1000.0 * db->rate;
     echo_decay = params->echo_decay / 100.0;
-    
-    db->channels = n_output_channels;
-    db->len *= n_output_channels;
     
     for (i = 0; i < params->echoes; i += 1) {
 	delay_lookup[i]   = echo_samples * params->size_factor[i];
@@ -395,7 +398,7 @@ static void
 echo_filter(effect_t *p, gnuitar_packet_t *db)
 {
     struct echo_params *params = p->params;
-    if (params->multichannel && db->channels == 1 && n_output_channels > 1) {
+    if (params->multichannel && db->channels == 1) {
         echo_filter_mc(p, db);
     } else {
         echo_filter_mono(p, db);
