@@ -466,7 +466,7 @@ main(int argc, char **argv)
         gnuitar_printf("warning: no usable audio driver found.\n");
 
     pump_start();
-    if (audio_driver && (error = audio_driver->init()) != ERR_NOERROR) {
+    if (audio_driver && (error = gnuitar_audio_driver_start(audio_driver)) != ERR_NOERROR) {
         gnuitar_printf("warning: unable to begin audio processing (code %d)\n", error);
     }
 
@@ -474,8 +474,10 @@ main(int argc, char **argv)
     load_initial_state(argv, argc);
     gtk_main();
 
+/*
     if (audio_driver && audio_driver->enabled)
-        audio_driver->finish();
+        gnuitar_audio_driver_destroy(audio_driver);
+*/
 
     pump_stop();
     save_settings();
