@@ -15,6 +15,7 @@ addons:
       - libgtk2.0-dev
       - libasound2-dev
       - libjack-dev
+      - libsndfile-dev
 
 script:
   - bash scripts/cmake-build.sh
