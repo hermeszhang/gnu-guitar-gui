@@ -227,6 +227,8 @@ toggle_stereo(GtkWidget *w, struct phasor_params *params)
 static void
 phasor_init(gnuitar_effect_t *p)
 {
+    gnuitar_format_t format;
+
     struct phasor_params *params;
 
     GtkWidget      *speed;
@@ -244,6 +246,10 @@ phasor_init(gnuitar_effect_t *p)
     GtkWidget      *button;
     GtkWidget      *parmTable;
     params = p->params;
+
+    if (gnuitar_audio_driver_get_format(audio_driver, &format) != 0) {
+        gnuitar_format_defaults(&format);
+    }
 
     /*
      * GUI Init
@@ -331,7 +337,7 @@ phasor_init(gnuitar_effect_t *p)
 		     (GTK_EXPAND | GTK_SHRINK),
 		     __GTKATTACHOPTIONS(GTK_SHRINK), 0, 0);
 
-    if (n_output_channels > 1 && n_input_channels == 1) {
+    if (format.output_channels > 1 && format.input_channels == 1) {
         button = gtk_check_button_new_with_label("Stereo");
         if (params->stereo)
 	    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(button), TRUE);
@@ -367,7 +373,7 @@ phasor_filter_mono(gnuitar_effect_t *p, gnuitar_packet_t *db)
 
     while (count) {
         if (curr_channel == 0 && count % PHASOR_UPDATE_INTERVAL == 0) { 
-            f += 1000.0f / params->sweep_time / sample_rate * PHASOR_UPDATE_INTERVAL;
+            f += 1000.0f / params->sweep_time / db->rate * PHASOR_UPDATE_INTERVAL;
             if (f >= 1.0f)
                 f -= 1.0f;
             delay = (sin_lookup(f) + 1.f) / 2.f;
@@ -395,7 +401,7 @@ phasor_filter_stereo(gnuitar_effect_t *p, gnuitar_packet_t *db)
 {
     struct phasor_params *params = p->params;
     float f, Dry, Wet, sinval=0, cosval=0;
-    int_fast16_t i;
+    uint_fast16_t i;
     gnuitar_sample_t *tmp;
     
     db->channels = 2;
@@ -406,7 +412,7 @@ phasor_filter_stereo(gnuitar_effect_t *p, gnuitar_packet_t *db)
     for (i = 0; i < db->len / 2; i += 1) {
         gnuitar_sample_t x0, x1, y0, y1;
         if (i % PHASOR_UPDATE_INTERVAL == 0) { 
-            f += 1000.0f / params->sweep_time / sample_rate * PHASOR_UPDATE_INTERVAL;
+            f += 1000.0f / params->sweep_time / db->rate * PHASOR_UPDATE_INTERVAL;
             if (f >= 1.0f)
                 f -= 1.0f;
             sinval = sin_lookup(f);
@@ -431,12 +437,12 @@ phasor_filter(gnuitar_effect_t *p, gnuitar_packet_t *db)
 {
     struct phasor_params *params = p->params;
 
-    if (n_output_channels > 1 && db->channels == 1 && params->stereo) {
+    if (db->channels == 1 && params->stereo) {
         phasor_filter_stereo(p, db);
-        params->f += 1000.0 / params->sweep_time / sample_rate * (db->len / db->channels);
+        params->f += 1000.0 / params->sweep_time / db->rate * (db->len / db->channels);
     } else {
         phasor_filter_mono(p, db);
-        params->f += 1000.0 / params->sweep_time / sample_rate * (db->len / db->channels);
+        params->f += 1000.0 / params->sweep_time / db->rate * (db->len / db->channels);
     }
     
     if (params->f >= 1.0)
