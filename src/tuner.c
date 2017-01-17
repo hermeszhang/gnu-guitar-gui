@@ -481,10 +481,10 @@ static void
 tuner_filter(gnuitar_effect_t *p, gnuitar_packet_t *db)
 {
     struct tuner_params *params;
-    int			i, j;
-    gnuitar_sample_t	       *s;
-    float		power = 0,
-			freq = 0;
+    unsigned int i, j;
+    gnuitar_sample_t *s;
+    float power = 0,
+    freq = 0;
 #ifdef HAVE_FFTW3
     float               weighted_bin = 0,
                         weighted_bin_n = 0,
@@ -572,7 +572,7 @@ tuner_filter(gnuitar_effect_t *p, gnuitar_packet_t *db)
     /* note: the complex part should be neglible */
 
     /* search for maximum quefrency -- this analysis could be better though... */
-    for (i = sample_rate / MAX_HZ; i < sample_rate / MIN_HZ; i += 1) {
+    for (i = db->rate / MAX_HZ; i < db->rate / MIN_HZ; i += 1) {
         float len = fabs(params->fftin[i][0]);
         if (len > maxlen) {
             maxbin = i;
@@ -592,7 +592,7 @@ tuner_filter(gnuitar_effect_t *p, gnuitar_packet_t *db)
     /* this should be a good approximation of the true quefrency */
     weighted_bin /= weighted_bin_n;
 
-    freq = (float) sample_rate / weighted_bin;
+    freq = (float) db->rate / weighted_bin;
 #else
 #define HISTORY_SIZE 1200	/* history buffer size: allows ~40 Hz */
 #define COMPARE_LEN 192		/* sample data examining length */
