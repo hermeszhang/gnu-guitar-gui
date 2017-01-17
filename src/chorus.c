@@ -216,6 +216,10 @@ toggle_chorus_multichannel(void *bullshit, struct chorus_params *params)
 static void
 chorus_init(gnuitar_effect_t *p)
 {
+    gnuitar_format_t format;
+    unsigned int input_channels;
+    unsigned int output_channels;
+
     struct chorus_params *pchorus;
 
     GtkWidget      *basedelay;
@@ -246,6 +250,13 @@ chorus_init(gnuitar_effect_t *p)
 
     GtkWidget      *parmTable;
 
+    if (gnuitar_audio_driver_get_format(audio_driver, &format) != 0) {
+        input_channels = 2;
+        output_channels = 2;
+    } else {
+        input_channels = format.input_channels;
+        output_channels = format.output_channels;
+    }
     pchorus = (struct chorus_params *) p->params;
 
     /*
@@ -384,7 +395,7 @@ chorus_init(gnuitar_effect_t *p)
 		     __GTKATTACHOPTIONS(GTK_FILL | GTK_EXPAND |
 					GTK_SHRINK), 3, 0);
     
-    if (n_input_channels == 1 && n_output_channels > 1) {
+    if (input_channels == 1 && output_channels > 1) {
         mcbutton = gtk_check_button_new_with_label("Multichannel flange");
         if (pchorus->multichannel)
             gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(mcbutton), TRUE);
@@ -419,8 +430,8 @@ static void
 chorus_filter_mono(gnuitar_effect_t *p, gnuitar_packet_t *db)
 {
     struct chorus_params *cp;
-    int             count, i, curr_channel = 0;
-    double          dly, Speed, tmp_ang, Depth, BaseDelay, Dry, Wet, Rgn;
+    int count, i, curr_channel = 0;
+    double dly, Speed, tmp_ang, Depth, BaseDelay, Dry, Wet, Rgn;
     gnuitar_sample_t     *s;
     gnuitar_sample_t      tmp, rgn;
 
@@ -432,9 +443,9 @@ chorus_filter_mono(gnuitar_effect_t *p, gnuitar_packet_t *db)
     Dry = 1 - cp->drywet / 100.0;
     Wet =     cp->drywet / 100.0;
     Rgn = cp->regen / 100.0;
-    Speed = 1000.0 / cp->speed / sample_rate;
-    Depth = cp->depth / 1000.0 * sample_rate;
-    BaseDelay = cp->basedelay / 1000.0 * sample_rate;
+    Speed = 1000.0 / cp->speed / db->rate;
+    Depth = cp->depth / 1000.0 * db->rate;
+    BaseDelay = cp->basedelay / 1000.0 * db->rate;
 
     while (count) {
         tmp = 0.0;
@@ -475,10 +486,10 @@ static void
 chorus_filter_mc(gnuitar_effect_t *p, gnuitar_packet_t *db)
 {
     struct chorus_params *cp;
-    int             i, count, curr_channel = 0;
-    double          dly, Speed, tmp_ang, Depth, BaseDelay, Dry, Wet, Rgn;
-    gnuitar_sample_t     *outs, *ins;
-    gnuitar_sample_t      tmp, rgn;
+    unsigned int i, count, curr_channel = 0;
+    double dly, Speed, tmp_ang, Depth, BaseDelay, Dry, Wet, Rgn;
+    gnuitar_sample_t *outs, *ins;
+    gnuitar_sample_t tmp, rgn;
 
     cp = (struct chorus_params *) p->params;
 
@@ -494,12 +505,9 @@ chorus_filter_mc(gnuitar_effect_t *p, gnuitar_packet_t *db)
     Dry = 1 - cp->drywet / 100.0;
     Wet =     cp->drywet / 100.0;
     Rgn = cp->regen / 100.0;
-    Speed = 1000.0 / cp->speed / sample_rate;
-    Depth = cp->depth / 1000.0 * sample_rate;
-    BaseDelay = cp->basedelay / 1000.0 * sample_rate;
-
-    db->channels = n_output_channels;
-    db->len *= n_output_channels;
+    Speed = 1000.0 / cp->speed / db->rate;
+    Depth = cp->depth / 1000.0 * db->rate;
+    BaseDelay = cp->basedelay / 1000.0 * db->rate;
 
     while (count) {
         tmp_ang = cp->ang;
@@ -524,8 +532,8 @@ chorus_filter_mc(gnuitar_effect_t *p, gnuitar_packet_t *db)
         if (cp->ang >= 1.0)
             cp->ang -= 1.0;
 
-	ins++;
-	count--;
+        ins++;
+        count--;
     }
 }
 
@@ -534,7 +542,7 @@ chorus_filter(gnuitar_effect_t *p, gnuitar_packet_t *db)
 {
     struct chorus_params *params = p->params;
     
-    if (params->multichannel && db->channels == 1 && n_output_channels > 1) {
+    if (params->multichannel && db->channels == 1) {
         chorus_filter_mc(p, db);
     } else {
         chorus_filter_mono(p, db);
