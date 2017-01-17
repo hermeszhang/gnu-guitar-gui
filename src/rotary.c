@@ -75,13 +75,10 @@ static void
 rotary_filter(gnuitar_effect_t *p, gnuitar_packet_t *db)
 {
     struct rotary_params *params = p->params;
-    int i;
+    unsigned int i;
     float pha, sinval = 0, cosval = 0;
     gnuitar_sample_t *tmp;
-    
-    if (db->channels != 1 || n_output_channels < 2)
-        return;
-    
+
     /* The rotary speaker simulation is based on modulating input with subsonic
      * sinuswave and then separating the upwards and downwards shifted frequencies
      * with hilbert transform. The upwards shifted component can be thought to be
@@ -102,7 +99,7 @@ rotary_filter(gnuitar_effect_t *p, gnuitar_packet_t *db)
         if (i % 8 == 0) {
             sinval = sin_lookup(pha);
             cosval = cos_lookup(pha);
-            pha += (float) 16 / sample_rate * 1000.0 / params->speed;
+            pha += (float) 16 / db->rate * 1000.0 / params->speed;
             // params->speed;
             if (pha >= 1.0)
                 pha -= 1.0;
@@ -118,7 +115,7 @@ rotary_filter(gnuitar_effect_t *p, gnuitar_packet_t *db)
         db->data_swap[i*2+1] = 0.60 * y1 + 0.40 * do_biquad(y0, &params->rd, 0);
     }
 
-    params->phase += (float) db->len / sample_rate * 1000.0 / params->speed;
+    params->phase += (float) db->len / db->rate * 1000.0 / params->speed;
     if (params->phase >= 1.0)
         params->phase -= 1.0;
 
@@ -154,6 +151,11 @@ rotary_create()
 {
     effect_t   *p;
     struct rotary_params *params;
+    gnuitar_format_t format;
+
+    if (gnuitar_audio_driver_get_format(audio_driver, &format) != 0) {
+        gnuitar_format_defaults(&format);
+    }
 
     p = calloc(1, sizeof(effect_t)); 
     params = p->params = gnuitar_memalign(1, sizeof(struct rotary_params));
@@ -167,10 +169,11 @@ rotary_create()
     params->speed = 1000;
     params->unread_output = 0;
 
-    set_rc_lowpass_biquad(sample_rate, 2000, &params->ld);
-    set_rc_lowpass_biquad(sample_rate, 2000, &params->rd);
+    set_rc_lowpass_biquad(format.rate, 2000, &params->ld);
+    set_rc_lowpass_biquad(format.rate, 2000, &params->rd);
 
     hilbert_init(&params->hilb);
     
     return p;
 }
+
