@@ -16,17 +16,20 @@ IF (UNIX)
     ADD_DEFINITIONS(-D_GNU_SOURCE)
 
     # OSS is always available on Unix
-    ADD_DEFINITIONS(-DHAVE_OSS)
+    # Removing support for OSS for now
+    # ADD_DEFINITIONS(-DHAVE_OSS)
 
     # these libraries are dynamically detected.
     # probably pkg-config should be used for these as well.
-    FIND_LIBRARY(JACK_LIBRARY NAMES jack)
-    IF (JACK_LIBRARY)
-        ADD_DEFINITIONS(-DHAVE_JACK)
-        SET(OTHER_LIBRARIES ${OTHER_LIBRARIES} jack)
-    ELSE (JACK_LIBRARY)
-        MESSAGE("*** Warning: libjack not found -- not compiling jack support.")
-    ENDIF (JACK_LIBRARY)
+
+     # Removing jack support, for now
+#    FIND_LIBRARY(JACK_LIBRARY NAMES jack)
+#    IF (JACK_LIBRARY)
+#        ADD_DEFINITIONS(-DHAVE_JACK)
+#        SET(OTHER_LIBRARIES ${OTHER_LIBRARIES} jack)
+#    ELSE (JACK_LIBRARY)
+#        MESSAGE("*** Warning: libjack not found -- not compiling jack support.")
+#    ENDIF (JACK_LIBRARY)
 
     FIND_LIBRARY(ALSA_LIBRARY NAMES asound)
     IF (ALSA_LIBRARY)
