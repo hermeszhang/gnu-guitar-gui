@@ -608,7 +608,7 @@ tuner_filter(gnuitar_effect_t *p, gnuitar_packet_t *db)
     max_diff = power * COMPARE_LEN / 128.0;
     /* this value must be much higher or we give up too early on noisy signal */
     max_tmp2 = power / 3.0;
-    loop_len = sample_rate / MAX_HZ - 1;
+    loop_len = db->rate / MAX_HZ - 1;
   NEXT_SEARCH:
     while (++loop_len < HISTORY_SIZE - COMPARE_LEN) {
         float diff = 0;
@@ -645,7 +645,7 @@ tuner_filter(gnuitar_effect_t *p, gnuitar_packet_t *db)
 
     /* If we are reinitializing, prefill the history to improve the time
      * it takes to get a valid median */
-    freq = sample_rate / good_loop_len;
+    freq = db->rate / good_loop_len;
 #endif
 
     if (params->freq == 0) {
