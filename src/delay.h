@@ -30,14 +30,15 @@
 #define MAX_STEP (MAX_SAMPLE_RATE * MAX_SECONDS)
 #define MAX_SIZE (MAX_STEP * (MAX_COUNT + 1))
 
-effect_t *   delay_create(void);
+effect_t * delay_create(void);
 
 struct delay_params {
-    Backbuf_t       *history[MAX_CHANNELS];  /* history of samples */
-    short            multichannel;
-    float            delay_decay,   /* % of decay each time */
-                     delay_time;    /* time (ms) between repeats */
-    int              delay_count;    /* number of repeats */
+    Backbuf_t *history[MAX_CHANNELS]; /* history of samples */
+    short multichannel;
+    float delay_decay; /* % of decay each time */
+    float delay_time; /* time (ms) between repeats */
+    unsigned int delay_count; /* number of repeats */
 };
 
 #endif
+
