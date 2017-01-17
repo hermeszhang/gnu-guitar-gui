@@ -206,7 +206,7 @@ reverb_filter(gnuitar_effect_t *p, gnuitar_packet_t *db)
     s = db->data;
     count = db->len;
 
-    Delay = params->delay / 1000.0 * sample_rate;
+    Delay = params->delay / 1000.0 * db->rate;
     Wet = params->drywet / 100.0;
     Dry = 1 - Wet;
     Rgn = params->regen / 100.0;
@@ -240,7 +240,7 @@ reverb_filter(gnuitar_effect_t *p, gnuitar_packet_t *db)
      * For stereo output, the channels 1, 2 and 3, 4 are averaged.
      */
 
-    fsr = sample_rate / 44100;
+    fsr = db->rate / 44100;
     while (count) {
         input = *s;
 
