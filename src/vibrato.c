@@ -339,17 +339,17 @@ vibrato_filter(gnuitar_effect_t *p, gnuitar_packet_t *db)
             *s = cosval * x0 - sinval * x1;
         
         curr_channel = (curr_channel + 1) % db->channels;
-	if (curr_channel == 0) {
-	    vp->vibrato_phase += 1000.0 / vp->vibrato_speed / sample_rate;
+        if (curr_channel == 0) {
+            vp->vibrato_phase += 1000.0 / vp->vibrato_speed / db->rate;
             if (vp->vibrato_phase >= 1.0)
                 vp->vibrato_phase -= 1.0;
-	    vp->phase += (fabs(vp->vibrato_base) + (vp->vibrato_amplitude + sin_lookup(vp->vibrato_phase) * vp->vibrato_amplitude) / 2) / sample_rate;
+            vp->phase += (fabs(vp->vibrato_base) + (vp->vibrato_amplitude + sin_lookup(vp->vibrato_phase) * vp->vibrato_amplitude) / 2) / db->rate;
             if (vp->phase >= 1.0)
                 vp->phase -= 1.0;
         }
 
-	s++;
-	count--;
+        s++;
+        count--;
     }
 }
 
