@@ -163,12 +163,17 @@ tracker_out(const char *outfile)
 {
 #ifndef _WIN32
 #ifdef HAVE_SNDFILE
+    gnuitar_format_t format;
     SF_INFO             sfinfo;
 
+    if (gnuitar_audio_driver_get_format(audio_driver, &format) != 0) {
+        gnuitar_format_defaults(&format);
+    }
+
     memset(&sfinfo, 0, sizeof(sfinfo));
-    sfinfo.samplerate = sample_rate;
+    sfinfo.samplerate = format.rate;
     sfinfo.frames     = 0;
-    sfinfo.channels   = n_output_channels;
+    sfinfo.channels   = format.output_channels;
     sfinfo.format     = SF_FORMAT_WAV | SF_FORMAT_PCM_16;
     
     fout = sf_open(outfile, SFM_WRITE, &sfinfo);
@@ -178,7 +183,7 @@ tracker_out(const char *outfile)
 #else
     fout = open(outfile, O_NONBLOCK | O_WRONLY | O_CREAT, 0644);
     if (ioctl(fout, O_NONBLOCK, 0) == -1)
-	perror("ioctl");
+        perror("ioctl");
 #endif // SNDFILE
 
 #else
