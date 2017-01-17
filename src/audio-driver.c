@@ -30,6 +30,90 @@
 #include "audio-winmm.h"
 #include "audio-dsound.h"
 
+void
+gnuitar_packet_mul(gnuitar_packet_t *packet, float n)
+{
+    unsigned int i;
+    for (i = 0; i < packet->len; i++) {
+        packet->data[i] *= n;
+    }
+}
+
+void
+gnuitar_packet_div(gnuitar_packet_t *packet, float n)
+{
+    unsigned int i;
+    for (i = 0; i < packet->len; i++) {
+        packet->data[i] /= n;
+    }
+}
+
+void
+gnuitar_audio_driver_destroy(gnuitar_audio_driver_t *driver)
+{
+    if ((driver != NULL) && (driver->destroy_callback != NULL))
+        driver->destroy_callback(driver->data);
+}
+
+int
+gnuitar_audio_driver_start(gnuitar_audio_driver_t *driver)
+{
+    if (driver == NULL)
+        return -1;
+    if (driver->start_callback == NULL)
+        return -2;
+    if (driver->start_callback(driver->data) != 0)
+        return -3;
+
+    return 0;
+}
+
+int
+gnuitar_audio_driver_stop(gnuitar_audio_driver_t *driver)
+{
+    if (driver == NULL)
+        return -1;
+    if (driver->stop_callback == NULL)
+        return -2;
+    if (driver->stop_callback(driver->data) != 0)
+        return -3;
+
+    return 0;
+}
+
+int
+gnuitar_audio_driver_get_format(const gnuitar_audio_driver_t *driver, gnuitar_format_t *format)
+{
+    if (driver == NULL)
+        return -1;
+    if (driver->get_format_callback == NULL)
+        return -2;
+    if (driver->get_format_callback(driver->data, format) != 0)
+        return -3;
+    return 0;
+}
+
+int
+gnuitar_audio_driver_set_format(gnuitar_audio_driver_t *driver, const gnuitar_format_t *format)
+{
+    if (driver == NULL)
+        return -1;
+    if (driver->set_format_callback == NULL)
+        return -2;
+    if (driver->set_format_callback(driver->data, format) != 0)
+        return -3;
+    return 0;
+}
+
+void
+gnuitar_format_defaults(gnuitar_format_t *format)
+{
+    format->input_channels = 2;
+    format->input_bits = 32;
+    format->output_channels = 2;
+    format->output_bits = 32;
+}
+
 #ifndef _WIN32
 gnuitar_sample_t procbuf[MAX_BUFFER_SIZE * MAX_CHANNELS];
 gnuitar_sample_t procbuf2[MAX_BUFFER_SIZE * MAX_CHANNELS];
@@ -41,17 +125,10 @@ gnuitar_sample_t procbuf2[MAX_BUFFER_SIZE / sizeof(int16_t)];
 audio_driver_t  *audio_driver = NULL;
 
 /* default settings */
-char            alsadevice_str[64];
-unsigned short  n_input_channels = 1;
-unsigned short  n_output_channels = 2;
-unsigned int    sample_rate = 44100;
-unsigned int    buffer_size = MIN_BUFFER_SIZE * 2;
 gnuitar_mutex_t effectlist_lock;
-#ifndef _WIN32
-unsigned int    fragments = 2;
-#else
-unsigned int    overrun_threshold = 4;
-unsigned int    nbuffers = MAX_BUFFERS;
+#ifdef _WIN32
+unsigned int overrun_threshold = 4;
+unsigned int nbuffers = MAX_BUFFERS;
 #endif
 
 /* from JACK -- blindingly fast */
@@ -71,7 +148,7 @@ void
 triangular_dither(gnuitar_packet_t *db, int16_t *target)
 {
     static int32_t correlated_noise[MAX_CHANNELS] = { 0, 0, 0, 0 };
-    int_fast16_t i, current_channel = 0;
+    uint_fast16_t i, current_channel = 0;
     
     for (i = 0; i < db->len; i += 1) {
         int32_t tmp = db->data[i];
@@ -93,14 +170,15 @@ void
 guess_audio_driver(void)
 {
     audio_driver = NULL;
+
 #ifdef HAVE_JACK
     if (jack_available()) {
         audio_driver = &jack_driver;
     } else
 #endif
 #ifdef HAVE_ALSA
-    if (alsa_available()) {
-        audio_driver = &alsa_driver;
+    if (gnuitar_alsa_available()) {
+        audio_driver = gnuitar_alsa_driver_create();
     } else
 #endif
 #ifdef HAVE_OSS
@@ -131,7 +209,7 @@ set_audio_driver_from_str(const char const *tmp)
 #endif
 #ifdef HAVE_ALSA
     if (strcmp(tmp, "ALSA") == 0) {
-        audio_driver = &alsa_driver;
+        audio_driver = gnuitar_alsa_driver_create();
     } else
 #endif
 #ifdef HAVE_OSS

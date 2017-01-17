@@ -68,6 +68,7 @@
 #include "audio-driver.h"
 
 #include <alsa/asoundlib.h>
+#include <pthread.h>
 
 typedef struct gnuitar_alsa_driver {
     /** The name of the input PCM */
@@ -76,25 +77,33 @@ typedef struct gnuitar_alsa_driver {
     snd_pcm_t * input_pcm;
     /** The number of channels from the input */
     unsigned int input_channels;
+    /** The number of bits per sample from the input */
+    unsigned int input_bits;
     /** The name of the output PCM */
     char * output_name;
     /** The output PCM */
     snd_pcm_t * output_pcm;
     /** The number of channels from the output */
     unsigned int output_channels;
+    /** The number of bits per sample from the output */
+    unsigned int output_bits;
     /** The number of periods to use */
     unsigned int period_size;
     /** The number of frames in a period */
     unsigned int periods;
     /** The number of frames per second */
     unsigned long int rate;
+    /** The thread that runs the audio threw the pump */
+    pthread_t thread;
+    /** A flag to decide whether or not to keep to the thread running */
+    unsigned int keep_thread_running;
 } gnuitar_alsa_driver_t;
 
 gnuitar_audio_driver_t * gnuitar_alsa_driver_create(void);
 
-int alsa_available(void);
+int gnuitar_alsa_available(void);
 
-extern audio_driver_t alsa_driver;
+extern gnuitar_audio_driver_t *global_alsa_driver;
 
 #endif /* HAVE_ALSA */
 

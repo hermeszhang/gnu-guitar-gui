@@ -15,48 +15,64 @@ typedef float gnuitar_sample_t;
 typedef struct gnuitar_packet {
     gnuitar_sample_t * __restrict__ data;
     gnuitar_sample_t * __restrict__ data_swap;
-    int_fast32_t    len;
-    int_fast8_t     channels;
+    unsigned int len;
+    unsigned int channels;
+    unsigned long int rate;
 } gnuitar_packet_t;
 
-struct audio_driver_channels {
+void gnuitar_packet_mul(gnuitar_packet_t * packet, float n);
+
+void gnuitar_packet_div(gnuitar_packet_t * packet, float n);
+
+typedef struct gnuitar_format {
+    unsigned int input_bits;
+    unsigned int input_channels;
+    unsigned int output_bits;
+    unsigned int output_channels;
+    unsigned int rate;
+} gnuitar_format_t;
+
+void gnuitar_format_defaults(gnuitar_format_t * format);
+
+typedef struct gnuitar_chmap {
     unsigned int in, out;
-};
+} gnuitar_chmap_t;
 
 typedef struct gnuitar_audio_driver {
     /** The name of the driver */
-    char * name;
+    char *name;
     /** driver specific data */
-    void * data;
-    /** Creates the driver data */
-    void * (*create_callback)(void);
+    void *data;
     /** Destroys the driver data */
-    void (*destroy_callback)(void * data_);
+    void (*destroy_callback)(void *data_);
     /** Sets a parameter for the driver */
-    int (*set_callback)(void * data_, const char * name, const char * value);
+    int (*set_format_callback)(void *data_, const gnuitar_format_t *format);
     /** Gets a parameter for the driver */
-    int (*get_callback)(const void * data_, const char * name, char ** value);
+    int (*get_format_callback)(const void *data_, gnuitar_format_t *format);
     /** Starts the audio stream */
-    int (*start_callback)(void * data_);
+    int (*start_callback)(void *data_);
     /** Stops the audio stream */
-    int (*stop_callback)(void * data_);
+    int (*stop_callback)(void *data_);
 /* old params */
-    const char *str;
     int enabled;
+    /** The channel maps available */
+    const gnuitar_chmap_t * chmaps;
+/*
     const struct audio_driver_channels *channels;
     int (*init)(void);
     void (*finish)(void);
+*/
 } gnuitar_audio_driver_t;
 
-void gnuitar_audio_driver_destroy(gnuitar_audio_driver_t * driver);
+void gnuitar_audio_driver_destroy(gnuitar_audio_driver_t *driver);
 
-int gnuitar_audio_driver_get_param(const gnuitar_audio_driver_t * driver, const char * name, char ** value);
+int gnuitar_audio_driver_get_format(const gnuitar_audio_driver_t *driver, gnuitar_format_t *format);
 
-int gnuitar_audio_driver_set_param(gnuitar_audio_driver_t * driver, const char * name, const char * value);
+int gnuitar_audio_driver_set_format(gnuitar_audio_driver_t *driver, const gnuitar_format_t *format);
 
-int gnuitar_audio_driver_start(gnuitar_audio_driver_t * driver);
+int gnuitar_audio_driver_start(gnuitar_audio_driver_t *driver);
 
-int gnuitar_audio_driver_stop(gnuitar_audio_driver_t * driver);
+int gnuitar_audio_driver_stop(gnuitar_audio_driver_t *driver);
 
 /* for compatibility */
 
@@ -73,15 +89,7 @@ extern gnuitar_audio_driver_t *audio_driver;
 #define MAX_CHANNELS 4
 #define MAX_SAMPLE_RATE 48000
 
-extern char alsadevice_str[64];
-extern unsigned short n_input_channels;
-extern unsigned short n_output_channels;
-extern unsigned int sample_rate;
-extern unsigned int buffer_size;
-
-#ifndef _WIN32
-extern unsigned int fragments;
-#else
+#ifdef _WIN32
 extern unsigned int nbuffers;
 extern unsigned int overrun_threshold;
 #endif
