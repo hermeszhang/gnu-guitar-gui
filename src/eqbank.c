@@ -169,16 +169,18 @@ static const int fb_bw[FB_NB] =
 #include "eqbank.h"
 #include "gui.h"
 
+unsigned long int sample_rate2 = 48000;
+
 static struct slider_wrapper {
     struct eqbank_params *par;
-    int             slider_id;
+    int slider_id;
 } sl_wrappers[FB_NB];
 
 static void
 update_eqbank_eq(GtkAdjustment * adj, struct slider_wrapper *p)
 {
     p->par->boosts[p->slider_id] = adj->value;
-    set_peq_biquad(sample_rate, fb_cf[p->slider_id], fb_bw[p->slider_id],
+    set_peq_biquad(sample_rate2, fb_cf[p->slider_id], fb_bw[p->slider_id],
 		   adj->value, &p->par->filters[p->slider_id]);
 }
 
@@ -369,16 +371,21 @@ eqbank_load(gnuitar_effect_t *p, LOAD_ARGS)
     LOAD_DOUBLE("volume", params->volume);
 
     for (i = 0; i < FB_NB; i++) {
-	set_peq_biquad(sample_rate * 2, fb_cf[i], fb_bw[i], params->boosts[i], &params->filters[i]);
+        set_peq_biquad(sample_rate2 * 2, fb_cf[i], fb_bw[i], params->boosts[i], &params->filters[i]);
     }
 }
 
 effect_t *
 eqbank_create()
 {
-    effect_t       *p;
+    gnuitar_format_t format;
+    effect_t *p;
     struct eqbank_params *params;
-    int             i;
+    int i;
+
+    if (gnuitar_audio_driver_get_format(audio_driver, &format) != 0) {
+        sample_rate2 = 48000;
+    }
 
     p = calloc(1, sizeof(effect_t));
     p->params = calloc(1, sizeof(struct eqbank_params));
@@ -393,8 +400,9 @@ eqbank_create()
     params->filters = gnuitar_memalign(FB_NB, sizeof(params->filters[0]));
     params->boosts  = calloc(FB_NB, sizeof(params->boosts[0]));
     for (i = 0; i < FB_NB; i++)
-	set_peq_biquad(sample_rate * 2, fb_cf[i], fb_bw[i], params->boosts[i], &params->filters[i]);
+        set_peq_biquad(sample_rate2 * 2, fb_cf[i], fb_bw[i], params->boosts[i], &params->filters[i]);
     params->volume = 0;
 
     return p;
 }
+
