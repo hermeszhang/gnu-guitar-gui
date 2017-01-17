@@ -84,15 +84,9 @@ void
 LC_filter(gnuitar_packet_t *db, int filter_no, double freq,
 	  struct filter_data *pp)
 {
-    double          R,
-                    L,
-                    C,
-                    dt_div_L,
-                    dt_div_C;
-    double          du,
-                    d2i;
-    int             t,
-                    currchannel = 0;
+    double R, L, C, dt_div_L, dt_div_C;
+    double du, d2i;
+    unsigned int t, currchannel = 0;
     gnuitar_sample_t     *sound = db->data;
 
     L = 50e-3;			/* 
@@ -101,8 +95,8 @@ LC_filter(gnuitar_packet_t *db, int filter_no, double freq,
     C = 1.0 / (4.0 * pow(M_PI * freq, 2.0) * L);
     R = 300.0;
 
-    dt_div_C = 1.0 / (C * sample_rate);
-    dt_div_L = 1.0 / (L * sample_rate);
+    dt_div_C = 1.0 / (C * db->rate);
+    dt_div_L = 1.0 / (L * db->rate);
 
     for (t = 0; t < db->len; t++) {
 	if(isnan(*sound))
@@ -149,45 +143,42 @@ RC_set_freq(double f, struct filter_data *pp)
     pp->R = 1000.0;
     pp->C = other(f, pp->R);
     pp->invR = 1.0 / pp->R;
-    pp->dt_div_C = 1.0 / (sample_rate * pp->C);
 }
 
 static void
 RC_filter(gnuitar_packet_t *db, int mode, int filter_no,
 	  struct filter_data *pp)
 {
-    double          du,
-                    di;
-    int             t,
-                    currchannel = 0;
-    gnuitar_sample_t     *sound = db->data;
+    double du, di;
+    unsigned int t, currchannel = 0;
+    double dt_div_C;
+
+    dt_div_C = 1.0 / (pp->C * db->rate);
+
+    gnuitar_sample_t *sound = db->data;
     
     for (t = 0; t < db->len; t++) {
-	if(isnan(*sound))
-	    *sound=0;
-	du = (double) *sound -
-	    pp->last_sample[filter_no][mode][currchannel];
-	pp->last_sample[filter_no][mode][currchannel] = (double) *sound;
 
-	di = pp->invR * (du -
-			 pp->i[filter_no][mode][currchannel] *
-			 pp->dt_div_C);
-	pp->i[filter_no][mode][currchannel] += di;
+        if(isnan(*sound))
+            *sound=0;
 
-	if (mode == HIGHPASS)
-	    *sound =
-		((pp->i[filter_no][mode][currchannel] * pp->R) *
-		       pp->amplify);
-	else
-	    *sound =
-		(((double) *sound -
-			pp->i[filter_no][mode][currchannel] * pp->R) *
-		       pp->amplify);
-	currchannel = (currchannel + 1) % db->channels;
-	if(isnan(*sound))
-	    *sound=0;
+         du = (double) *sound - pp->last_sample[filter_no][mode][currchannel];
+         pp->last_sample[filter_no][mode][currchannel] = (double) *sound;
 
-	sound++;
+         di = pp->invR * (du - pp->i[filter_no][mode][currchannel] * dt_div_C);
+         pp->i[filter_no][mode][currchannel] += di;
+
+         if (mode == HIGHPASS)
+             *sound = ((pp->i[filter_no][mode][currchannel] * pp->R) * pp->amplify);
+         else
+             *sound = (((double) *sound - pp->i[filter_no][mode][currchannel] * pp->R) * pp->amplify);
+
+         currchannel = (currchannel + 1) % db->channels;
+
+         if(isnan(*sound))
+             *sound=0;
+
+         sound++;
     }
 }
 
