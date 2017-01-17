@@ -32,14 +32,14 @@
 effect_t *   echo_create(void);
 
 struct echo_params {
-    Backbuf_t       *history[MAX_CHANNELS][MAX_ECHO_COUNT];
-    double          primes[MAX_ECHO_COUNT];
-    double          size_factor[MAX_ECHO_COUNT];
-    double          decay_factor[MAX_ECHO_COUNT];
-    double          echo_size,
-                    echo_decay;
-    int             echoes;
-    short           multichannel;
+    Backbuf_t *history[MAX_CHANNELS][MAX_ECHO_COUNT];
+    double primes[MAX_ECHO_COUNT];
+    double size_factor[MAX_ECHO_COUNT];
+    double decay_factor[MAX_ECHO_COUNT];
+    double echo_size, echo_decay;
+    unsigned int echoes;
+    short multichannel;
 };
 
 #endif
+
