@@ -137,7 +137,7 @@
 #endif
 
 /* used to swap rear channels */
-static const int circular_order[] = { 0, 1, 3, 2 };
+static const unsigned int circular_order[] = { 0, 1, 3, 2 };
 
 static void
 update_delay_decay(GtkAdjustment *adj, struct delay_params *params)
@@ -191,9 +191,13 @@ delay_init(gnuitar_effect_t *p)
 
     GtkWidget      *parmTable;
 
+    gnuitar_format_t format;
 
     pdelay = (struct delay_params *) p->params;
 
+    if (gnuitar_audio_driver_get_format(audio_driver, &format) != 0) {
+        gnuitar_format_defaults(&format);
+    }
 
     /*
      * GUI Init
@@ -273,7 +277,7 @@ delay_init(gnuitar_effect_t *p)
 		     __GTKATTACHOPTIONS(GTK_FILL | GTK_EXPAND |
 					GTK_SHRINK), 0, 0);
     
-    if (n_input_channels == 1 && n_output_channels > 1) {
+    if (format.input_channels == 1 && format.output_channels > 1) {
         mcbutton = gtk_check_button_new_with_label("Multichannel");
         if (pdelay->multichannel)
 	    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(mcbutton), TRUE);
@@ -309,17 +313,16 @@ static void
 delay_filter_mono(effect_t *p, gnuitar_packet_t *db)
 {
     struct delay_params *dp = p->params;
-    int             i,
-                    count,
-                    current_delay = 0;
-    double          current_decay, delay_inc, decay_fac;
-    gnuitar_sample_t     *s, newval;
-    int             curr_channel = 0;
+    unsigned int i, count;
+    unsigned current_delay = 0;
+    double current_decay, delay_inc, decay_fac;
+    gnuitar_sample_t *s, newval;
+    unsigned int curr_channel = 0;
 
     s = db->data;
     count = db->len;
 
-    delay_inc = dp->delay_time / 1000.0 * sample_rate;
+    delay_inc = dp->delay_time / 1000.0 * db->rate;
     decay_fac = dp->delay_decay / 100.0;
     
     /* this is a simple mono version that treats all channels separately */
@@ -330,9 +333,8 @@ delay_filter_mono(effect_t *p, gnuitar_packet_t *db)
         for (i = 0; i < dp->delay_count; i += 1) {
             current_delay += delay_inc;
             current_decay *= decay_fac;
-
             newval += dp->history[curr_channel]->get(dp->history[curr_channel], current_delay) * current_decay;
-	}
+        }
         
         /* write to history, add decay to current sample */
         dp->history[curr_channel]->add(dp->history[curr_channel], *s);
@@ -349,17 +351,15 @@ static void
 delay_filter_mc(effect_t *p, gnuitar_packet_t *db)
 {
     struct delay_params *dp = p->params;
-    int             i,
-                    count,
-                    current_delay = 0;
-    double          current_decay, delay_inc, decay_fac;
-    gnuitar_sample_t     *ins, *outs, newval;
-    int             curr_channel = 0;
+    unsigned int i, count;
+    unsigned int current_delay = 0;
+    double current_decay, delay_inc, decay_fac;
+    gnuitar_sample_t *ins, *outs, newval;
+    unsigned int curr_channel = 0;
 
     /* this is only good for mono and up to 4 channels */
     assert(db->channels == 1);
-    assert(n_output_channels <= 4);
-    
+
     /* fill into provided output buffer */
     ins = db->data;
     outs = db->data_swap;
@@ -369,10 +369,7 @@ delay_filter_mc(effect_t *p, gnuitar_packet_t *db)
     
     count = db->len;
 
-    db->channels = n_output_channels;
-    db->len *= n_output_channels;
-    
-    delay_inc = dp->delay_time / 1000.0 * sample_rate;
+    delay_inc = dp->delay_time / 1000.0 * db->rate;
     decay_fac = dp->delay_decay / 100.0;
     
     while (count) {
@@ -383,11 +380,11 @@ delay_filter_mc(effect_t *p, gnuitar_packet_t *db)
             current_delay = 0;
             current_decay = 1.0;
             newval = 0;
-	    /* +1 because we mix even the current data through history */
+            /* +1 because we mix even the current data through history */
             for (i = 0; i < dp->delay_count + 1; i += 1) {
                 /* mix only every Nth voice */
                 if (circular_order[i % db->channels] == curr_channel)
-		    newval += dp->history[0]->get(dp->history[0], current_delay) * current_decay;
+                    newval += dp->history[0]->get(dp->history[0], current_delay) * current_decay;
                 current_delay += delay_inc;
                 current_decay *= decay_fac;
             }
@@ -402,10 +399,10 @@ static void
 delay_filter(effect_t *p, gnuitar_packet_t *db)
 {
     struct delay_params *params = p->params;
-    if (params->multichannel && db->channels == 1 && n_output_channels > 1) {
+    if (params->multichannel && db->channels == 1) {
         delay_filter_mc(p, db);
     } else {
-	delay_filter_mono(p, db);
+        delay_filter_mono(p, db);
     }
 }
 
