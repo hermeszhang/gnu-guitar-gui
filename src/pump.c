@@ -458,30 +458,30 @@ static void
 bias_elimination(gnuitar_packet_t *db) {
     static gnuitar_sample_t       bias_s[MAX_CHANNELS] = { 0, 0, 0, 0 };
     static int_least32_t    bias_n[MAX_CHANNELS] = { 10, 10, 10, 10 };
-    int_fast16_t i, curr_channel = 0;
+    uint_fast16_t i, curr_channel = 0;
     gnuitar_sample_t biasadj = bias_s[curr_channel] / bias_n[curr_channel];
     
     for (i = 0; i < db->len; i += 1) {
         bias_s[curr_channel] += db->data[i];
-	bias_n[curr_channel] += 1;
+        bias_n[curr_channel] += 1;
         db->data[i] -= biasadj;
         curr_channel = (curr_channel + 1) % db->channels;
     }
     /* keep bias within limits of shortest type (int_least32_t) */
     for (i = 0; i < MAX_CHANNELS; i += 1) {
-	if (fabs(bias_s[i]) > (gnuitar_sample_t) 1E10 || bias_n[i] > (int_least32_t) 1E10) {
-	    bias_s[i] /= (gnuitar_sample_t) 2;
-	    bias_n[i] /= 2;
-	}
+        if (fabs(bias_s[i]) > (gnuitar_sample_t) 1E10 || bias_n[i] > (int_least32_t) 1E10) {
+            bias_s[i] /= (gnuitar_sample_t) 2;
+            bias_n[i] /= 2;
+        }
     }
 }
 
 /* accumulate power estimate and monitor clipping */
 static float
 vu_meter(gnuitar_packet_t *db) {
-    int             i;
-    gnuitar_sample_t      sample;
-    float           power = 0;
+    unsigned int i;
+    gnuitar_sample_t sample;
+    float power = 0;
 
     for (i = 0; i < db->len; i += 1) {
         sample = db->data[i];
@@ -494,8 +494,8 @@ vu_meter(gnuitar_packet_t *db) {
 /* adjust master volume according to the main window slider and clip */
 static void
 adjust_master_volume(gnuitar_packet_t *db) {
-    int		    i;
-    float	    volume = pow(10, master_volume / 20.0);
+    unsigned int i;
+    float volume = pow(10, master_volume / 20.0);
 
     for (i = 0; i < db->len; i += 1) {
 	float val = db->data[i] * volume;
@@ -506,8 +506,8 @@ adjust_master_volume(gnuitar_packet_t *db) {
 
 static void
 adjust_input_volume(gnuitar_packet_t *db) {
-    int		    i;
-    float	    volume = pow(10, input_volume / 20.0);
+    unsigned int i;
+    float	volume = pow(10, input_volume / 20.0);
 
     for (i = 0; i < db->len; i += 1)
         db->data[i] = db->data[i] * volume;
@@ -517,17 +517,25 @@ adjust_input_volume(gnuitar_packet_t *db) {
 static void
 adapt_to_output(gnuitar_packet_t *db)
 {
-    int             i;
-    int             size = db->len;
-    gnuitar_sample_t     *s = db->data;
+    int i;
+    int size = db->len;
+    gnuitar_format_t format;
+    unsigned int output_channels;
+    gnuitar_sample_t *s = db->data;
 
-    assert(db->channels <= n_output_channels);
+    if (gnuitar_audio_driver_get_format(audio_driver, &format) < 0) {
+        output_channels = 2;
+    } else {
+        output_channels = format.output_channels;
+    }
+
+    assert(db->channels <= output_channels);
 
     /* nothing to do */
-    if (db->channels == n_output_channels)
+    if (db->channels == output_channels)
         return;
     /* clone 1 to 2 */
-    if (db->channels == 1 && n_output_channels == 2) {
+    if (db->channels == 1 && output_channels == 2) {
         for (i = size - 1; i >= 0; i -= 1) {
             s[i*2+1] = s[i];
             s[i*2  ] = s[i];
@@ -537,7 +545,7 @@ adapt_to_output(gnuitar_packet_t *db)
         return;
     }
     /* clone 1 to 4, mute channels 2 & 3 (the rear channels) */
-    if (db->channels == 1 && n_output_channels == 4) {
+    if (db->channels == 1 && output_channels == 4) {
         for (i = size - 1; i >= 0; i -= 1) {
             s[i*4+3] = 0;
             s[i*4+2] = 0;
@@ -549,7 +557,7 @@ adapt_to_output(gnuitar_packet_t *db)
         return;
     }
     /* clone 2 to 4, mute channels 2 & 3 */
-    if (db->channels == 2 && n_output_channels == 4) {
+    if (db->channels == 2 && output_channels == 4) {
         for (i = size/2-1; i >= 0; i -= 1) {
             s[i*4+3] = 0;
             s[i*4+2] = 0;
@@ -564,7 +572,7 @@ adapt_to_output(gnuitar_packet_t *db)
      * generating to 5 channels, so error out */
 
     gnuitar_printf( "unknown channel combination: %d in and %d out",
-            db->channels, n_output_channels);
+            db->channels, output_channels);
 }
 
 /* function called on each effect during processing */
@@ -591,7 +599,7 @@ pump_sample(gnuitar_packet_t *db)
     
     adapt_to_output(db);
     if (write_track)
-	track_write(db->data, db->len);
+        track_write(db->data, db->len);
 }
 
 static void
@@ -599,11 +607,6 @@ init_sin_lookup_table(void) {
     int i = 0;
     for (i = 0; i < SIN_LOOKUP_SIZE + 1; i += 1)
         sin_lookup_table[i] = sin(2 * M_PI * i / SIN_LOOKUP_SIZE);
-}
-
-static const gchar *
-discover_settings_path(void) {
-    return g_strdup_printf("%s" FILESEP "%s", g_get_home_dir(), ".gnuitarrc");
 }
 
 gchar *
@@ -675,108 +678,12 @@ load_initial_state(char **argv, int argc)
 
 void
 load_settings(void) {
-    const gchar    *settingspath;
-    GKeyFile       *file;
-    GError         *error;
-    gchar          *gstr;
-    gint            tmp;
-
-    settingspath = discover_settings_path();
-    file = g_key_file_new();
-
-    /* Thanks, glib! */
-    g_key_file_load_from_file(file, settingspath, G_KEY_FILE_NONE, NULL);
-
-    error = NULL;
-    gstr = g_key_file_get_string(file, "global", "driver", &error);
-    if (error == NULL) {
-        set_audio_driver_from_str(gstr);
-	free(gstr);
-    }
-    
-    error = NULL;
-    gstr = g_key_file_get_string(file, "global", "alsadevice", &error);
-    strcpy(alsadevice_str, "default");
-    if (error == NULL) {
-        strncpy(alsadevice_str, gstr, sizeof(alsadevice_str)-1);
-	free(gstr);	
-    }
-
-    error = NULL;
-    tmp = g_key_file_get_integer(file, "global", "n_output_channels", &error);
-    if (error == NULL)
-        n_output_channels = tmp;
-
-    error = NULL;
-    tmp = g_key_file_get_integer(file, "global", "n_input_channels", &error);
-    if (error == NULL)
-        n_input_channels = tmp;
-
-    error = NULL;
-    tmp = g_key_file_get_integer(file, "global", "sample_rate", &error);
-    if (error == NULL)
-        sample_rate = tmp;
-
-    error = NULL;
-    tmp = g_key_file_get_integer(file, "global", "buffer_size", &error);
-    if (error == NULL)
-        buffer_size = tmp;
-
-#ifdef _WIN32
-    error = NULL;
-    tmp = g_key_file_get_integer(file, "global", "n_inout_buffers", &error);
-    if (error == NULL)
-        nbuffers = tmp;
-    
-    error = NULL;
-    tmp = g_key_file_get_integer(file, "global", "overrun_threshold", &error);
-    if (error == NULL)
-        overrun_threshold = tmp;
-#endif
-    g_key_file_free(file);
-    g_free((void *) settingspath);
-    return;
+    /* deprecated */
 }
 
 void
 save_settings(void) {
-    const gchar    *settingspath;
-    GKeyFile       *file;
-    gchar          *key_file_as_str;
-    gsize           length, w_length;
-    int             fd;
-
-    settingspath = discover_settings_path();
-    file = g_key_file_new();
-
-    if (audio_driver)
-        g_key_file_set_string(file, "global", "driver", audio_driver->str);
-    
-    g_key_file_set_string(file, "global", "alsadevice", alsadevice_str);
-    g_key_file_set_integer(file, "global", "n_output_channels", n_output_channels);
-    g_key_file_set_integer(file, "global", "n_input_channels", n_input_channels);
-    g_key_file_set_integer(file, "global", "sample_rate", sample_rate);
-    g_key_file_set_integer(file, "global", "buffer_size", buffer_size);
-#ifdef _WIN32
-    g_key_file_set_integer(file, "global", "n_inout_buffers", nbuffers);
-    g_key_file_set_integer(file, "global", "overrun_threshold", overrun_threshold);
-#endif
-    key_file_as_str = g_key_file_to_data(file, &length, NULL);
-
-    /* there's g_set_file_contents() in glib 2.8 */
-    fd = g_open(settingspath, O_WRONLY | O_TRUNC | O_CREAT, 0777);
-    if (fd == -1)
-        goto SAVE_SETTINGS_CLEANUP1;
-    w_length = write(fd, key_file_as_str, length);
-    if (w_length != length)
-        perror("Failed to write settings file completely: ");
-    close(fd);
-
-  SAVE_SETTINGS_CLEANUP1:
-    g_key_file_free(file);
-    g_free((void *) settingspath);
-    g_free((void *) key_file_as_str);
-    return;
+    /* deprecated */
 }
 
 void
