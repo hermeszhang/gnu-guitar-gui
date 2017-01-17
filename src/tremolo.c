@@ -250,7 +250,7 @@ tremolo_filter(gnuitar_effect_t *p, gnuitar_packet_t *db)
     s = db->data;
     count = db->len;
     
-    speed = tp->tremolo_speed / 1000.0 * sample_rate;
+    speed = tp->tremolo_speed / 1000.0 * db->rate;
     
     while (count) {
 	if (tp->tremolo_phase >= speed)
