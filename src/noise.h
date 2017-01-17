@@ -28,11 +28,11 @@
 effect_t *   noise_create(void);
 
 struct noise_params {
-    int             threshold,
-                    hold_time,
-                    release_time,
-                    attack,
-		    hysteresis;
+    unsigned int threshold;
+    unsigned int hold_time;
+    unsigned int release_time;
+    unsigned int attack;
+    unsigned int hysteresis;
 };
 
 #endif
