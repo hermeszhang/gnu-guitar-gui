@@ -40,9 +40,9 @@ struct tubeamp_params {
     Biquad_t    decimation_filter;
 
     /* user parameters */
-    int         stages, impulse_model, impulse_quality;
-    float       gain, asymmetry, biasfactor;
-    float       tone_bass, tone_middle, tone_treble;
+    unsigned int stages, impulse_model, impulse_quality;
+    float gain, asymmetry, biasfactor;
+    float tone_bass, tone_middle, tone_treble;
     
     /* internal stuff */
     float       bias[MAX_STAGES];
