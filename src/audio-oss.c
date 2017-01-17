@@ -279,7 +279,8 @@ oss_midi_event(void)
 static void *
 oss_audio_thread(void *V)
 {
-    int             count, i;
+    ssize_t count;
+    unsigned int i;
     gnuitar_packet_t db = {
         .data = procbuf,
         .data_swap = procbuf2,
@@ -291,22 +292,25 @@ oss_audio_thread(void *V)
     (void) V;
 
     while (keepthreadrunning) {
-	/* keep on reading and discard if select says we can read.
+        /* keep on reading and discard if select says we can read.
          * this will allow us to catch up if we fall behind */
         FD_ZERO(&read_fds);
         FD_SET(fd, &read_fds);
-	read_timeout.tv_sec  = 0;
-	read_timeout.tv_usec = 0;
+        read_timeout.tv_sec  = 0;
+        read_timeout.tv_usec = 0;
+
         do {
-	    count = read(fd, rwbuf, buffer_size * n_output_channels * 2);
+            count = read(fd, rwbuf, buffer_size * n_output_channels * 2);
             if (count < 0) {
                 perror("error reading from sound device: ");
                 break;
             } else if (count != (int) buffer_size * n_output_channels * 2) {
                 //gnuitar_printf( "warning: short read (%d/%d) from sound device\n", count, buffer_size);
                 break;
-	    }
-	} while (select(fd+1, &read_fds, NULL, NULL, &read_timeout) != 0);
+            }
+        }
+
+        while (select(fd+1, &read_fds, NULL, NULL, &read_timeout) != 0);
 	
         db.len = buffer_size * n_input_channels;
         db.channels = n_input_channels;
@@ -322,17 +326,19 @@ oss_audio_thread(void *V)
 
         if (midi_fd)
             oss_midi_event();
-	pump_sample(&db);
+
+        pump_sample(&db);
 
         /* Ensure that pump adapted us to output */
         assert(db.channels == n_output_channels);
         assert(db.len == buffer_size * n_output_channels);
         triangular_dither(&db, rwbuf);
 
-	count = write(fd, rwbuf, buffer_size * n_output_channels * 2);
-        /*
-	if (count != buffer_size * n_output_channels * 2)
-	    gnuitar_printf( "warning: short write (%d/%d) to sound device\n", count, buffer_size);*/
+        count = write(fd, rwbuf, buffer_size * n_output_channels * 2);
+/*
+        if (count != buffer_size * n_output_channels * 2)
+            gnuitar_printf( "warning: short write (%d/%d) to sound device\n", count, buffer_size);
+*/
     }
 
     return NULL;
@@ -462,10 +468,9 @@ static const struct audio_driver_channels oss_channels_cfg[] = {
 };
 
 audio_driver_t oss_driver = {
-    .str = "OSS",
+    .name = "OSS",
     .enabled = 0,
     .channels = oss_channels_cfg,
-
     .init = oss_init_sound,
     .finish = oss_finish_sound,
 };
