@@ -479,8 +479,8 @@ static void
 autowah_filter(gnuitar_effect_t *p, gnuitar_packet_t *db)
 {
     struct autowah_params *ap;
-    int             i, curr_channel = 0, delay_time;
-    float           freq, g, g2;
+    unsigned int i, curr_channel = 0, delay_time;
+    float freq, g, g2;
 
     ap = (struct autowah_params *) p->params;
 
@@ -502,7 +502,7 @@ autowah_filter(gnuitar_effect_t *p, gnuitar_packet_t *db)
             ap->f = 0.0;
             ap->dir = 0;
         }
-        delay_time = sample_rate * AUTOWAH_HISTORY_LENGTH / 1000;
+        delay_time = db->rate * AUTOWAH_HISTORY_LENGTH / 1000;
         
         /* Estimate signal higher frequency content's power. When user picks
          * the string strongly it's the high frequency content that increases
@@ -558,9 +558,9 @@ autowah_filter(gnuitar_effect_t *p, gnuitar_packet_t *db)
 
     ap->smoothed_f = (ap->f + ap->smoothed_f) / 2.f;
     freq = ap->freq_low * pow(2, log(ap->freq_high / ap->freq_low)/log(2) * ap->smoothed_f + 0.2 * sin_lookup(ap->freq_vibrato));
-    ap->f += ap->dir * 1000.0f / ap->sweep_time * db->len / (sample_rate * db->channels) * 2;
+    ap->f += ap->dir * 1000.0f / ap->sweep_time * db->len / (db->rate * db->channels) * 2;
 
-    ap->freq_vibrato += 1000.0f / ap->sweep_time * db->len / (sample_rate * db->channels) / 2.0f;
+    ap->freq_vibrato += 1000.0f / ap->sweep_time * db->len / (db->rate * db->channels) / 2.0f;
     if (ap->freq_vibrato >= 1.0f)
         ap->freq_vibrato -= 1.0f;
     
@@ -568,7 +568,7 @@ autowah_filter(gnuitar_effect_t *p, gnuitar_packet_t *db)
       case 0:
         /* lowpass resonant filter -- we must avoid setting value 0 to
          * resonance. We also drop level by 6 dB to leave some room for it. */
-        set_lpf_biquad(sample_rate, freq, 1.1 + -ap->res / 100.0, &ap->lpf);
+        set_lpf_biquad(db->rate, freq, 1.1 + -ap->res / 100.0, &ap->lpf);
         for (i = 0; i < db->len; i += 1) {
             db->data[i] = do_biquad(db->data[i], &ap->lpf, curr_channel) / 2;
             curr_channel = (curr_channel + 1) % db->channels;
@@ -576,7 +576,7 @@ autowah_filter(gnuitar_effect_t *p, gnuitar_packet_t *db)
         break;
         
       case 1: 
-        set_bpf_biquad(sample_rate, freq, 1.1 + -ap->res / 100.0, &ap->bpf);
+        set_bpf_biquad(db->rate, freq, 1.1 + -ap->res / 100.0, &ap->bpf);
         for (i = 0; i < db->len; i += 1) {
             db->data[i] = do_biquad(db->data[i], &ap->bpf, curr_channel);
             curr_channel = (curr_channel + 1) % db->channels;
@@ -598,11 +598,11 @@ autowah_filter(gnuitar_effect_t *p, gnuitar_packet_t *db)
  *
  * Wx = tanh(Yx(n) / (2 * Vt)) */
 
-        g = 1.f - expf((float) (-2.0 * M_PI) * freq / sample_rate);
+        g = 1.f - expf((float) (-2.0 * M_PI) * freq / db->rate);
         g2 = g;
         /* TB-303 style: the first phase is one octave higher than rest */
         if (ap->method == 3)
-            g2 = 1.f - expf((float) (-2.0 * M_PI) * 2 * freq / sample_rate);
+            g2 = 1.f - expf((float) (-2.0 * M_PI) * 2 * freq / db->rate);
         for (i = 0; i < db->len; i += 1) {
 #define PARAM_V (MAX_SAMPLE * 1.0) /* the sound gets dirtier if the factor gets small */
             ap->ya[curr_channel] += (float) PARAM_V * g2 *
