@@ -24,6 +24,23 @@ struct audio_driver_channels {
 };
 
 typedef struct gnuitar_audio_driver {
+    /** The name of the driver */
+    char * name;
+    /** driver specific data */
+    void * data;
+    /** Creates the driver data */
+    void * (*create_callback)(void);
+    /** Destroys the driver data */
+    void (*destroy_callback)(void * data_);
+    /** Sets a parameter for the driver */
+    int (*set_callback)(void * data_, const char * name, const char * value);
+    /** Gets a parameter for the driver */
+    int (*get_callback)(const void * data_, const char * name, char ** value);
+    /** Starts the audio stream */
+    int (*start_callback)(void * data_);
+    /** Stops the audio stream */
+    int (*stop_callback)(void * data_);
+/* old params */
     const char *str;
     int enabled;
     const struct audio_driver_channels *channels;
@@ -31,9 +48,15 @@ typedef struct gnuitar_audio_driver {
     void (*finish)(void);
 } gnuitar_audio_driver_t;
 
-void gnuitar_audio_driver_init(gnuitar_audio_driver_t * driver);
+void gnuitar_audio_driver_destroy(gnuitar_audio_driver_t * driver);
 
-void gnuitar_audio_driver_done(gnuitar_audio_driver_t * driver);
+int gnuitar_audio_driver_get_param(const gnuitar_audio_driver_t * driver, const char * name, char ** value);
+
+int gnuitar_audio_driver_set_param(gnuitar_audio_driver_t * driver, const char * name, const char * value);
+
+int gnuitar_audio_driver_start(gnuitar_audio_driver_t * driver);
+
+int gnuitar_audio_driver_stop(gnuitar_audio_driver_t * driver);
 
 /* for compatibility */
 

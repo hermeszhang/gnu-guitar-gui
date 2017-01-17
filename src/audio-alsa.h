@@ -60,16 +60,43 @@
  *
  */
 
-#ifndef _AUDIO_ALSA_H_
-#define _AUDIO_ALSA_H_ 1
+#ifndef GNUITAR_AUDIO_ALSA_H
+#define GNUITAR_AUDIO_ALSA_H
 
 #ifdef HAVE_ALSA
 
 #include "audio-driver.h"
 
-int    alsa_available(void);
+#include <alsa/asoundlib.h>
+
+typedef struct gnuitar_alsa_driver {
+    /** The name of the input PCM */
+    char * input_name;
+    /** The input PCM */
+    snd_pcm_t * input_pcm;
+    /** The number of channels from the input */
+    unsigned int input_channels;
+    /** The name of the output PCM */
+    char * output_name;
+    /** The output PCM */
+    snd_pcm_t * output_pcm;
+    /** The number of channels from the output */
+    unsigned int output_channels;
+    /** The number of periods to use */
+    unsigned int period_size;
+    /** The number of frames in a period */
+    unsigned int periods;
+    /** The number of frames per second */
+    unsigned long int rate;
+} gnuitar_alsa_driver_t;
+
+gnuitar_audio_driver_t * gnuitar_alsa_driver_create(void);
+
+int alsa_available(void);
+
 extern audio_driver_t alsa_driver;
 
-#endif
+#endif /* HAVE_ALSA */
 
-#endif
+#endif /* GNUITAR_AUDIO_ALSA_H */
+

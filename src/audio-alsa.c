@@ -280,6 +280,84 @@
 #include "gui.h"
 #include "pump.h"
 
+#ifdef _MSC_VER
+#define gnuitar_strdup _strdup
+#else
+#define gnuitar_strdup strdup
+#endif
+
+static void * create_callback(void);
+
+static void destroy_callback(void * data);
+
+gnuitar_audio_driver_t *
+gnuitar_alsa_driver_create(void)
+{
+    gnuitar_audio_driver_t * driver;
+
+    driver = malloc(sizeof(*driver));
+    if (driver == NULL)
+        return NULL;
+
+    driver->name = gnuitar_strdup("ALSA");
+    if (driver->name == NULL) {
+        free(driver);
+        return NULL;
+    }
+
+    driver->data = NULL;
+    driver->create_callback = create_callback;
+    driver->destroy_callback = destroy_callback;
+    driver->start_callback = NULL;
+    driver->stop_callback = NULL;
+    driver->set_callback = NULL;
+    driver->get_callback = NULL;
+
+    return driver;
+}
+
+static void *
+create_callback(void)
+{
+    gnuitar_alsa_driver_t * alsa_driver;
+
+    alsa_driver = malloc(sizeof(*alsa_driver));
+    if (alsa_driver == NULL)
+        return NULL;
+
+    alsa_driver->input_name = "default";
+    alsa_driver->input_pcm = NULL;
+    alsa_driver->input_channels = 2;
+
+    alsa_driver->output_name = "default";
+    alsa_driver->output_pcm = NULL;
+    alsa_driver->output_channels = 2;
+
+    alsa_driver->period_size = 1024;
+    alsa_driver->periods = 2;
+    alsa_driver->rate = 48000;
+
+    return alsa_driver;
+}
+
+static void
+destroy_callback(void * data)
+{
+    gnuitar_alsa_driver_t * alsa_driver;
+
+    alsa_driver = (gnuitar_alsa_driver_t *)(data);
+    if (alsa_driver != NULL) {
+        if (alsa_driver->input_pcm != NULL)
+            snd_pcm_close(alsa_driver->input_pcm);
+        if (alsa_driver->input_name != NULL)
+            free(alsa_driver->input_name);
+        if (alsa_driver->output_pcm != NULL)
+            snd_pcm_close(alsa_driver->output_pcm);
+        if (alsa_driver->output_name != NULL)
+            free(alsa_driver->output_name);
+    }
+}
+
 /* these parameters affect our persistency in attempts to configure playback */
 #define MAX_TRIES 8
 
