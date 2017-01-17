@@ -472,7 +472,7 @@ static const struct audio_driver_channels jack_channels_cfg[] = {
 };
 
 audio_driver_t jack_driver = {
-    .str = "JACK",
+    .name = "JACK",
     .enabled = 0,
     .channels = jack_channels_cfg,
     
