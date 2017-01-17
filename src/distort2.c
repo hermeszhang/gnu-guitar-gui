@@ -528,14 +528,14 @@ distort2_filter(gnuitar_effect_t *p, gnuitar_packet_t *db)
      * If everything is zero, we have a large chances that all array is zero. */
     if(s[0]==0 && s[1]==0 && s[16]==0 && s[17]==0 &&
           s[24]==0 && s[25]==0 && s[32]==0 && s[33]==0 &&
-	  s[buffer_size-1]==0) {
+	  s[db->len-1]==0) {
         for (i = 0; i < MAX_CHANNELS; i += 1) {
             dp->last[i] = 0;
         }
         return;
     }
 
-    set_rc_lowpass_biquad(sample_rate * UPSAMPLING_RATE, 720, &dp->rolloff);
+    set_rc_lowpass_biquad(db->rate * UPSAMPLING_RATE, 720, &dp->rolloff);
     /*
      * process signal; x - input, in the range -1, 1
      */
@@ -645,6 +645,7 @@ distort2_create()
 {
     effect_t   *p;
     struct distort2_params *ap;
+    gnuitar_format_t format;
 
     p = calloc(1, sizeof(effect_t)); 
     p->params = gnuitar_memalign(1, sizeof(struct distort2_params));
@@ -660,12 +661,14 @@ distort2_create()
     ap->clip = 100.0;
     ap->treble = 6.0;
 
+    if (gnuitar_audio_driver_get_format(audio_driver, &format) != 0) {
+        gnuitar_format_defaults(&format);
+    }
+
     /* static shapers */
-    set_rc_lowpass_biquad(sample_rate, 3200, &ap->treble_highpass);
-    set_rc_lowpass_biquad(sample_rate * UPSAMPLING_RATE, 
-            1 / (2 * M_PI * RC_FEEDBACK_R * RC_FEEDBACK_C),
-            &ap->feedback_minus_loop);
-    set_rc_highpass_biquad(sample_rate, 160, &ap->output_bass_cut);
+    set_rc_lowpass_biquad(format.rate, 3200, &ap->treble_highpass);
+    set_rc_lowpass_biquad(format.rate * UPSAMPLING_RATE, 1 / (2 * M_PI * RC_FEEDBACK_R * RC_FEEDBACK_C), &ap->feedback_minus_loop);
+    set_rc_highpass_biquad(format.rate, 160, &ap->output_bass_cut);
     
     return p;
 }
