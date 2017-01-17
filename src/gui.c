@@ -541,6 +541,13 @@
 #include "tracker.h"
 #include "utils.h"
 
+char alsadevice_str[64];
+
+unsigned long int buffer_size = 0;
+unsigned long int sample_rate = 48000;
+unsigned int n_input_channels = 2;
+unsigned int n_output_channels = 2;
+
 static void add_pressed(GtkWidget *, gpointer);
 static void bank_start_save(GtkWidget *, gpointer);
 static void bank_start_load(GtkWidget *, gpointer);
@@ -1448,15 +1455,20 @@ update_input_volume(GtkAdjustment *adj, void *nothing) {
 static void
 populate_sparams_channels(GtkWidget *w)
 {
+    gnuitar_format_t format;
     GList *channels_list = NULL, *iter = NULL;
     gchar *defchoice = NULL;
 
-    defchoice = g_strdup_printf("%d in - %d out", n_input_channels, n_output_channels);
+    if (gnuitar_audio_driver_get_format(audio_driver, &format) != 0) {
+        gnuitar_format_defaults(&format);
+    }
+
+    defchoice = g_strdup_printf("%d in - %d out", format.input_channels, format.output_channels);
 
     if (audio_driver) {
         int i;
-        for (i = 0; audio_driver->channels[i].in != 0; i += 1) {
-            gchar *gtmp = g_strdup_printf("%d in - %d out", audio_driver->channels[i].in, audio_driver->channels[i].out);
+        for (i = 0; audio_driver->chmaps[i].in != 0; i += 1) {
+            gchar *gtmp = g_strdup_printf("%d in - %d out", audio_driver->chmaps[i].in, audio_driver->chmaps[i].out);
             channels_list = g_list_append(channels_list, gtmp);
         }
     }
@@ -1474,14 +1486,18 @@ update_latency_label(GtkWidget *widget, gpointer data)
 {
     gchar          *gtmp;
     sample_params_t *sparams = data;
+    gnuitar_format_t format;
+
+    if (gnuitar_audio_driver_get_format(audio_driver, &format) != 0) {
+        gnuitar_format_defaults(&format);
+    }
 
     update_sampling_params(widget, data);
-#ifndef _WIN32
-    gtmp = g_strdup_printf("%.2f ms", 1000.0 * (buffer_size * (fragments-1)) / sample_rate);
-#else
-    gtmp = g_strdup_printf("%.2f ms", 1000.0 * buffer_size / sample_rate);
-#endif
+
+    gtmp = g_strdup_printf("%.2f ms", 1000.0 * buffer_size / format.rate);
+
     gtk_label_set_text(GTK_LABEL(sparams->latency_label), gtmp);
+
     free(gtmp);
 }
 
@@ -1603,8 +1619,7 @@ gnuitar_gui_options_entry(GtkWidget *widget, gpointer data)
     sample_rates = g_list_append(sample_rates, "16000");
     gtk_combo_set_popdown_strings(GTK_COMBO(sparams.rate), sample_rates);
     g_list_free(sample_rates);
-    gtk_entry_set_text(GTK_ENTRY(GTK_COMBO(sparams.rate)->entry),
-		       g_strdup_printf("%d", sample_rate));
+    gtk_entry_set_text(GTK_ENTRY(GTK_COMBO(sparams.rate)->entry), g_strdup_printf("%lu", sample_rate));
     gtk_entry_set_editable(GTK_ENTRY(GTK_COMBO(sparams.rate)->entry), FALSE);
     gtk_table_attach(GTK_TABLE(sp_table), sparams.rate, 1, 2, 0, 1,
                      TBLOPT, TBLOPT, 3, 3);
@@ -1660,7 +1675,7 @@ gnuitar_gui_options_entry(GtkWidget *widget, gpointer data)
     g_list_free(drivers_list);
     
     if (audio_driver)
-        gtk_entry_set_text(GTK_ENTRY(GTK_COMBO(sparams.driver)->entry), audio_driver->str);
+        gtk_entry_set_text(GTK_ENTRY(GTK_COMBO(sparams.driver)->entry), audio_driver->name);
 
     gtk_entry_set_editable(GTK_ENTRY(GTK_COMBO(sparams.driver)->entry),
 			   FALSE);
@@ -1762,8 +1777,8 @@ update_sampling_params(GtkWidget * dialog, gpointer data)
     /* for certain audio drivers, make the fragment size to be a multiple
      * of the MIN_BUFFER_SIZE */
     if (audio_driver) {
-        if (strcmp(audio_driver->str, "OSS") == 0
-            || strcmp(audio_driver->str, "MMSystem") == 0) {
+        if (strcmp(audio_driver->name, "OSS") == 0
+            || strcmp(audio_driver->name, "MMSystem") == 0) {
             buffer_size -= buffer_size % MIN_BUFFER_SIZE;
             gtk_adjustment_set_value(gtk_spin_button_get_adjustment(GTK_SPIN_BUTTON(sparams->latency)),
                                                                     buffer_size);
@@ -1775,7 +1790,7 @@ update_sampling_params(GtkWidget * dialog, gpointer data)
     n_output_channels = tmp2;
     
     /* if alsa and surround40 selected, force 4-channel output. */
-    if (audio_driver && strcmp(audio_driver->str, "ALSA") == 0
+    if (audio_driver && strcmp(audio_driver->name, "ALSA") == 0
         && strcmp(alsadevice_str, "surround40") == 0)
         n_output_channels = 4;
 
@@ -1827,7 +1842,7 @@ start_stop(GtkWidget *widget, gpointer data)
     }
 
     if (GTK_TOGGLE_BUTTON(widget)->active) {
-	if ((error = audio_driver->init()) != ERR_NOERROR)
+        if ((error = gnuitar_audio_driver_start(audio_driver)) != ERR_NOERROR)
             gnuitar_printf("warning: unable to begin audio processing (code %d)\n", error);
 
 	gtk_widget_set_sensitive(GTK_WIDGET
@@ -1839,7 +1854,7 @@ start_stop(GtkWidget *widget, gpointer data)
         if (!audio_driver->enabled)
             gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(widget), 0);
     } else {
-	audio_driver->finish();
+        gnuitar_audio_driver_stop(audio_driver);
 	gtk_widget_set_sensitive(GTK_WIDGET
 				 (gtk_item_factory_get_widget
 				  (global_gui.item_factory, "/Options/Options")),
