@@ -94,10 +94,7 @@ extern unsigned int nbuffers;
 extern unsigned int overrun_threshold;
 #endif
 
-#ifndef _WIN32
-extern gnuitar_sample_t procbuf[MAX_BUFFER_SIZE * MAX_CHANNELS];
-extern gnuitar_sample_t procbuf2[MAX_BUFFER_SIZE * MAX_CHANNELS];
-#else
+#ifdef _WIN32
 /* sadly, Windows and Linux have a different idea what the size of the buffer is.
  * Linux world talks about size in frames because that is most convenient for ALSA
  * and JACK (but less so for OSS). */
