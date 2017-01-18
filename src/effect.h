@@ -41,6 +41,8 @@
 #include "utils.h"
 
 typedef struct gnuitar_effect {
+    /** The reference count of the effect. */
+    unsigned int ref_count;
     void *params;
     void (*proc_init) (struct gnuitar_effect *);
     void (*proc_done) (struct gnuitar_effect *);
@@ -50,6 +52,10 @@ typedef struct gnuitar_effect {
     short toggle;
     GtkWidget *control;
 } gnuitar_effect_t;
+
+void gnuitar_effect_incref(gnuitar_effect_t * effect);
+
+void gnuitar_effect_decref(gnuitar_effect_t * effect);
 
 /* for compatibility */
 

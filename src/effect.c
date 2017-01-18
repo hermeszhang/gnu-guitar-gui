@@ -40,6 +40,24 @@
 
 #include "utils.h"
 
+void
+gnuitar_effect_incref(gnuitar_effect_t *effect)
+{
+    effect->ref_count++;
+}
+
+void
+gnuitar_effect_decref(gnuitar_effect_t *effect)
+{
+    if ((effect == NULL) || (effect->ref_count == 0))
+        return;
+    effect->ref_count--;
+    if (effect->ref_count > 0)
+        return;
+    if (effect->proc_done)
+        effect->proc_done(effect);
+}
+
 static effect_t       *effects[MAX_EFFECTS];
 static int             effects_n = 0;
 static gnuitar_mutex_t effectlist_lock;
