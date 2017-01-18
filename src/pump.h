@@ -1,7 +1,6 @@
 #ifndef GNUITAR_PUMP_H
 #define GNUITAR_PUMP_H
 
-#include "audio-driver.h"
 #include "effect.h"
 #include "error.h"
 
@@ -14,13 +13,13 @@ typedef struct gnuitar_pump {
     size_t n_effects;
 } gnuitar_pump_t;
 
-void gnuitar_pump_init(gnuitar_pump_t *pump);
+gnuitar_pump_t * gnuitar_pump_create(void);
 
 void gnuitar_pump_incref(gnuitar_pump_t *pump);
 
 void gnuitar_pump_decref(gnuitar_pump_t *pump);
 
-gnuitar_error_t gnuitar_pump_add_effect(gnuitar_pump_t * pump, gnuitar_effect_t * effect);
+gnuitar_error_t gnuitar_pump_add_effect(gnuitar_pump_t *pump, gnuitar_effect_t *effect);
 
 
 extern volatile unsigned short write_track;

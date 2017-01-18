@@ -415,12 +415,17 @@
 #include "tracker.h"
 #include "utils.h"
 
-void
-gnuitar_pump_init(gnuitar_pump_t *pump)
+gnuitar_pump_t *
+gnuitar_pump_create(void)
 {
+    gnuitar_pump_t *pump;
+    pump = malloc(sizeof(*pump));
+    if (pump == NULL)
+        return NULL;
     pump->ref_count = 1;
     pump->effects = NULL;
     pump->n_effects = 0;
+    return pump;
 }
 
 void
