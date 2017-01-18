@@ -38,7 +38,9 @@ typedef struct gnuitar_chmap {
     unsigned int in, out;
 } gnuitar_chmap_t;
 
-typedef struct gnuitar_audio_driver {
+typedef struct gnuitar_audio_driver gnuitar_audio_driver_t;
+
+struct gnuitar_audio_driver {
     /** The name of the driver */
     char *name;
     /** driver specific data */
@@ -46,18 +48,18 @@ typedef struct gnuitar_audio_driver {
     /** Destroys the driver data */
     void (*destroy_callback)(void *data_);
     /** Sets a parameter for the driver */
-    int (*set_format_callback)(void *data_, const gnuitar_format_t *format);
+    int (*set_format_callback)(gnuitar_audio_driver_t *driver, const gnuitar_format_t *format);
     /** Gets a parameter for the driver */
-    int (*get_format_callback)(const void *data_, gnuitar_format_t *format);
+    int (*get_format_callback)(const gnuitar_audio_driver_t *driver, gnuitar_format_t *format);
     /** Starts the audio stream */
-    int (*start_callback)(void *data_);
+    int (*start_callback)(gnuitar_audio_driver_t *driver);
     /** Stops the audio stream */
-    int (*stop_callback)(void *data_);
+    int (*stop_callback)(gnuitar_audio_driver_t *driver);
 /* old params */
     int enabled;
     /** The channel maps available */
     const gnuitar_chmap_t * chmaps;
-} gnuitar_audio_driver_t;
+};
 
 void gnuitar_audio_driver_destroy(gnuitar_audio_driver_t *driver);
 

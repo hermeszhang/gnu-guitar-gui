@@ -62,7 +62,7 @@ gnuitar_audio_driver_start(gnuitar_audio_driver_t *driver)
         return -1;
     if (driver->start_callback == NULL)
         return -2;
-    if (driver->start_callback(driver->data) != 0)
+    if (driver->start_callback(driver) != 0)
         return -3;
 
     return 0;
@@ -75,7 +75,7 @@ gnuitar_audio_driver_stop(gnuitar_audio_driver_t *driver)
         return -1;
     if (driver->stop_callback == NULL)
         return -2;
-    if (driver->stop_callback(driver->data) != 0)
+    if (driver->stop_callback(driver) != 0)
         return -3;
 
     return 0;
@@ -88,7 +88,7 @@ gnuitar_audio_driver_get_format(const gnuitar_audio_driver_t *driver, gnuitar_fo
         return -1;
     if (driver->get_format_callback == NULL)
         return -2;
-    if (driver->get_format_callback(driver->data, format) != 0)
+    if (driver->get_format_callback(driver, format) != 0)
         return -3;
     return 0;
 }
@@ -100,7 +100,7 @@ gnuitar_audio_driver_set_format(gnuitar_audio_driver_t *driver, const gnuitar_fo
         return -1;
     if (driver->set_format_callback == NULL)
         return -2;
-    if (driver->set_format_callback(driver->data, format) != 0)
+    if (driver->set_format_callback(driver, format) != 0)
         return -3;
     return 0;
 }

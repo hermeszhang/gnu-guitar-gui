@@ -38,13 +38,13 @@ static void * create_callback(void);
 
 static void destroy_callback(void *data);
 
-static int start_callback(void *data);
+static int start_callback(gnuitar_audio_driver_t *driver);
 
-static int stop_callback(void *data);
+static int stop_callback(gnuitar_audio_driver_t *driver);
 
-static int get_format_callback(const void *data, gnuitar_format_t *format);
+static int get_format_callback(const gnuitar_audio_driver_t *driver, gnuitar_format_t *format);
 
-static int set_format_callback(void *data, const gnuitar_format_t *format);
+static int set_format_callback(gnuitar_audio_driver_t *driver, const gnuitar_format_t *format);
 
 static void * alsa_audio_thread(void *data);
 
@@ -128,7 +128,6 @@ static void
 destroy_callback(void *data)
 {
     gnuitar_alsa_driver_t *alsa_driver;
-
     alsa_driver = (gnuitar_alsa_driver_t *)(data);
     if (alsa_driver != NULL) {
         if (alsa_driver->input_pcm != NULL)
@@ -143,51 +142,51 @@ destroy_callback(void *data)
 }
 
 static int
-start_callback(void *data)
+start_callback(gnuitar_audio_driver_t *driver)
 {
-    gnuitar_alsa_driver_t *driver;
+    gnuitar_alsa_driver_t *alsa_driver;
 
-    driver = (gnuitar_alsa_driver_t *)(data);
-    if (driver == NULL)
+    alsa_driver = (gnuitar_alsa_driver_t *)(driver->data);
+    if (alsa_driver == NULL)
         return -1;
 
-    if (snd_pcm_open(&driver->input_pcm,
-                     driver->input_name,
+    if (snd_pcm_open(&alsa_driver->input_pcm,
+                     alsa_driver->input_name,
                      SND_PCM_STREAM_CAPTURE,
                      0 /* mode flags */) != 0) {
         return -2;
     }
 
-    if (alsa_configure_audio(driver->input_pcm,
-                             &driver->periods,
-                             &driver->period_size,
-                             driver->input_channels,
-                             &driver->rate,
-                             &driver->input_bits,
+    if (alsa_configure_audio(alsa_driver->input_pcm,
+                             &alsa_driver->periods,
+                             &alsa_driver->period_size,
+                             alsa_driver->input_channels,
+                             &alsa_driver->rate,
+                             &alsa_driver->input_bits,
                              1 /* 1 means values may be changed */) != 0) {
         return -3;
     }
 
-    if (snd_pcm_open(&driver->output_pcm,
-                     driver->output_name,
+    if (snd_pcm_open(&alsa_driver->output_pcm,
+                     alsa_driver->output_name,
                      SND_PCM_STREAM_PLAYBACK,
                      0 /* mode flags */) != 0) {
         return -2;
     }
 
-    if (alsa_configure_audio(driver->output_pcm,
-                             &driver->periods,
-                             &driver->period_size,
-                             driver->output_channels,
-                             &driver->rate,
-                             &driver->output_bits,
+    if (alsa_configure_audio(alsa_driver->output_pcm,
+                             &alsa_driver->periods,
+                             &alsa_driver->period_size,
+                             alsa_driver->output_channels,
+                             &alsa_driver->rate,
+                             &alsa_driver->output_bits,
                              1 /* 1 means values may be changed */) != 0) {
         return -3;
     }
 
-    driver->keep_thread_running = 1;
+    alsa_driver->keep_thread_running = 1;
 
-    if (pthread_create(&driver->thread, NULL, alsa_audio_thread, data)) {
+    if (pthread_create(&alsa_driver->thread, NULL, alsa_audio_thread, driver)) {
         return -4;
     }
 
@@ -195,49 +194,49 @@ start_callback(void *data)
 }
 
 static int
-stop_callback(void *data)
+stop_callback(gnuitar_audio_driver_t *driver)
 {
-    gnuitar_alsa_driver_t *driver;
+    gnuitar_alsa_driver_t *alsa_driver;
 
-    driver = (gnuitar_alsa_driver_t *)(data);
-    if (driver == NULL)
+    alsa_driver = (gnuitar_alsa_driver_t *)(driver->data);
+    if (alsa_driver == NULL)
         return -1;
 
-    driver->keep_thread_running = 0;
+    alsa_driver->keep_thread_running = 0;
 
-    if (pthread_join(driver->thread, NULL) != 0)
+    if (pthread_join(alsa_driver->thread, NULL) != 0)
         return -1;
 
     return 0;
 }
 
 static int
-get_format_callback(const void *data, gnuitar_format_t *format)
+get_format_callback(const gnuitar_audio_driver_t *driver, gnuitar_format_t *format)
 {
-    gnuitar_alsa_driver_t *driver;
+    const gnuitar_alsa_driver_t *alsa_driver;
 
-    driver = (gnuitar_alsa_driver_t *)(data);
-    if (driver == NULL)
+    alsa_driver = (gnuitar_alsa_driver_t *)(driver->data);
+    if (alsa_driver == NULL)
         return -1;
 
-    format->output_bits = driver->output_bits;
-    format->output_channels = driver->output_channels;
+    format->output_bits = alsa_driver->output_bits;
+    format->output_channels = alsa_driver->output_channels;
 
-    format->input_bits = driver->input_bits;
-    format->input_channels = driver->input_channels;
+    format->input_bits = alsa_driver->input_bits;
+    format->input_channels = alsa_driver->input_channels;
 
-    format->rate = driver->rate;
+    format->rate = alsa_driver->rate;
 
     return 0;
 }
 
 static int
-set_format_callback(void *data, const gnuitar_format_t *format)
+set_format_callback(gnuitar_audio_driver_t *driver, const gnuitar_format_t *format)
 {
-    gnuitar_alsa_driver_t *driver;
+    gnuitar_alsa_driver_t *alsa_driver;
 
-    driver = (gnuitar_alsa_driver_t *)(data);
-    if (driver == NULL)
+    alsa_driver = (gnuitar_alsa_driver_t *)(driver->data);
+    if (alsa_driver == NULL)
         return -1;
 
     /* not implemented */
@@ -255,26 +254,31 @@ alsa_audio_thread(void *data)
     unsigned int restarting = 0;
     unsigned int data_size = 0;
 
-    gnuitar_alsa_driver_t * driver;
+    gnuitar_audio_driver_t *driver;
+    gnuitar_alsa_driver_t *alsa_driver;
 
     snd_pcm_t * input_pcm;
     snd_pcm_t * output_pcm;
 
-    driver = (gnuitar_alsa_driver_t *)(data);
+    driver = (gnuitar_audio_driver_t *)(data);
     if (driver == NULL)
         return NULL;
 
-    input_pcm = driver->input_pcm;
+    alsa_driver = (gnuitar_alsa_driver_t *)(driver->data);
+    if (alsa_driver == NULL)
+        return NULL;
+
+    input_pcm = alsa_driver->input_pcm;
     if (input_pcm == NULL)
         return NULL;
 
-    output_pcm = driver->output_pcm;
+    output_pcm = alsa_driver->output_pcm;
     if (output_pcm == NULL)
         return NULL;
 
-    data_size = (driver->output_channels
-               * driver->period_size
-               * driver->output_bits) / 8;
+    data_size = (alsa_driver->output_channels
+               * alsa_driver->period_size
+               * alsa_driver->output_bits) / 8;
 
     db.data = malloc(data_size);
     if (db.data == NULL)
@@ -286,12 +290,13 @@ alsa_audio_thread(void *data)
         return NULL;
     }
 
-    db.len = driver->output_channels * driver->period_size;
-    db.channels = driver->output_channels;
-    db.rate = driver->rate;
+    db.len = alsa_driver->output_channels
+           * alsa_driver->period_size;
+    db.channels = alsa_driver->output_channels;
+    db.rate = alsa_driver->rate;
 
     /* frame counts are always the same to both read and write */
-    while (driver->keep_thread_running) {
+    while (alsa_driver->keep_thread_running) {
         if (restarting) {
             restarting = 0;
             /* drop any output we might got and stop */
@@ -302,12 +307,12 @@ alsa_audio_thread(void *data)
             snd_pcm_prepare(output_pcm);
             /* prefill audio area */
             memset(db.data, 0, data_size);
-            for (i = 0; i < driver->periods; i += 1)
+            for (i = 0; i < alsa_driver->periods; i += 1)
                 if (snd_pcm_avail_update(output_pcm) > 0)
                     snd_pcm_writei(output_pcm, db.data, db.len / db.channels);
         }
 
-        while ((inframes = snd_pcm_readi(driver->input_pcm, db.data, db.len / db.channels)) < 0) {
+        while ((inframes = snd_pcm_readi(input_pcm, db.data, db.len / db.channels)) < 0) {
             //gnuitar_printf( "Input buffer overrun\n");
             restarting = 1;
             snd_pcm_prepare(input_pcm);
