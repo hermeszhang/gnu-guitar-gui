@@ -111,6 +111,7 @@ SET(LIBGNUITAR_SOURCES
     sustain.c
     reverb.c
     backbuf.c
+    packet.c
     utils.c
     noise.c
     biquad.c
