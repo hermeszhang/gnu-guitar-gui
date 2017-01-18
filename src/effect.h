@@ -53,9 +53,9 @@ typedef struct gnuitar_effect {
     GtkWidget *control;
 } gnuitar_effect_t;
 
-void gnuitar_effect_incref(gnuitar_effect_t * effect);
+void gnuitar_effect_incref(gnuitar_effect_t *effect);
 
-void gnuitar_effect_decref(gnuitar_effect_t * effect);
+void gnuitar_effect_decref(gnuitar_effect_t *effect);
 
 /* for compatibility */
 
