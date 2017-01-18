@@ -57,11 +57,6 @@ typedef struct gnuitar_audio_driver {
     int enabled;
     /** The channel maps available */
     const gnuitar_chmap_t * chmaps;
-/*
-    const struct audio_driver_channels *channels;
-    int (*init)(void);
-    void (*finish)(void);
-*/
 } gnuitar_audio_driver_t;
 
 void gnuitar_audio_driver_destroy(gnuitar_audio_driver_t *driver);
