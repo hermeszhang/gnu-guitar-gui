@@ -3,26 +3,9 @@
 
 #include <stdint.h>
 
-/* get rid of __restrict__ type qualifier for MS Visual C */
-#ifdef _MSC_VER
-#define __restrict__
-#endif
-
-#define MAX_SAMPLE (32767 << 8)
-
-typedef float gnuitar_sample_t;
-
-typedef struct gnuitar_packet {
-    gnuitar_sample_t * __restrict__ data;
-    gnuitar_sample_t * __restrict__ data_swap;
-    unsigned int len;
-    unsigned int channels;
-    unsigned long int rate;
-} gnuitar_packet_t;
-
-void gnuitar_packet_mul(gnuitar_packet_t * packet, float n);
-
-void gnuitar_packet_div(gnuitar_packet_t * packet, float n);
+#include "error.h"
+#include "packet.h"
+#include "pump.h"
 
 typedef struct gnuitar_format {
     unsigned int input_bits;
@@ -57,13 +40,15 @@ struct gnuitar_audio_driver {
     int (*stop_callback)(gnuitar_audio_driver_t *driver);
     /** The effects pump for the driver */
     gnuitar_pump_t *pump;
-/* old params */
+    /* old params */
     int enabled;
     /** The channel maps available */
     const gnuitar_chmap_t * chmaps;
 };
 
 void gnuitar_audio_driver_destroy(gnuitar_audio_driver_t *driver);
+
+gnuitar_error_t gnuitar_audio_driver_add_effect(gnuitar_audio_driver_t *driver, gnuitar_effect_t *effect);
 
 int gnuitar_audio_driver_get_format(const gnuitar_audio_driver_t *driver, gnuitar_format_t *format);
 

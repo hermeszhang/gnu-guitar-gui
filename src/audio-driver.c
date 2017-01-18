@@ -58,6 +58,23 @@ gnuitar_audio_driver_destroy(gnuitar_audio_driver_t *driver)
         gnuitar_pump_decref(driver->pump);
 }
 
+gnuitar_error_t
+gnuitar_audio_driver_add_effect(gnuitar_audio_driver_t *driver, gnuitar_effect_t *effect)
+{
+    gnuitar_error_t error;
+
+    if (driver->pump == NULL)
+        driver->pump = gnuitar_pump_create();
+    if (driver->pump == NULL)
+        return GNUITAR_ERROR_MALLOC;
+
+    error = gnuitar_pump_add_effect(driver->pump, effect);
+    if (error)
+        return error;
+
+    return GNUITAR_ERROR_NONE;
+}
+
 int
 gnuitar_audio_driver_start(gnuitar_audio_driver_t *driver)
 {
