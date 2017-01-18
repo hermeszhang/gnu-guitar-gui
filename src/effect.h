@@ -37,7 +37,7 @@
 #include <gtk/gtk.h>
 #include "glib12-compat.h"
 
-#include "audio-driver.h"
+#include "packet.h"
 #include "utils.h"
 
 typedef struct gnuitar_effect {
