@@ -3,21 +3,25 @@
 
 #include "audio-driver.h"
 #include "effect.h"
+#include "error.h"
 
 typedef struct gnuitar_pump {
     /** number of references */
     size_t ref_count;
     /** array of effects */
-    gnuitar_effect_t * effects;
+    gnuitar_effect_t **effects;
     /** number of effects in the pump */
     size_t n_effects;
 } gnuitar_pump_t;
 
-void gnuitar_pump_init(gnuitar_pump_t * pump);
+void gnuitar_pump_init(gnuitar_pump_t *pump);
 
-void gnuitar_pump_ref(gnuitar_pump_t * pump);
+void gnuitar_pump_incref(gnuitar_pump_t *pump);
 
-void gnuitar_pump_unref(gnuitar_pump_t * pump);
+void gnuitar_pump_decref(gnuitar_pump_t *pump);
+
+gnuitar_error_t gnuitar_pump_add_effect(gnuitar_pump_t * pump, gnuitar_effect_t * effect);
+
 
 extern volatile unsigned short write_track;
 

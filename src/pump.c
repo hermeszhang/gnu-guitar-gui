@@ -424,13 +424,13 @@ gnuitar_pump_init(gnuitar_pump_t *pump)
 }
 
 void
-gnuitar_pump_ref(gnuitar_pump_t *pump)
+gnuitar_pump_incref(gnuitar_pump_t *pump)
 {
     pump->ref_count++;
 }
 
 void
-gnuitar_pump_unref(gnuitar_pump_t *pump)
+gnuitar_pump_decref(gnuitar_pump_t *pump)
 {
     size_t i;
     if (pump->ref_count <= 0) {
@@ -444,6 +444,25 @@ gnuitar_pump_unref(gnuitar_pump_t *pump)
         /* TODO destroy effects here */
     }
     free(pump->effects);
+}
+
+gnuitar_error_t
+gnuitar_pump_add_effect(gnuitar_pump_t *pump, gnuitar_effect_t *effect)
+{
+    gnuitar_effect_t ** tmp;
+    size_t tmp_size;
+
+    tmp_size = sizeof(*tmp) * (pump->n_effects + 1);
+    tmp = realloc(pump->effects, tmp_size);
+    if (tmp == NULL)
+        return GNUITAR_ERROR_MALLOC;
+
+    gnuitar_effect_incref(effect);
+
+    tmp[pump->n_effects] = effect;
+    pump->effects = tmp;
+    pump->n_effects++;
+    return GNUITAR_ERROR_NONE;
 }
 
 /* flag for whether we are creating .wav */
