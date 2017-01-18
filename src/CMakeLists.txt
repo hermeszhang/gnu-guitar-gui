@@ -89,12 +89,11 @@ ENDIF (FFTW3_LIBRARY)
 # set final C flags
 SET(CMAKE_C_FLAGS "${ARCH_FLAGS} ${CMAKE_C_FLAGS} ${WARNING_FLAGS} ${OPT_FLAGS}")
 
-SET(SOURCES
+SET(LIBGNUITAR_SOURCES
     amp.c
     error.c
     package.c
     session.c
-    main.c
     pump.c
     chorus.c
     delay.c
@@ -107,7 +106,6 @@ SET(SOURCES
     rcfilter.c
     tubeamp.c
     rotary.c
-    gui.c
     distort.c
     distort2.c
     sustain.c
@@ -129,12 +127,26 @@ SET(SOURCES
     audio-midi.c
     effect.c)
 
-ADD_EXECUTABLE(gnuitar ${SOURCES})
+ADD_LIBRARY(gnuitar-lib ${LIBGNUITAR_SOURCES})
+SET_TARGET_PROPERTIES(gnuitar-lib PROPERTIES OUTPUT_NAME gnuitar)
 
-SET_TARGET_PROPERTIES(gnuitar PROPERTIES LINK_FLAGS "-Wl,--as-needed")
-TARGET_LINK_LIBRARIES(gnuitar ${GTK2_LIBRARIES} ${OTHER_LIBRARIES})
+SET(GNUITAR_GUI_SOURCES
+    gui.c
+    main.c)
 
-INSTALL(TARGETS gnuitar RUNTIME DESTINATION bin)
+ADD_EXECUTABLE(gnuitar-gui ${GNUITAR_GUI_SOURCES})
+
+SET_TARGET_PROPERTIES(gnuitar-gui
+    PROPERTIES
+        LINK_FLAGS "-Wl,--as-needed"
+        OUTPUT_NAME gnuitar)
+TARGET_LINK_LIBRARIES(gnuitar-gui gnuitar-lib ${GTK2_LIBRARIES} ${OTHER_LIBRARIES})
+
+INSTALL(TARGETS gnuitar-lib gnuitar-gui
+    RUNTIME DESTINATION bin
+    ARCHIVE DESTINATION lib
+    LIBRARY DESTINATION lib)
+
 MAKE_DIRECTORY("${CMAKE_INSTALL_PREFIX}/share/doc/gnuitar/docs")
 INSTALL(FILES AUTHORS NEWS README TODO FAQ COPYING ChangeLog
         DESTINATION share/doc/gnuitar)
