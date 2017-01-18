@@ -18,7 +18,6 @@
  *
  */
 
-
 #include <stdlib.h>
 #include <string.h>
 
@@ -51,8 +50,12 @@ gnuitar_packet_div(gnuitar_packet_t *packet, float n)
 void
 gnuitar_audio_driver_destroy(gnuitar_audio_driver_t *driver)
 {
-    if ((driver != NULL) && (driver->destroy_callback != NULL))
+    if (driver == NULL)
+        return;
+    if (driver->destroy_callback != NULL)
         driver->destroy_callback(driver->data);
+    if (driver->pump)
+        gnuitar_pump_decref(driver->pump);
 }
 
 int

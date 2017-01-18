@@ -55,6 +55,8 @@ struct gnuitar_audio_driver {
     int (*start_callback)(gnuitar_audio_driver_t *driver);
     /** Stops the audio stream */
     int (*stop_callback)(gnuitar_audio_driver_t *driver);
+    /** The effects pump for the driver */
+    gnuitar_pump_t *pump;
 /* old params */
     int enabled;
     /** The channel maps available */
