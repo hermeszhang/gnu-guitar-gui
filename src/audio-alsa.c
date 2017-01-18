@@ -254,7 +254,6 @@ alsa_audio_thread(void *data)
     gnuitar_packet_t db;
     unsigned int restarting = 0;
     unsigned int data_size = 0;
-    unsigned int j = 0;
 
     gnuitar_alsa_driver_t * driver;
 
@@ -293,8 +292,6 @@ alsa_audio_thread(void *data)
 
     /* frame counts are always the same to both read and write */
     while (driver->keep_thread_running) {
-        printf("repeating: %u\n", j++);
-
         if (restarting) {
             restarting = 0;
             /* drop any output we might got and stop */
@@ -324,7 +321,6 @@ alsa_audio_thread(void *data)
             restarting = 1;
             snd_pcm_prepare(output_pcm);
         }
-        printf("write count: %d\n", outframes);
     }
     return NULL;
 }
