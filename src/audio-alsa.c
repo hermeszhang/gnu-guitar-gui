@@ -13,13 +13,6 @@
 #include "gui.h"
 #include "pump.h"
 
-/** The global ALSA driver.
- * This will be used until the rest of the code
- * base can function without global variables.
- */
-
-gnuitar_audio_driver_t * global_alsa_driver;
-
 const gnuitar_chmap_t chmaps_avail[] = {
     { 1, 1 },
     { 1, 2 },
