@@ -57,6 +57,8 @@ void gnuitar_effect_incref(gnuitar_effect_t *effect);
 
 void gnuitar_effect_decref(gnuitar_effect_t *effect);
 
+void gnuitar_effect_process(gnuitar_effect_t *effect, gnuitar_packet_t *packet);
+
 /* for compatibility */
 
 typedef struct gnuitar_effect effect_t;
@@ -161,24 +163,5 @@ gnuitar_free(void *memory) {
     free(memory);
 }
 #endif
-
-// global initialisers
-void effect_start(void);
-void effect_stop(void);
-
-// effect list operations
-void effect_list_add_to_clist(GtkWidget *w);
-int effect_list_find_by_name(const char *name);
-
-// effect operations
-effect_t *effect_create(const int idx);
-effect_t *effect_create_without_init(const int idx);
-void effect_iterate(void (*func)(effect_t *effect, int idx, void *data), void *data);
-void effect_clear(void);
-int effect_insert(effect_t *effect, const int idx);
-int effect_move(const int start, const int end);
-int effect_find(const effect_t *effect);
-void effect_destroy(effect_t *effect);
-effect_t *effect_delete(const int idx);
 
 #endif
