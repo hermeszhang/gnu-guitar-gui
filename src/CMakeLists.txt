@@ -132,6 +132,7 @@ ADD_LIBRARY(gnuitar-lib ${LIBGNUITAR_SOURCES})
 SET_TARGET_PROPERTIES(gnuitar-lib PROPERTIES OUTPUT_NAME gnuitar)
 
 SET(GNUITAR_GUI_SOURCES
+    gtk.c
     gui.c
     main.c)
 
