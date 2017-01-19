@@ -446,7 +446,7 @@ gnuitar_pump_decref(gnuitar_pump_t *pump)
         return;
     }
     for (i = 0; i < pump->n_effects; i++) {
-        /* TODO destroy effects here */
+        gnuitar_effect_decref(pump->effects[i]);
     }
     free(pump->effects);
 }
@@ -468,6 +468,80 @@ gnuitar_pump_add_effect(gnuitar_pump_t *pump, gnuitar_effect_t *effect)
     pump->effects = tmp;
     pump->n_effects++;
     return GNUITAR_ERROR_NONE;
+}
+
+gnuitar_error_t
+gnuitar_pump_erase_effect(gnuitar_pump_t *pump, unsigned int index)
+{
+    if (index >= pump->n_effects)
+        return GNUITAR_ERROR_ENOENT;
+
+    gnuitar_effect_decref(pump->effects[index]);
+
+    memmove(&pump->effects[index],
+            &pump->effects[index + 1],
+            (pump->n_effects - (index + 1)) * sizeof(*pump->effects));
+
+    pump->n_effects--;
+
+    return GNUITAR_ERROR_NONE;
+}
+
+gnuitar_error_t
+gnuitar_pump_move_effect(gnuitar_pump_t *pump, unsigned int src, unsigned int dst)
+{
+    unsigned int i;
+    gnuitar_effect_t *swap;
+
+    if ((src >= pump->n_effects)
+     || (dst >= pump->n_effects)){
+        return GNUITAR_ERROR_ENOENT;
+    }
+
+    swap = pump->effects[src];
+    if (src < dst) {
+        for (i = src; i < dst; i++)
+            pump->effects[i] = pump->effects[i + 1];
+    } else if (src > dst) {
+        for (i = src; i > dst; i--)
+            pump->effects[i] = pump->effects[i - 1];
+    }
+    pump->effects[dst] = swap;
+
+    return GNUITAR_ERROR_NONE;
+}
+
+static void bias_elimination(gnuitar_packet_t *packet);
+
+static float vu_meter(gnuitar_packet_t *packet);
+
+static void adjust_master_volume(gnuitar_packet_t *packet);
+
+static void adjust_input_volume(gnuitar_packet_t *packet);
+
+static void adapt_to_output(gnuitar_packet_t *packet);
+
+void
+gnuitar_pump_process(gnuitar_pump_t *pump, gnuitar_packet_t *packet)
+{
+    unsigned int i;
+
+    bias_elimination(packet);
+    adjust_input_volume(packet);
+    set_vumeter_in_value(vu_meter(packet));
+
+    for (i = 0; i < pump->n_effects; i++) {
+        if (!pump->effects[i]->toggle)
+            continue;
+        gnuitar_effect_process(pump->effects[i], packet);
+    }
+
+    adjust_master_volume(packet);
+    set_vumeter_out_value(vu_meter(packet));
+    adapt_to_output(packet);
+
+    if (write_track)
+        track_write(packet->data, packet->len);
 }
 
 /* flag for whether we are creating .wav */
@@ -599,33 +673,6 @@ adapt_to_output(gnuitar_packet_t *db)
             db->channels, output_channels);
 }
 
-/* function called on each effect during processing */
-static void
-run_effects(effect_t *effect, int idx, void *data) {
-
-    gnuitar_packet_t *db = (gnuitar_packet_t *) data;
-
-    (void) idx;
-
-    if (effect->toggle)
-        effect->proc_filter(effect, db);
-}
-
-void
-pump_sample(gnuitar_packet_t *db)
-{
-    bias_elimination(db);
-    adjust_input_volume(db);
-    set_vumeter_in_value(vu_meter(db));
-    effect_iterate(run_effects, db);
-    adjust_master_volume(db);
-    set_vumeter_out_value(vu_meter(db));
-    
-    adapt_to_output(db);
-    if (write_track)
-        track_write(db->data, db->len);
-}
-
 static void
 init_sin_lookup_table(void) {
     int i = 0;
@@ -713,7 +760,6 @@ save_settings(void) {
 void
 pump_start(void)
 {
-    effect_start();
     init_sin_lookup_table();
 
     master_volume = 0.0;
@@ -728,152 +774,16 @@ pump_stop(void)
         write_track = 0;
         tracker_done();
     }
-
-    effect_stop();
-}
-
-static void
-save_effect_states(effect_t *effect, int idx, void *data) {
-    GKeyFile       *preset = data;
-    gchar	   *gtmp, *effect_name;
-
-    g_key_file_set_integer(preset, "global", "effects", idx + 1); /* last set will win */
-    gtmp = g_strdup_printf("effect%d", idx + 1);
-    gtk_clist_get_text(GTK_CLIST(processor), idx, 0, &effect_name);
-    g_key_file_set_string(preset, "global", gtmp, effect_name);
-    /* save enabled flag */
-    g_key_file_set_integer(preset, gtmp, "enabled", effect->toggle);
-    /* save effect-specific settings */
-    if (effect->proc_save != NULL)
-        effect->proc_save(effect, preset, gtmp);
-    free(gtmp);
 }
 
 void
 save_pump(const char *fname)
 {
-    int             fd;
-    gsize           length, w_length;
-    gchar	   *key_file_as_str;
-    GKeyFile	   *preset;
-
-    if ((fd = open(fname, O_WRONLY | O_CREAT | O_TRUNC, S_IREAD | S_IWRITE)) < 0) {
-        perror("Save failed: ");
-        return;
-    }
-
-    preset = g_key_file_new();
-
-    /* record software version */
-    g_key_file_set_string(preset, "global", "version", version);
-
-    g_key_file_set_integer(preset, "global", "effects", 0);
-    effect_iterate(save_effect_states, preset);
-    g_key_file_set_double(preset, "global", "volume", master_volume);
-    g_key_file_set_double(preset, "global", "input_volume", input_volume);
-
-    key_file_as_str = g_key_file_to_data(preset, &length, NULL);
-    w_length = write(fd, key_file_as_str, length);
-    if (length != w_length)
-	perror("Failed to write settings file completely: ");
-
-    g_key_file_free(preset);
-
-    close(fd);
+    (void) fname;
 }
 
 void
 load_pump(const char *fname)
 {
-    int		    i, j, effects_to_load;
-    GKeyFile	   *preset;
-    GError	   *error = NULL;
-    gchar	   *gtmp, *effect_name;
-
-    preset = g_key_file_new();
-    g_key_file_load_from_file(preset, fname, G_KEY_FILE_NONE, NULL);
-    gtmp = g_key_file_get_string(preset, "global", "version", &error);
-    if (error != NULL) {
-	gnuitar_printf( "error: failed to read file version.\n");
-	g_key_file_free(preset);
-	return;
-    }
-
-    /* we should adapt the keyfile between version changes */
-    if (strncmp(gtmp, version, 13) != 0) {
-	gnuitar_printf( "warning: version number mismatch: %s vs. %s\n", version, gtmp);
-    }
-    free(gtmp);
-    effect_clear();
-
-    effects_to_load = g_key_file_get_integer(preset, "global", "effects", &error);
-    if (error != NULL) {
-	gnuitar_printf( "error: failed to read effect count.\n");
-	g_key_file_free(preset);
-	return;
-    }
-
-    gtk_clist_clear(GTK_CLIST(processor));
-
-    for (i = 0; i < effects_to_load; i += 1) {
-        effect_t *effect;
-
-	gtmp = g_strdup_printf("effect%d", i+1);
-	effect_name = g_key_file_get_string(preset, "global", gtmp, &error);
-	if (error != NULL) {
-	    gnuitar_printf("warning: effect tag '%s' not found\n", gtmp);
-	    error = NULL;
-	    free(gtmp);
-	    continue;
-	}
-        j = effect_list_find_by_name(effect_name);
-        if (j == -1) {
-	    gnuitar_printf("warning: no effect called '%s'\n", effect_name);
-	    free(effect_name);
-	    free(gtmp);
-	    continue;
-	}
-
-        effect = effect_create_without_init(j);
-
-	/* read enabled flag */
-	effect->toggle = g_key_file_get_integer(preset, gtmp, "enabled", &error);
-	if (error != NULL) {
-	    gnuitar_printf("warning: no state flag in '%s'\n", effect_name);
-	    error = NULL;
-	    free(effect_name);
-	    free(gtmp);
-	    continue;
-	}
-
-	/* load effect specific settings */
-	if (effect->proc_load != NULL)
-	    effect->proc_load(effect, preset, gtmp, &error);
-
-	effect->proc_init(effect);
-        effect_insert(effect, -1);
-	gtk_clist_append(GTK_CLIST(processor), &effect_name);
-
-	free(effect_name);
-	free(gtmp);
-    }
-
-    master_volume = g_key_file_get_double(preset, "global", "volume", &error);
-    if (error != NULL) {
-	master_volume = 0.0;
-	error = NULL;
-    }
-    
-    input_volume = g_key_file_get_double(preset, "global", "input_volume", &error);
-    if (error != NULL) {
-        input_volume = 0.0;
-        error = NULL;
-    }
-        
-    g_key_file_free(preset);
-    
-    /* update master volume */
-    gtk_adjustment_set_value(GTK_ADJUSTMENT(adj_master), master_volume);
-    /* update input volume */
-    gtk_adjustment_set_value(GTK_ADJUSTMENT(adj_input), input_volume);
+    (void) fname;
 }
