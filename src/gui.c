@@ -530,6 +530,7 @@
 #include <stdarg.h>
 
 #include "gui.h"
+#include "gtk.h"
 #include "audio-midi.h"
 #include "authors_text.h"
 #include "about_text.h"
@@ -968,20 +969,26 @@ toggle_effect(GtkWidget *widget, effect_t *p)
 gint
 delete_event(GtkWidget * widget, GdkEvent * event, gpointer data)
 {
-    effect_t       *effect = data;
-    int             i;
+    gnuitar_error_t error;
+    gnuitar_effect_t *effect = (gnuitar_effect_t *)(data);
+    unsigned int i;
 
     (void) widget;
     (void) event;
 
-    i = effect_find(effect);
-    if (i == -1) {
+    /* TODO find a way to do this without directly accessing members */
+    for (i = 0; i < audio_driver->pump->n_effects; i++) {
+        if (audio_driver->pump->effects[i] == effect)
+            break;
+    }
+    if (i >= audio_driver->pump->n_effects) {
         gnuitar_printf("hmm, can't find effect to destroy in subwindow delete\n");
         return TRUE;
     }
-    effect_delete(i);
-    effect_destroy(effect);
-    gtk_clist_remove(GTK_CLIST(processor), i);
+    error = gnuitar_audio_driver_erase_effect(audio_driver, i);
+    if (!error)
+        gtk_clist_remove(GTK_CLIST(processor), i);
+
     return TRUE;
 }
 
@@ -1034,7 +1041,7 @@ rowmove_processor(GtkWidget *widget, gint start, gint end, gpointer data)
 {
     (void) widget;
     (void) data;
-    effect_move(start, end);
+    gnuitar_pump_move_effect(audio_driver->pump, start, end);
 }
 
 static void
@@ -1045,7 +1052,7 @@ up_pressed(GtkWidget *widget, gpointer data)
     (void) widget;
     (void) data;
 
-    if (effect_move(curr_row, curr_row - 1)) {
+    if (gnuitar_pump_move_effect(audio_driver->pump, curr_row, curr_row - 1) == GNUITAR_ERROR_NONE) {
         gtk_clist_freeze(GTK_CLIST(processor));
         gtk_clist_get_text(GTK_CLIST(processor), curr_row-1, 0, &name_above);
         gtk_clist_get_text(GTK_CLIST(processor), curr_row, 0, &name_selected);
@@ -1069,7 +1076,7 @@ down_pressed(GtkWidget *widget, gpointer data)
     (void) widget;
     (void) data;
 
-    if (effect_move(curr_row, curr_row + 1)) {
+    if (gnuitar_pump_move_effect(audio_driver->pump, curr_row, curr_row + 1) == GNUITAR_ERROR_NONE) {
 	gtk_clist_freeze(GTK_CLIST(processor));
         gtk_clist_get_text(GTK_CLIST(processor), curr_row, 0, &name_selected);
         gtk_clist_get_text(GTK_CLIST(processor), curr_row+1, 0, &name_below);
@@ -1088,11 +1095,9 @@ down_pressed(GtkWidget *widget, gpointer data)
 static void
 del_pressed(GtkWidget *widget, gpointer data)
 {
-    effect_t *effect = effect_delete(curr_row);
     (void) widget;
     (void) data;
-    if (effect)
-        effect_destroy(effect);
+    gnuitar_pump_erase_effect(audio_driver->pump, curr_row);
     gtk_clist_remove(GTK_CLIST(processor), curr_row);
     gtk_clist_select_row(GTK_CLIST(processor), curr_row, 0);
 }
@@ -1100,21 +1105,32 @@ del_pressed(GtkWidget *widget, gpointer data)
 static void
 add_pressed(GtkWidget *widget, gpointer data)
 {
-    int             idx;
-    gchar          *name;
-    GtkWidget      *known_effects = data;
+    unsigned int index;
+    gchar *name;
+    GtkWidget *known_effects = data;
+    gnuitar_effect_t *effect;
+    gnuitar_error_t error;
 
     (void) widget;
-
-    effect_t *effect = effect_create(effects_row);
-    idx = effect_insert(effect, curr_row);
 
     gtk_clist_get_text(GTK_CLIST(known_effects), effects_row, 0, &name);
     name = strdup(name);
 
-    gtk_clist_insert(GTK_CLIST(processor), idx, &name);
+    effect = gnuitar_package_create_effect(builtin_package, name);
+    if (effect == NULL)
+        return;
+
+    error = gnuitar_audio_driver_add_effect(audio_driver, effect);
+    if (!error) {
+        error = gnuitar_package_find_effect(builtin_package, name, &index);
+        if (!error)
+            gtk_clist_insert(GTK_CLIST(processor), index, &name);
+    }
+
+    gnuitar_effect_decref(effect);
     free(name);
-    gtk_clist_select_row(GTK_CLIST(processor), idx, 0);
+
+    gtk_clist_select_row(GTK_CLIST(processor), index, 0);
 }
 
 /*
@@ -1946,7 +1962,7 @@ init_gui(void)
 	"To apply effects to the sound, you need to add the effects" \
 	"to the \"Current Effects\" list." \
 	"You can use Add/Up/Down/Delete buttons to do this.",NULL);
-    effect_list_add_to_clist(known_effects);
+    gnuitar_package_add_to_clist(builtin_package, known_effects);
 
     bank = gtk_clist_new_with_titles(1, bank_titles);
     gtk_clist_set_selection_mode(GTK_CLIST(bank), GTK_SELECTION_SINGLE);
