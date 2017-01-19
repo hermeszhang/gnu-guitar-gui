@@ -57,13 +57,15 @@ void gnuitar_package_incref(gnuitar_package_t *package);
 
 void gnuitar_package_decref(gnuitar_package_t *package);
 
-unsigned int gnuitar_package_get_effect_count(const gnuitar_package_t * package);
+gnuitar_error_t gnuitar_package_find_effect(const gnuitar_package_t *package, const char *name, unsigned int *index);
 
-const char * gnuitar_package_get_effect_name(const gnuitar_package_t * package, unsigned int index);
+unsigned int gnuitar_package_get_effect_count(const gnuitar_package_t *package);
 
-gnuitar_effect_t * gnuitar_package_create_effect(gnuitar_package_t * package, const char * name);
+const char * gnuitar_package_get_effect_name(const gnuitar_package_t *package, unsigned int index);
 
-gnuitar_audio_driver_t * gnuitar_package_create_driver(gnuitar_package_t * package, const char * name);
+gnuitar_effect_t * gnuitar_package_create_effect(gnuitar_package_t *package, const char * name);
+
+gnuitar_audio_driver_t * gnuitar_package_create_driver(gnuitar_package_t *package, const char * name);
 
 #endif /* GNUITAR_PACKAGE_H */
 

@@ -26,7 +26,7 @@
 #include <stdlib.h>
 
 const gnuitar_package_effect_t effect_list[] = {
-    { "Digital amp", amp_create },
+    { "Digital Amp", amp_create },
     { "Autowah", autowah_create },
     { "Distort", distort_create },
     { "Delay", delay_create },
@@ -138,6 +138,54 @@ gnuitar_package_decref(gnuitar_package_t *package)
 #endif /* _WIN32 */
     }
     free(package->name);
+}
+
+gnuitar_effect_t *
+gnuitar_package_create_effect(gnuitar_package_t *package, const char *name)
+{
+    gnuitar_error_t error;
+    gnuitar_effect_t *effect;
+    unsigned int index;
+
+    error = gnuitar_package_find_effect(package, name, &index);
+    if (error)
+        return NULL;
+
+    effect = package->effects[index].create();
+    if (effect == NULL)
+        return NULL;
+
+    effect->ref_count = 1;
+    effect->toggle = 0;
+    effect->proc_init(effect);
+
+    return effect;
+}
+
+/** Locates the index of an effect.
+ * @param package The package to search the effect for.
+ * @param name The name of the effect
+ * @param index The index of the effect.
+ *  If the effect is not found, this parameter is not accessed.
+ *  This parameter may be NULL.
+ * @returns If the effect is found, @ref GNUITAR_ERROR_NONE is returned.
+ *  If the effect is not found, @ref GNUITAR_ERROR_ENOENT is returned.
+ * @ingroup gnuitar-package
+ */
+
+gnuitar_error_t
+gnuitar_package_find_effect(const gnuitar_package_t *package, const char *name, unsigned int *index)
+{
+    unsigned int i;
+    for (i = 0; i < package->effects_count; i++) {
+        if (strcmp(package->effects[i].name, name) == 0)
+            break;
+    }
+    if (i >= package->effects_count)
+        return GNUITAR_ERROR_ENOENT;
+    if (index != NULL)
+        *index = i;
+    return GNUITAR_ERROR_NONE;
 }
 
 /** Gets the number of effects in the package.
