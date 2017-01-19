@@ -45,6 +45,8 @@ gnuitar_audio_driver_add_effect(gnuitar_audio_driver_t *driver, gnuitar_effect_t
 {
     gnuitar_error_t error;
 
+    gnuitar_mutex_lock(&driver->pump_mutex);
+
     if (driver->pump == NULL)
         driver->pump = gnuitar_pump_create();
     if (driver->pump == NULL)
@@ -54,7 +56,18 @@ gnuitar_audio_driver_add_effect(gnuitar_audio_driver_t *driver, gnuitar_effect_t
     if (error)
         return error;
 
+    gnuitar_mutex_unlock(&driver->pump_mutex);
+
     return GNUITAR_ERROR_NONE;
+}
+
+gnuitar_error_t
+gnuitar_audio_driver_erase_effect(gnuitar_audio_driver_t *driver, unsigned int index)
+{
+    if (driver->pump == NULL)
+        return GNUITAR_ERROR_ENOENT;
+
+    return gnuitar_pump_erase_effect(driver->pump, index);
 }
 
 int
