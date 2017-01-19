@@ -40,6 +40,8 @@ struct gnuitar_audio_driver {
     int (*stop_callback)(gnuitar_audio_driver_t *driver);
     /** The effects pump for the driver */
     gnuitar_pump_t *pump;
+    /** The mutex for the pump */
+    gnuitar_mutex_t pump_mutex;
     /* old params */
     int enabled;
     /** The channel maps available */
@@ -49,6 +51,8 @@ struct gnuitar_audio_driver {
 void gnuitar_audio_driver_destroy(gnuitar_audio_driver_t *driver);
 
 gnuitar_error_t gnuitar_audio_driver_add_effect(gnuitar_audio_driver_t *driver, gnuitar_effect_t *effect);
+
+gnuitar_error_t gnuitar_audio_driver_erase_effect(gnuitar_audio_driver_t *driver, unsigned int index);
 
 int gnuitar_audio_driver_get_format(const gnuitar_audio_driver_t *driver, gnuitar_format_t *format);
 
