@@ -1,12 +1,50 @@
 #include "package.h"
 
+#include "amp.h"
 #include "autowah.h"
+#include "phasor.h"
+#include "chorus.h"
+#include "delay.h"
+#include "echo.h"
+#include "tremolo.h"
+#include "vibrato.h"
+#include "distort.h"
+#include "distort2.h"
+#include "tubeamp.h"
+#include "sustain.h"
+#include "reverb.h"
+#include "rotary.h"
+#include "noise.h"
+#include "eqbank.h"
+#include "pitch.h"
+#include "tuner.h"
 
 #ifndef _WIN32
 #include <dlfcn.h>
 #endif /* _WIN32 */
 
 #include <stdlib.h>
+
+const gnuitar_package_effect_t effect_list[] = {
+    { "Digital amp", amp_create },
+    { "Autowah", autowah_create },
+    { "Distort", distort_create },
+    { "Delay", delay_create },
+    { "Reverb", reverb_create },
+    { "Tremolo bar", vibrato_create },
+    { "Chorus / Flanger", chorus_create },
+    { "Echo", echo_create },
+    { "Phaser", phasor_create },
+    { "Tremolo", tremolo_create },
+    { "Sustain", sustain_create },
+    { "Overdrive", distort2_create },
+    { "Tube amplifier", tubeamp_create },
+    { "Rotary speaker", rotary_create },
+    { "Noise gate", noise_create },
+    { "Eq bank", eqbank_create },
+    { "Pitch shift", pitch_create },
+    { "Tuner", tuner_create }
+};
 
 #ifdef _MSC_VER
 #define gnuitar_strdup _strdup
@@ -140,18 +178,21 @@ static int
 gnuitar_package_add_builtins(gnuitar_package_t *package)
 {
     /* 18 effects */
-    const unsigned int effects_count = 1;
+    const unsigned int effects_count = sizeof(effect_list) / sizeof(effect_list[0]);
+    unsigned int i;
 
     package->name = gnuitar_strdup("GNUitar");
 
-    package->effects = malloc(effects_count * sizeof(gnuitar_effect_t));
+    package->effects = malloc(effects_count * sizeof(gnuitar_package_effect_t));
     if (package->effects == NULL) {
         return -1;
     }
     package->effects_count = effects_count;
 
-    package->effects[0].name = gnuitar_strdup("Autowah");
-    package->effects[0].create = autowah_create;
+    for (i = 0; i < effects_count; i++){
+        package->effects[i].name = strdup(effect_list[i].name);
+        package->effects[i].create = effect_list[i].create;
+    }
 
     return 0;
 }
