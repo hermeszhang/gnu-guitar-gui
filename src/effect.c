@@ -89,16 +89,6 @@ static const struct effect_creator effect_list[] = {
     {NULL, NULL}
 };
 
-/* for the old STDOUT listing -- need iterators to do these two... */
-void
-effect_list_print_all(void)
-{
-    int i = 0;
-    for (i = 0; effect_list[i].str != NULL; i += 1) {
-        printf("\t%s\n", effect_list[i].str);
-    }
-}
-
 void
 effect_list_add_to_clist(GtkWidget *w)
 {

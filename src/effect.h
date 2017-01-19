@@ -167,7 +167,6 @@ void effect_start(void);
 void effect_stop(void);
 
 // effect list operations
-void effect_list_print_all(void);
 void effect_list_add_to_clist(GtkWidget *w);
 int effect_list_find_by_name(const char *name);
 
