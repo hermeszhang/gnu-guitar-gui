@@ -64,11 +64,15 @@ gnuitar_alsa_driver_create(void)
         return NULL;
     }
 
+    gnuitar_mutex_init(&driver->pump_mutex);
+    driver->pump = gnuitar_pump_create();
+
     driver->destroy_callback = destroy_callback;
     driver->start_callback = start_callback;
     driver->stop_callback = stop_callback;
     driver->set_format_callback = set_format_callback;
     driver->get_format_callback = get_format_callback;
+
     driver->data = create_callback();
     if (driver->data == NULL) {
         free(driver->name);
@@ -290,6 +294,7 @@ alsa_audio_thread(void *data)
 
     /* frame counts are always the same to both read and write */
     while (alsa_driver->keep_thread_running) {
+
         if (restarting) {
             restarting = 0;
             /* drop any output we might got and stop */
@@ -311,8 +316,13 @@ alsa_audio_thread(void *data)
             snd_pcm_prepare(input_pcm);
         }
         db.len = inframes * db.channels;
+
         gnuitar_packet_mul(&db, MAX_SAMPLE);
-        pump_sample(&db);
+
+        gnuitar_mutex_lock(&driver->pump_mutex);
+        gnuitar_pump_process(driver->pump, &db);
+        gnuitar_mutex_unlock(&driver->pump_mutex);
+
         gnuitar_packet_div(&db, MAX_SAMPLE);
         /* write output */
         while ((outframes = snd_pcm_writei(output_pcm, db.data, db.len / db.channels)) < 0) {
