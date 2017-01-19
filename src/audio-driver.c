@@ -30,24 +30,6 @@
 #include "audio-dsound.h"
 
 void
-gnuitar_packet_mul(gnuitar_packet_t *packet, float n)
-{
-    unsigned int i;
-    for (i = 0; i < packet->len; i++) {
-        packet->data[i] *= n;
-    }
-}
-
-void
-gnuitar_packet_div(gnuitar_packet_t *packet, float n)
-{
-    unsigned int i;
-    for (i = 0; i < packet->len; i++) {
-        packet->data[i] /= n;
-    }
-}
-
-void
 gnuitar_audio_driver_destroy(gnuitar_audio_driver_t *driver)
 {
     if (driver == NULL)
