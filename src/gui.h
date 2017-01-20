@@ -25,6 +25,7 @@
 
 #include <gtk/gtk.h>
 #include "effect.h"
+#include "error.h"
 #include "glib12-compat.h"
 
 #ifdef __cplusplus
@@ -41,12 +42,35 @@ extern "C" {
 
 typedef struct gnuitar_gui {
     GtkAccelGroup *accel_group;
+
     /** The top level window */
     GtkWidget *mainWnd;
+    /** Tooltips for all windows */
+    GtkTooltips *tooltips;
+
     GtkWidget *menuBar;
     GtkWidget *tbl;
     GtkItemFactory *item_factory;
 } gnuitar_gui_t;
+
+/** The graphical version of the pump.
+ * Contains a list of the effects in the pump.
+ */
+
+typedef struct gnuitar_processor {
+    GtkWidget *widget;
+} gnuitar_processor_t;
+
+gnuitar_error_t gnuitar_processor_init(gnuitar_processor_t *processor);
+
+void gnuitar_processor_init_lazy(gnuitar_processor_t *processor);
+
+void gnuitar_processor_done(gnuitar_processor_t *processor);
+
+typedef struct gnuitar_volume_control {
+    float master_volume;
+    float input_volume;
+} gnuitar_volume_control_t;
 
 int gnuitar_gui_init(gnuitar_gui_t * gui);
 

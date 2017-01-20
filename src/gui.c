@@ -619,6 +619,12 @@ gnuitar_gui_init(gnuitar_gui_t *gui)
         return -2;
     }
 
+    gui->tooltips = gtk_tooltips_new();
+    if (gui->tooltips == NULL) {
+        gnuitar_gui_done(gui);
+        return -3;
+    }
+
     return 0;
 }
 
@@ -630,9 +636,8 @@ gnuitar_gui_init(gnuitar_gui_t *gui)
 void
 gnuitar_gui_done(gnuitar_gui_t *gui)
 {
-    if (gui->mainWnd != NULL) {
+    if (gui->mainWnd != NULL)
         gtk_widget_destroy(gui->mainWnd);
-    }
 }
 
 /** Sets the size of the top level window.
@@ -699,12 +704,39 @@ gnuitar_gui_init_menu(gnuitar_gui_t *gui)
     return 0;
 }
 
+gnuitar_error_t
+gnuitar_processor_init(gnuitar_processor_t *processor)
+{
+    char * processor_titles[] = {
+        "Current Effects", NULL };
+
+    gnuitar_processor_init_lazy(processor);
+
+    processor->widget = gtk_clist_new_with_titles(1, processor_titles);
+    if (processor->widget == NULL)
+        return GNUITAR_ERROR_UNKNOWN;
+
+    return GNUITAR_ERROR_NONE;
+}
+
+void
+gnuitar_processor_init_lazy(gnuitar_processor_t *processor)
+{
+    processor->widget = NULL;
+}
+
+void
+gnuitar_processor_done(gnuitar_processor_t *processor)
+{
+    if (processor->widget)
+        gtk_widget_destroy(processor->widget);
+}
+
 #define VU_UPDATE_INTERVAL   100.0    /* ms */
 #define BANK_UPDATE_INTERVAL 20.0     /* ms */
 
 static GtkWidget      *tracker;
 static GtkWidget      *bank;
-static GtkTooltips    *tooltips;
 static GtkWidget      *status_text = NULL;
 static GtkWidget      *status_window = NULL;
 static gchar *effects_dir = NULL;
@@ -1621,7 +1653,7 @@ gnuitar_gui_options_entry(GtkWidget *widget, gpointer data)
     gtk_table_attach(GTK_TABLE(sp_table),  sparams.alsadevice, 1, 2, 2, 3,
                      TBLOPT, TBLOPT, 3, 3);
 		     
-    gtk_tooltips_set_tip(tooltips,GTK_COMBO(sparams.alsadevice)->entry,
+    gtk_tooltips_set_tip(global_gui.tooltips,GTK_COMBO(sparams.alsadevice)->entry,
         "Name of ALSA output device. (Used only with ALSA driver)", NULL);
 #endif
     
@@ -1639,7 +1671,7 @@ gnuitar_gui_options_entry(GtkWidget *widget, gpointer data)
     gtk_entry_set_editable(GTK_ENTRY(GTK_COMBO(sparams.rate)->entry), FALSE);
     gtk_table_attach(GTK_TABLE(sp_table), sparams.rate, 1, 2, 0, 1,
                      TBLOPT, TBLOPT, 3, 3);
-    gtk_tooltips_set_tip(tooltips,GTK_COMBO(sparams.rate)->entry,"This is the current sampling rate.",NULL);
+    gtk_tooltips_set_tip(global_gui.tooltips,GTK_COMBO(sparams.rate)->entry,"This is the current sampling rate.",NULL);
 
     channels_label = gtk_label_new("Channels:");
     gtk_misc_set_alignment(GTK_MISC(channels_label), 0, 0.5);
@@ -1652,7 +1684,7 @@ gnuitar_gui_options_entry(GtkWidget *widget, gpointer data)
 			   FALSE);
     gtk_table_attach(GTK_TABLE(sp_table), sparams.channels, 3, 4, 0, 1,
                      TBLOPT, TBLOPT, 3, 3);
-    gtk_tooltips_set_tip(tooltips,GTK_COMBO(sparams.channels)->entry,"Mono/Stereo/Quadrophonic",NULL);
+    gtk_tooltips_set_tip(global_gui.tooltips,GTK_COMBO(sparams.channels)->entry,"Mono/Stereo/Quadrophonic",NULL);
 
     latency_label = gtk_label_new("Fragment size:");
     gtk_misc_set_alignment(GTK_MISC(latency_label), 0, 0.5);
@@ -1697,7 +1729,7 @@ gnuitar_gui_options_entry(GtkWidget *widget, gpointer data)
 			   FALSE);
     gtk_table_attach(GTK_TABLE(sp_table), sparams.driver, 1, 2, 1, 2,
                      TBLOPT, TBLOPT, 3, 3);
-    gtk_tooltips_set_tip(tooltips,GTK_COMBO(sparams.driver)->entry,
+    gtk_tooltips_set_tip(global_gui.tooltips,GTK_COMBO(sparams.driver)->entry,
 	"Sound driver is an API that you use to capture/playback sound.",NULL);
 
     latency_label = gtk_label_new("Latency:");
@@ -1708,7 +1740,7 @@ gnuitar_gui_options_entry(GtkWidget *widget, gpointer data)
     gtk_misc_set_alignment(GTK_MISC(sparams.latency_label), 0, 0.5);
     gtk_table_attach(GTK_TABLE(sp_table), sparams.latency_label, 3, 4, 2, 3,
                      TBLOPT, TBLOPT, 3, 3);
-    gtk_tooltips_set_tip(tooltips,sparams.latency,"The fragment size is the number of samples " \
+    gtk_tooltips_set_tip(global_gui.tooltips,sparams.latency,"The fragment size is the number of samples " \
 	"that the sound driver reads by one time. " \
 	"The smaller is the fragment size, the lower is the latency, " \
 	"and vice versa. However, small fragment size may cause buffer overruns. " \
@@ -1730,7 +1762,7 @@ gnuitar_gui_options_entry(GtkWidget *widget, gpointer data)
     gtk_entry_set_editable(dummy2, FALSE);
     gtk_table_attach(GTK_TABLE(sp_table), threshold, 3, 4, 3, 4,
                      TBLOPT, TBLOPT, 3, 3);
-    gtk_tooltips_set_tip(tooltips,threshold,"Large value will force buffer overruns " \
+    gtk_tooltips_set_tip(global_gui.tooltips,threshold,"Large value will force buffer overruns " \
 	"to be ignored. If you encounter heavy overruns, " \
 	"especially with autowah, decrease this to 1. " \
 	"(for hackers: this is the number of fragments that are allowed to be lost).",NULL);
@@ -1902,7 +1934,7 @@ init_gui(void)
     GtkWidget      *volume_label;
     GtkWidget      *input_label;
 
-    char     *processor_titles[] = { "Current effects", NULL };
+    char *processor_titles[] = { "Current Effects", NULL };
     char     *effects_titles[] = { "Known effects", NULL };
     char     *bank_titles[] = { "Preset list", NULL };
 #ifdef HAVE_GTK
@@ -1935,8 +1967,6 @@ init_gui(void)
     effects_dir = g_strdup_printf("%s" FILESEP "presetname.gnuitar", tmp);
     g_free(tmp);
 
-    tooltips=gtk_tooltips_new();
-
     processor = gtk_clist_new_with_titles(1, processor_titles);
     gtk_clist_set_selection_mode(GTK_CLIST(processor),
 				 GTK_SELECTION_SINGLE);
@@ -1946,7 +1976,7 @@ init_gui(void)
     gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(processor_scroll),
 				   GTK_POLICY_AUTOMATIC,
 				   GTK_POLICY_AUTOMATIC);
-    gtk_tooltips_set_tip(tooltips,processor,"This area contains a list of current applied effects." \
+    gtk_tooltips_set_tip(global_gui.tooltips,processor,"This area contains a list of current applied effects." \
 	"You can use Add/Up/Down/Delete buttons to control this list.",NULL);
 
     known_effects = gtk_clist_new_with_titles(1, effects_titles);
@@ -1958,7 +1988,7 @@ init_gui(void)
     gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(effect_scroll),
 				   GTK_POLICY_AUTOMATIC,
 				   GTK_POLICY_AUTOMATIC);
-    gtk_tooltips_set_tip(tooltips,known_effects,"This area contains a list of available effects." \
+    gtk_tooltips_set_tip(global_gui.tooltips,known_effects,"This area contains a list of available effects." \
 	"To apply effects to the sound, you need to add the effects" \
 	"to the \"Current Effects\" list." \
 	"You can use Add/Up/Down/Delete buttons to do this.",NULL);
@@ -1972,7 +2002,7 @@ init_gui(void)
     gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(bank_scroll),
 				   GTK_POLICY_AUTOMATIC,
 				   GTK_POLICY_AUTOMATIC);
-    gtk_tooltips_set_tip(tooltips,bank,"This area contains the available presets." \
+    gtk_tooltips_set_tip(global_gui.tooltips,bank,"This area contains the available presets." \
 	"Use \"Add preset\" button to add more presets to the list." \
 	"Use \"Cycle presets\" to go through the list of available presets.", NULL);
 
@@ -1993,7 +2023,7 @@ init_gui(void)
     gtk_window_set_title(GTK_WINDOW(global_gui.mainWnd), "GNUitar");
 
     bank_add = gtk_button_new_with_label("Add preset...");
-    gtk_tooltips_set_tip(tooltips,bank_add,"Load a file into the presets list.", NULL);
+    gtk_tooltips_set_tip(global_gui.tooltips,bank_add,"Load a file into the presets list.", NULL);
 
     style = gtk_widget_get_style(bank_add);
 #ifdef HAVE_GTK
@@ -2014,26 +2044,26 @@ init_gui(void)
     gtk_clist_set_reorderable(GTK_CLIST(processor), TRUE);
 
     bank_del = gtk_button_new_with_label("Remove preset");
-    gtk_tooltips_set_tip(tooltips,bank_del,"Remove preset from the presets list.",NULL);
+    gtk_tooltips_set_tip(global_gui.tooltips,bank_del,"Remove preset from the presets list.",NULL);
     bank_switch = gtk_button_new_with_label("Cycle\npresets");
-    gtk_tooltips_set_tip(tooltips,bank_switch,"Cycle through effect presets",NULL);
+    gtk_tooltips_set_tip(global_gui.tooltips,bank_switch,"Cycle through effect presets",NULL);
     up = gtk_button_new_with_label("Up");
-    gtk_tooltips_set_tip(tooltips,up,"Move the currently selected effect up.", NULL);
+    gtk_tooltips_set_tip(global_gui.tooltips,up,"Move the currently selected effect up.", NULL);
     down = gtk_button_new_with_label("Down");
-    gtk_tooltips_set_tip(tooltips,down,"Move the currently selected effect down.", NULL);
+    gtk_tooltips_set_tip(global_gui.tooltips,down,"Move the currently selected effect down.", NULL);
     del = gtk_button_new_with_label("Delete");
-    gtk_tooltips_set_tip(tooltips,del,"Delete the currently selected effect", NULL);
+    gtk_tooltips_set_tip(global_gui.tooltips,del,"Delete the currently selected effect", NULL);
     add = gtk_button_new_with_label("<< Add");
-    gtk_tooltips_set_tip(tooltips,add,"Add the selected effect to Current Effects.", NULL);
+    gtk_tooltips_set_tip(global_gui.tooltips,add,"Add the selected effect to Current Effects.", NULL);
     tracker = gtk_check_button_new_with_label("Record audio...");
-    gtk_tooltips_set_tip(tooltips,tracker,"Toggle to begin recording audio.", NULL);
+    gtk_tooltips_set_tip(global_gui.tooltips,tracker,"Toggle to begin recording audio.", NULL);
     if (audio_driver && audio_driver->enabled) {
         start = gtk_toggle_button_new_with_label("Stop");
         gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(start), 1);
     } else {
         start = gtk_toggle_button_new_with_label("Start\n");
     }
-    gtk_tooltips_set_tip(tooltips,start,"Pause and resume audio processing.", NULL);
+    gtk_tooltips_set_tip(global_gui.tooltips,start,"Pause and resume audio processing.", NULL);
     vumeter_in = gtk_progress_bar_new();
     gtk_progress_set_format_string(GTK_PROGRESS(vumeter_in), "%v dB");
     gtk_progress_configure(GTK_PROGRESS(vumeter_in), -96, -96, 0);
@@ -2049,8 +2079,8 @@ init_gui(void)
     master = gtk_hscale_new(GTK_ADJUSTMENT(adj_master));
     input = gtk_hscale_new(GTK_ADJUSTMENT(adj_input));
     
-    gtk_tooltips_set_tip(tooltips, master, "Change output gain (post-amp)", NULL);
-    gtk_tooltips_set_tip(tooltips, input, "Change input gain (pre-amp)", NULL);
+    gtk_tooltips_set_tip(global_gui.tooltips, master, "Change output gain (post-amp)", NULL);
+    gtk_tooltips_set_tip(global_gui.tooltips, input, "Change input gain (pre-amp)", NULL);
     
     gtk_scale_set_value_pos(GTK_SCALE(master), GTK_POS_RIGHT);
     gtk_scale_set_value_pos(GTK_SCALE(input), GTK_POS_RIGHT);
