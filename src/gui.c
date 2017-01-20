@@ -605,6 +605,8 @@ static GtkItemFactoryEntry mainGui_menu[] = {
 int
 gnuitar_gui_init(gnuitar_gui_t *gui)
 {
+    gnuitar_error_t error;
+
     memset(gui, 0, sizeof(*gui));
 
     gui->mainWnd = gtk_window_new(GTK_WINDOW_TOPLEVEL);
@@ -623,6 +625,12 @@ gnuitar_gui_init(gnuitar_gui_t *gui)
     if (gui->tooltips == NULL) {
         gnuitar_gui_done(gui);
         return -3;
+    }
+
+    error = gnuitar_processor_init(&gui->processor);
+    if (error) {
+        gnuitar_gui_done(gui);
+        return -4;
     }
 
     return 0;
@@ -716,6 +724,20 @@ gnuitar_processor_init(gnuitar_processor_t *processor)
     if (processor->widget == NULL)
         return GNUITAR_ERROR_UNKNOWN;
 
+    gtk_clist_set_selection_mode(GTK_CLIST(processor->widget), GTK_SELECTION_SINGLE);
+
+    gtk_clist_set_column_auto_resize(GTK_CLIST(processor->widget), 0, TRUE);
+
+    /* create scroll bar */
+
+    processor->scroll_widget = gtk_scrolled_window_new(NULL, NULL);
+
+    gtk_container_add(GTK_CONTAINER(processor->scroll_widget), processor->widget);
+
+    gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(processor->scroll_widget),
+				   GTK_POLICY_AUTOMATIC,
+				   GTK_POLICY_AUTOMATIC);
+
     return GNUITAR_ERROR_NONE;
 }
 
@@ -728,8 +750,10 @@ gnuitar_processor_init_lazy(gnuitar_processor_t *processor)
 void
 gnuitar_processor_done(gnuitar_processor_t *processor)
 {
-    if (processor->widget)
+    if (processor->widget) {
         gtk_widget_destroy(processor->widget);
+        processor->widget = NULL;
+    }
 }
 
 #define VU_UPDATE_INTERVAL   100.0    /* ms */
@@ -744,8 +768,6 @@ static gchar *effects_dir = NULL;
 static void update_sampling_params(GtkWidget *, gpointer);
 static void update_sampling_params_and_close_dialog(GtkWidget *, gpointer);
 
-/* some public GUI widgets */
-GtkWidget      *processor;
 /* master volume and its current value */
 GtkObject      *adj_master;
 float		master_volume;
@@ -1019,7 +1041,7 @@ delete_event(GtkWidget * widget, GdkEvent * event, gpointer data)
     }
     error = gnuitar_audio_driver_erase_effect(audio_driver, i);
     if (!error)
-        gtk_clist_remove(GTK_CLIST(processor), i);
+        gtk_clist_remove(GTK_CLIST(global_gui.processor.widget), i);
 
     return TRUE;
 }
@@ -1085,18 +1107,18 @@ up_pressed(GtkWidget *widget, gpointer data)
     (void) data;
 
     if (gnuitar_pump_move_effect(audio_driver->pump, curr_row, curr_row - 1) == GNUITAR_ERROR_NONE) {
-        gtk_clist_freeze(GTK_CLIST(processor));
-        gtk_clist_get_text(GTK_CLIST(processor), curr_row-1, 0, &name_above);
-        gtk_clist_get_text(GTK_CLIST(processor), curr_row, 0, &name_selected);
+        gtk_clist_freeze(GTK_CLIST(global_gui.processor.widget));
+        gtk_clist_get_text(GTK_CLIST(global_gui.processor.widget), curr_row-1, 0, &name_above);
+        gtk_clist_get_text(GTK_CLIST(global_gui.processor.widget), curr_row, 0, &name_selected);
         name_above    = strdup(name_above);
         name_selected = strdup(name_selected);
-        gtk_clist_set_text(GTK_CLIST(processor), curr_row-1, 0, name_selected);
-        gtk_clist_set_text(GTK_CLIST(processor), curr_row, 0, name_above);
+        gtk_clist_set_text(GTK_CLIST(global_gui.processor.widget), curr_row-1, 0, name_selected);
+        gtk_clist_set_text(GTK_CLIST(global_gui.processor.widget), curr_row, 0, name_above);
         free(name_above);
         free(name_selected);
 
-        gtk_clist_select_row(GTK_CLIST(processor), curr_row-1, 0);
-        gtk_clist_thaw(GTK_CLIST(processor));
+        gtk_clist_select_row(GTK_CLIST(global_gui.processor.widget), curr_row-1, 0);
+        gtk_clist_thaw(GTK_CLIST(global_gui.processor.widget));
     }
 }
 
@@ -1109,18 +1131,18 @@ down_pressed(GtkWidget *widget, gpointer data)
     (void) data;
 
     if (gnuitar_pump_move_effect(audio_driver->pump, curr_row, curr_row + 1) == GNUITAR_ERROR_NONE) {
-	gtk_clist_freeze(GTK_CLIST(processor));
-        gtk_clist_get_text(GTK_CLIST(processor), curr_row, 0, &name_selected);
-        gtk_clist_get_text(GTK_CLIST(processor), curr_row+1, 0, &name_below);
+	gtk_clist_freeze(GTK_CLIST(global_gui.processor.widget));
+        gtk_clist_get_text(GTK_CLIST(global_gui.processor.widget), curr_row, 0, &name_selected);
+        gtk_clist_get_text(GTK_CLIST(global_gui.processor.widget), curr_row+1, 0, &name_below);
         name_selected = strdup(name_selected);
         name_below    = strdup(name_below);
-        gtk_clist_set_text(GTK_CLIST(processor), curr_row, 0, name_below);
-        gtk_clist_set_text(GTK_CLIST(processor), curr_row+1, 0, name_selected);
+        gtk_clist_set_text(GTK_CLIST(global_gui.processor.widget), curr_row, 0, name_below);
+        gtk_clist_set_text(GTK_CLIST(global_gui.processor.widget), curr_row+1, 0, name_selected);
         free(name_selected);
         free(name_below);
 
-        gtk_clist_select_row(GTK_CLIST(processor), curr_row+1, 0);
-	gtk_clist_thaw(GTK_CLIST(processor));
+        gtk_clist_select_row(GTK_CLIST(global_gui.processor.widget), curr_row+1, 0);
+        gtk_clist_thaw(GTK_CLIST(global_gui.processor.widget));
     }
 }
 
@@ -1130,8 +1152,8 @@ del_pressed(GtkWidget *widget, gpointer data)
     (void) widget;
     (void) data;
     gnuitar_pump_erase_effect(audio_driver->pump, curr_row);
-    gtk_clist_remove(GTK_CLIST(processor), curr_row);
-    gtk_clist_select_row(GTK_CLIST(processor), curr_row, 0);
+    gtk_clist_remove(GTK_CLIST(global_gui.processor.widget), curr_row);
+    gtk_clist_select_row(GTK_CLIST(global_gui.processor.widget), curr_row, 0);
 }
 
 static void
@@ -1156,13 +1178,13 @@ add_pressed(GtkWidget *widget, gpointer data)
     if (!error) {
         error = gnuitar_package_find_effect(builtin_package, name, &index);
         if (!error)
-            gtk_clist_insert(GTK_CLIST(processor), index, &name);
+            gtk_clist_insert(GTK_CLIST(global_gui.processor.widget), index, &name);
     }
 
     gnuitar_effect_decref(effect);
     free(name);
 
-    gtk_clist_select_row(GTK_CLIST(processor), index, 0);
+    gtk_clist_select_row(GTK_CLIST(global_gui.processor.widget), index, 0);
 }
 
 /*
@@ -1917,7 +1939,6 @@ init_gui(void)
     gchar          *tmp;
     GtkWidget      *vumeter_in;
     GtkWidget      *vumeter_out;
-    GtkWidget      *processor_scroll;
     GtkWidget	   *master;
     GtkWidget      *input;
     GtkWidget      *known_effects;
@@ -1934,7 +1955,6 @@ init_gui(void)
     GtkWidget      *volume_label;
     GtkWidget      *input_label;
 
-    char *processor_titles[] = { "Current Effects", NULL };
     char     *effects_titles[] = { "Known effects", NULL };
     char     *bank_titles[] = { "Preset list", NULL };
 #ifdef HAVE_GTK
@@ -1967,17 +1987,10 @@ init_gui(void)
     effects_dir = g_strdup_printf("%s" FILESEP "presetname.gnuitar", tmp);
     g_free(tmp);
 
-    processor = gtk_clist_new_with_titles(1, processor_titles);
-    gtk_clist_set_selection_mode(GTK_CLIST(processor),
-				 GTK_SELECTION_SINGLE);
-    gtk_clist_set_column_auto_resize(GTK_CLIST(processor), 0, TRUE);
-    processor_scroll = gtk_scrolled_window_new(NULL, NULL);
-    gtk_container_add(GTK_CONTAINER(processor_scroll), processor);
-    gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(processor_scroll),
-				   GTK_POLICY_AUTOMATIC,
-				   GTK_POLICY_AUTOMATIC);
-    gtk_tooltips_set_tip(global_gui.tooltips,processor,"This area contains a list of current applied effects." \
-	"You can use Add/Up/Down/Delete buttons to control this list.",NULL);
+    gtk_tooltips_set_tip(global_gui.tooltips,
+                         global_gui.processor.widget,
+                         "This area contains a list of current applied effects." \
+	                       "You can use Add/Up/Down/Delete buttons to control this list.",NULL);
 
     known_effects = gtk_clist_new_with_titles(1, effects_titles);
     gtk_clist_set_selection_mode(GTK_CLIST(known_effects),
@@ -2006,7 +2019,7 @@ init_gui(void)
 	"Use \"Add preset\" button to add more presets to the list." \
 	"Use \"Cycle presets\" to go through the list of available presets.", NULL);
 
-    gtk_table_attach(GTK_TABLE(global_gui.tbl), processor_scroll, 3, 4, 1, 5,
+    gtk_table_attach(GTK_TABLE(global_gui.tbl), global_gui.processor.scroll_widget, 3, 4, 1, 5,
 		     __GTKATTACHOPTIONS(GTK_FILL | GTK_EXPAND),
 		     __GTKATTACHOPTIONS(GTK_FILL | GTK_EXPAND), 0, 0);
 
@@ -2041,7 +2054,7 @@ init_gui(void)
     pango_font_description_set_style(style->font_desc,PANGO_STYLE_NORMAL);
     pango_font_description_set_weight(style->font_desc,PANGO_WEIGHT_NORMAL);
 #endif
-    gtk_clist_set_reorderable(GTK_CLIST(processor), TRUE);
+    gtk_clist_set_reorderable(GTK_CLIST(global_gui.processor.widget), TRUE);
 
     bank_del = gtk_button_new_with_label("Remove preset");
     gtk_tooltips_set_tip(global_gui.tooltips,bank_del,"Remove preset from the presets list.",NULL);
@@ -2162,11 +2175,11 @@ init_gui(void)
 		       GTK_SIGNAL_FUNC(add_pressed), known_effects);
     gtk_signal_connect(GTK_OBJECT(tracker), "clicked",
 		       GTK_SIGNAL_FUNC(tracker_pressed), NULL);
-    gtk_signal_connect(GTK_OBJECT(processor), "select_row",
+    gtk_signal_connect(GTK_OBJECT(global_gui.processor.widget), "select_row",
 		       GTK_SIGNAL_FUNC(selectrow_processor), NULL);
     gtk_signal_connect(GTK_OBJECT(bank), "select_row",
 		       GTK_SIGNAL_FUNC(selectrow_bank), NULL);
-    gtk_signal_connect(GTK_OBJECT(processor), "row_move",
+    gtk_signal_connect(GTK_OBJECT(global_gui.processor.widget), "row_move",
 		       GTK_SIGNAL_FUNC(rowmove_processor), NULL);
     gtk_signal_connect(GTK_OBJECT(known_effects), "select_row",
 		       GTK_SIGNAL_FUNC(selectrow_effects), known_effects);

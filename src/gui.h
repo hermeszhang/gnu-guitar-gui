@@ -36,29 +36,13 @@ extern "C" {
  * Contains information on the GUI API
  */
 
-/** The graphical interface for the GNUitar project.
- * @ingroup gnuitar-gui
- */
-
-typedef struct gnuitar_gui {
-    GtkAccelGroup *accel_group;
-
-    /** The top level window */
-    GtkWidget *mainWnd;
-    /** Tooltips for all windows */
-    GtkTooltips *tooltips;
-
-    GtkWidget *menuBar;
-    GtkWidget *tbl;
-    GtkItemFactory *item_factory;
-} gnuitar_gui_t;
-
 /** The graphical version of the pump.
  * Contains a list of the effects in the pump.
  */
 
 typedef struct gnuitar_processor {
     GtkWidget *widget;
+    GtkWidget *scroll_widget;
 } gnuitar_processor_t;
 
 gnuitar_error_t gnuitar_processor_init(gnuitar_processor_t *processor);
@@ -71,6 +55,25 @@ typedef struct gnuitar_volume_control {
     float master_volume;
     float input_volume;
 } gnuitar_volume_control_t;
+
+/** The graphical interface for the GNUitar project.
+ * @ingroup gnuitar-gui
+ */
+
+typedef struct gnuitar_gui {
+    GtkAccelGroup *accel_group;
+
+    /** The top level window */
+    GtkWidget *mainWnd;
+    /** Tooltips for all windows */
+    GtkTooltips *tooltips;
+    /** Processor */
+    gnuitar_processor_t processor;
+
+    GtkWidget *menuBar;
+    GtkWidget *tbl;
+    GtkItemFactory *item_factory;
+} gnuitar_gui_t;
 
 int gnuitar_gui_init(gnuitar_gui_t * gui);
 
@@ -105,7 +108,6 @@ void            set_vumeter_in_value(float power);
 void            set_vumeter_out_value(float power);
 void            gnuitar_printf(const char *fmt, ...);
 
-extern GtkWidget *processor;
 extern float master_volume;
 extern float input_volume;
 extern GtkObject* adj_input;
