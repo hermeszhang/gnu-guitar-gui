@@ -385,7 +385,7 @@ test_linux_cpufreq()
 #endif
 
 static void
-gnuitar_print_effects(gnuitar_package_t * package)
+gnuitar_print_effects(const gnuitar_package_t *package)
 {
     unsigned int i;
     unsigned int count;
