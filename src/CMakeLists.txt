@@ -93,7 +93,6 @@ SET(LIBGNUITAR_SOURCES
     amp.c
     error.c
     package.c
-    session.c
     pump.c
     chorus.c
     delay.c
