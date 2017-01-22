@@ -9,7 +9,6 @@
 #include "audio-alsa.h"
 #include "audio-midi.h"
 #include "audio-driver.h"
-#include "main.h"
 #include "gui.h"
 #include "pump.h"
 
