@@ -408,7 +408,6 @@
 #include "pump.h"
 #include "gui.h"
 #include "glib12-compat.h"
-#include "main.h"
 #include "audio-midi.h"
 #include "audio-driver.h"
 #include "effect.h"
