@@ -5,7 +5,7 @@
 
 #include <stdlib.h>
 
-#ifndef __cplusplus
+#ifdef __cplusplus
 extern "C" {
 #endif /* __cplusplus */
 
@@ -56,7 +56,7 @@ const char * gnuitar_map_get_name(const gnuitar_map_t *map, size_t i);
 
 gnuitar_error_t gnuitar_map_get_type(const gnuitar_map_t *map, const char *name, gnuitar_map_type_t *type);
 
-#ifndef __cplusplus
+#ifdef __cplusplus
 } /* extern "C" { */
 #endif /* __cplusplus */
 
