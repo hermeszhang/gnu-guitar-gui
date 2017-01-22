@@ -91,7 +91,7 @@ extern gnuitar_sample_t procbuf2[MAX_BUFFER_SIZE / sizeof(int16_t)];
 #endif
 
 void guess_audio_driver(void);
-void set_audio_driver_from_str(const char const *str);
+void set_audio_driver_from_str(const char *str);
 void triangular_dither(gnuitar_packet_t *db, int16_t *target);
 
 #endif /* GNUITAR_AUDIO_DRIVER_H */
