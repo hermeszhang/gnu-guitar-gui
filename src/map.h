@@ -5,6 +5,10 @@
 
 #include <stdlib.h>
 
+#ifndef __cplusplus
+extern "C" {
+#endif /* __cplusplus */
+
 typedef enum gnuitar_map_type {
     GNUITAR_MAP_TYPE_STRING,
     GNUITAR_MAP_TYPE_INT,
@@ -51,6 +55,10 @@ size_t gnuitar_map_get_count(const gnuitar_map_t *map);
 const char * gnuitar_map_get_name(const gnuitar_map_t *map, size_t i);
 
 gnuitar_error_t gnuitar_map_get_type(const gnuitar_map_t *map, const char *name, gnuitar_map_type_t *type);
+
+#ifndef __cplusplus
+} /* extern "C" { */
+#endif /* __cplusplus */
 
 #endif /* GNUITAR_MAP_H */
 
