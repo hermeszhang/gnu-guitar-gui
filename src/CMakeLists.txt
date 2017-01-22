@@ -131,6 +131,9 @@ SET(LIBGNUITAR_SOURCES
 ADD_LIBRARY(gnuitar-lib ${LIBGNUITAR_SOURCES})
 SET_TARGET_PROPERTIES(gnuitar-lib PROPERTIES OUTPUT_NAME gnuitar)
 
+ADD_EXECUTABLE(map-test map.c map-test.c)
+ADD_TEST(map-test map-test)
+
 SET(GNUITAR_GUI_SOURCES
     gtk.c
     gui.c
