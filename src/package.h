@@ -51,6 +51,10 @@ typedef struct gnuitar_package {
 
 extern gnuitar_package_t * builtin_package;
 
+#ifdef __cplusplus
+extern "C" {
+#endif /* __cplusplus */
+
 gnuitar_package_t * gnuitar_package_open(const char *path);
 
 void gnuitar_package_incref(gnuitar_package_t *package);
@@ -66,6 +70,10 @@ const char * gnuitar_package_get_effect_name(const gnuitar_package_t *package, u
 gnuitar_effect_t * gnuitar_package_create_effect(gnuitar_package_t *package, const char * name);
 
 gnuitar_audio_driver_t * gnuitar_package_create_driver(gnuitar_package_t *package, const char * name);
+
+#ifdef __cplusplus
+} /* extern "C" { */
+#endif /* __cplusplus */
 
 #endif /* GNUITAR_PACKAGE_H */
 
