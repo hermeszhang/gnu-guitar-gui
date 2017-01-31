@@ -35,7 +35,7 @@ const gnuitar_package_effect_t effect_list[] = {
     { "Chorus / Flanger", chorus_create },
     { "Echo", echo_create },
     { "Phaser", phasor_create },
-    { "Tremolo", tremolo_create },
+    { "Tremolo", gnuitar_tremolo_create },
     { "Sustain", sustain_create },
     { "Overdrive", distort2_create },
     { "Tube amplifier", tubeamp_create },
