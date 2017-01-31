@@ -34,6 +34,8 @@ static int start_callback(gnuitar_audio_driver_t *driver);
 
 static int stop_callback(gnuitar_audio_driver_t *driver);
 
+static gnuitar_error_t get_map_callback(const gnuitar_audio_driver_t *driver, gnuitar_map_t *map);
+
 static int get_format_callback(const gnuitar_audio_driver_t *driver, gnuitar_format_t *format);
 
 static int set_format_callback(gnuitar_audio_driver_t *driver, const gnuitar_format_t *format);
@@ -70,6 +72,7 @@ gnuitar_alsa_driver_create(void)
     driver->start_callback = start_callback;
     driver->stop_callback = stop_callback;
     driver->set_format_callback = set_format_callback;
+    driver->get_map_callback = get_map_callback;
     driver->get_format_callback = get_format_callback;
 
     driver->data = create_callback();
@@ -101,7 +104,7 @@ create_callback(void)
     if (alsa_driver == NULL)
         return NULL;
 
-    alsa_driver->input_name = "default";
+    alsa_driver->input_name = "plughw:1,0";
     alsa_driver->input_pcm = NULL;
     alsa_driver->input_channels = 2;
     alsa_driver->input_bits = 32;
@@ -111,7 +114,7 @@ create_callback(void)
     alsa_driver->output_channels = 2;
     alsa_driver->output_bits = 32;
 
-    alsa_driver->period_size = 1024;
+    alsa_driver->period_size = 128;
     alsa_driver->periods = 4;
     alsa_driver->rate = 48000;
 
@@ -204,6 +207,36 @@ stop_callback(gnuitar_audio_driver_t *driver)
         return -1;
 
     return 0;
+}
+
+static gnuitar_error_t
+get_map_callback(const gnuitar_audio_driver_t *driver, gnuitar_map_t *map)
+{
+    gnuitar_error_t error;
+
+    (void) driver;
+
+    error = gnuitar_map_define(map, "Rate", GNUITAR_MAP_TYPE_UINT32);
+    if (error)
+        return error;
+
+    error = gnuitar_map_define(map, "Periods", GNUITAR_MAP_TYPE_UINT32);
+    if (error)
+        return error;
+
+    error = gnuitar_map_define(map, "Period Size", GNUITAR_MAP_TYPE_UINT32);
+    if (error)
+        return error;
+
+    error = gnuitar_map_define(map, "Input Device", GNUITAR_MAP_TYPE_STRING);
+    if (error)
+        return error;
+
+    error = gnuitar_map_define(map, "Output Device", GNUITAR_MAP_TYPE_STRING);
+    if (error)
+        return error;
+
+    return GNUITAR_ERROR_NONE;
 }
 
 static int
