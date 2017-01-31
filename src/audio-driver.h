@@ -6,6 +6,7 @@
 #include "error.h"
 #include "packet.h"
 #include "pump.h"
+#include "map.h"
 
 typedef struct gnuitar_format {
     unsigned int input_bits;
@@ -34,6 +35,8 @@ struct gnuitar_audio_driver {
     int (*set_format_callback)(gnuitar_audio_driver_t *driver, const gnuitar_format_t *format);
     /** Gets a parameter for the driver */
     int (*get_format_callback)(const gnuitar_audio_driver_t *driver, gnuitar_format_t *format);
+    /** Gets the parameter map for the audio driver */
+    gnuitar_error_t (*get_map_callback)(const gnuitar_audio_driver_t *driver, gnuitar_map_t *map);
     /** Starts the audio stream */
     int (*start_callback)(gnuitar_audio_driver_t *driver);
     /** Stops the audio stream */
@@ -53,6 +56,8 @@ void gnuitar_audio_driver_destroy(gnuitar_audio_driver_t *driver);
 gnuitar_error_t gnuitar_audio_driver_add_effect(gnuitar_audio_driver_t *driver, gnuitar_effect_t *effect);
 
 gnuitar_error_t gnuitar_audio_driver_erase_effect(gnuitar_audio_driver_t *driver, unsigned int index);
+
+gnuitar_error_t gnuitar_audio_driver_get_map(const gnuitar_audio_driver_t *driver, gnuitar_map_t *map);
 
 int gnuitar_audio_driver_get_format(const gnuitar_audio_driver_t *driver, gnuitar_format_t *format);
 

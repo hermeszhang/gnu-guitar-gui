@@ -96,6 +96,19 @@ gnuitar_audio_driver_stop(gnuitar_audio_driver_t *driver)
     return 0;
 }
 
+gnuitar_error_t
+gnuitar_audio_driver_get_map(const gnuitar_audio_driver_t *driver, gnuitar_map_t *map)
+{
+    if (driver == NULL)
+        return GNUITAR_ERROR_UNKNOWN;
+    if (driver->get_map_callback == NULL)
+        return GNUITAR_ERROR_UNKNOWN;
+
+    gnuitar_map_init(map);
+
+    return driver->get_map_callback(driver, map);
+}
+
 int
 gnuitar_audio_driver_get_format(const gnuitar_audio_driver_t *driver, gnuitar_format_t *format)
 {
