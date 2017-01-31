@@ -92,6 +92,7 @@ SET(CMAKE_C_FLAGS "${ARCH_FLAGS} ${CMAKE_C_FLAGS} ${WARNING_FLAGS} ${OPT_FLAGS}"
 SET(LIBGNUITAR_SOURCES
     amp.c
     error.c
+    map.c
     package.c
     pump.c
     chorus.c
