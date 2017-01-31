@@ -2,6 +2,7 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include <stdint.h>
 
 #ifdef _MSC_VER
 #define gnuitar_strdup _strdup
@@ -14,6 +15,8 @@ gnuitar_map_entry_done(gnuitar_map_entry_t *entry)
 {
     if (entry != NULL) {
         free(entry->name);
+        if (entry->type == GNUITAR_MAP_TYPE_MAP)
+            gnuitar_map_entry_done((gnuitar_map_entry_t *)(entry->data));
         free(entry->data);
     }
 }
@@ -26,20 +29,40 @@ gnuitar_map_entry_compare(const void *a_ptr, const void *b_ptr)
     return strcmp(a->name, b->name);
 }
 
+static int
+gnuitar_map_name_compare(const void *a_ptr, const void *b_ptr)
+{
+    const char * a = (const char *)(a_ptr);
+    const gnuitar_map_entry_t *b = (const gnuitar_map_entry_t *)(b_ptr);
+    return strcmp(a, b->name);
+}
+
 size_t
 gnuitar_map_type_size(gnuitar_map_type_t type)
 {
     switch (type) {
     case GNUITAR_MAP_TYPE_STRING:
         return sizeof(char*);
-    case GNUITAR_MAP_TYPE_INT:
-        return sizeof(long int);
-    case GNUITAR_MAP_TYPE_UINT:
-        return sizeof(unsigned long int);
-    case GNUITAR_MAP_TYPE_REAL:
+    case GNUITAR_MAP_TYPE_INT16:
+        return sizeof(int16_t);
+    case GNUITAR_MAP_TYPE_INT32:
+        return sizeof(int32_t);
+    case GNUITAR_MAP_TYPE_INT64:
+        return sizeof(int64_t);
+    case GNUITAR_MAP_TYPE_UINT16:
+        return sizeof(uint16_t);
+    case GNUITAR_MAP_TYPE_UINT32:
+        return sizeof(uint32_t);
+    case GNUITAR_MAP_TYPE_UINT64:
+        return sizeof(uint64_t);
+    case GNUITAR_MAP_TYPE_FLOAT:
+        return sizeof(float);
+    case GNUITAR_MAP_TYPE_DOUBLE:
         return sizeof(double);
     case GNUITAR_MAP_TYPE_BOOL:
         return sizeof(unsigned char);
+    case GNUITAR_MAP_TYPE_MAP:
+        return sizeof(gnuitar_map_t);
     }
     return 0;
 }
@@ -85,6 +108,8 @@ gnuitar_map_define(gnuitar_map_t *map, const char *name, gnuitar_map_type_t type
     if (tmp_entry.data == NULL) {
         free(tmp_entry.name);
         return GNUITAR_ERROR_MALLOC;
+    } else if (type == GNUITAR_MAP_TYPE_MAP) {
+        gnuitar_map_init((gnuitar_map_t *)(tmp_entry.data));
     }
 
     entries_size = map->entries_count + 1;
@@ -123,7 +148,7 @@ gnuitar_map_find(const gnuitar_map_t *map, const char *name)
                      map->entries,
                      map->entries_count,
                      sizeof(*map->entries),
-                     gnuitar_map_entry_compare);
+                     gnuitar_map_name_compare);
     return (gnuitar_map_entry_t *)(result);
 }
 
