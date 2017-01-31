@@ -118,25 +118,26 @@
  */
 
 #include "tremolo.h"
-#include <math.h>
-#include <stdlib.h>
-#ifndef _WIN32
-#    include <unistd.h>
-#else
-#    include <io.h>
-#endif
 #include "utils.h"
 #include "gui.h"
 
+#include <math.h>
+#include <stdlib.h>
+
+#ifndef _WIN32
+#include <unistd.h>
+#else /* _WIN32 */
+#include <io.h>
+#endif /* _WIN32 */
+
 static void
-update_tremolo_speed(GtkAdjustment * adj, struct tremolo_params *params)
+update_tremolo_speed(GtkAdjustment * adj, gnuitar_tremolo_t *params)
 {
     params->tremolo_speed = adj->value;
 }
 
 static void
-update_tremolo_amplitude(GtkAdjustment * adj,
-			 struct tremolo_params *params)
+update_tremolo_amplitude(GtkAdjustment * adj, gnuitar_tremolo_t *params)
 {
     params->tremolo_amplitude = adj->value;
 }
@@ -144,26 +145,24 @@ update_tremolo_amplitude(GtkAdjustment * adj,
 static void
 tremolo_init(gnuitar_effect_t *p)
 {
-    struct tremolo_params *ptremolo;
+    gnuitar_tremolo_t *ptremolo;
 
-    GtkWidget      *speed;
-    GtkWidget      *speed_label;
-    GtkObject      *adj_speed;
+    GtkWidget *speed;
+    GtkWidget *speed_label;
+    GtkObject *adj_speed;
 
-    GtkWidget      *ampl;
-    GtkWidget      *ampl_label;
-    GtkObject      *adj_ampl;
+    GtkWidget *ampl;
+    GtkWidget *ampl_label;
+    GtkObject *adj_ampl;
 
-    GtkWidget      *button;
+    GtkWidget *button;
 
-    GtkWidget      *parmTable;
+    GtkWidget *parmTable;
 
-    ptremolo = (struct tremolo_params *) p->params;
+    ptremolo = (gnuitar_tremolo_t *) p->params;
 
+    /* GUI Init */
 
-    /*
-     * GUI Init
-     */
     p->control = gtk_window_new(GTK_WINDOW_DIALOG);
 
     gtk_signal_connect(GTK_OBJECT(p->control), "delete_event",
@@ -240,7 +239,7 @@ tremolo_init(gnuitar_effect_t *p)
 static void
 tremolo_filter(gnuitar_effect_t *p, gnuitar_packet_t *db)
 {
-    struct tremolo_params *tp;
+    gnuitar_tremolo_t *tp;
     double          vol, speed;
     int             count,
                     currchannel = 0;
@@ -272,8 +271,8 @@ tremolo_filter(gnuitar_effect_t *p, gnuitar_packet_t *db)
 static void
 tremolo_done(gnuitar_effect_t *p)
 {
-    struct tremolo_params *tp;
-    tp = (struct tremolo_params *) p->params;
+    gnuitar_tremolo_t *tp;
+    tp = (gnuitar_tremolo_t *) p->params;
 
     free(tp);
     gtk_widget_destroy(p->control);
@@ -283,7 +282,7 @@ tremolo_done(gnuitar_effect_t *p)
 static void
 tremolo_save(gnuitar_effect_t *p, SAVE_ARGS)
 {
-    struct tremolo_params *params = p->params;
+    gnuitar_tremolo_t *params = p->params;
 
     SAVE_DOUBLE("tremolo_amplitude", params->tremolo_amplitude);
     SAVE_DOUBLE("tremolo_speed", params->tremolo_speed);
@@ -292,20 +291,20 @@ tremolo_save(gnuitar_effect_t *p, SAVE_ARGS)
 static void
 tremolo_load(gnuitar_effect_t *p, LOAD_ARGS)
 {
-    struct tremolo_params *params = p->params;
+    gnuitar_tremolo_t *params = p->params;
 
     LOAD_DOUBLE("tremolo_amplitude", params->tremolo_amplitude);
     LOAD_DOUBLE("tremolo_speed", params->tremolo_speed);
 }
 
-effect_t *
-tremolo_create()
+gnuitar_effect_t *
+gnuitar_tremolo_create(void)
 {
     effect_t       *p;
-    struct tremolo_params *ptremolo;
+    gnuitar_tremolo_t *ptremolo;
 
     p = calloc(1, sizeof(effect_t));
-    p->params = calloc(1, sizeof(struct tremolo_params));
+    p->params = calloc(1, sizeof(gnuitar_tremolo_t));
     p->proc_init = tremolo_init;
     p->proc_load = tremolo_load;
     p->proc_save = tremolo_save;

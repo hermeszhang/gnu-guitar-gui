@@ -20,17 +20,18 @@
  * $Id$
  */
 
-#ifndef _TREMOLO_H_
-#define _TREMOLO_H_ 1
+#ifndef GNUITAR_TREMOLO_H
+#define GNUITAR_TREMOLO_H
 
 #include "effect.h"
 
-effect_t *   tremolo_create(void);
+gnuitar_effect_t * gnuitar_tremolo_create(void);
 
-struct tremolo_params {
-    float	    tremolo_amplitude,
-                    tremolo_speed,
-                    tremolo_phase;
-};
+typedef struct gnuitar_tremolo {
+    float tremolo_amplitude;
+    float tremolo_speed;
+    float tremolo_phase;
+} gnuitar_tremolo_t;
 
-#endif
+#endif /* GNUITAR_TREMOLO */
+
