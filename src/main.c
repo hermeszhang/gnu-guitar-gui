@@ -422,7 +422,10 @@ main(int argc, char **argv)
 
     /* We might have been running to this point as setuid root program.
      * Switching to real user id. */
-    setuid(getuid());
+    if (setuid(getuid()) != 0) {
+        gnuitar_printf("error: unable to drop root privileges\n");
+	return EXIT_FAILURE;
+    }
  
     /* JACK can give us PIPE if the server terminates abruptly,
      * ignoring it allows us to avoid exit(). */
