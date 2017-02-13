@@ -348,7 +348,7 @@
 #include <pmmintrin.h>
 #endif
 
-char version[13] = "GNUitar "VERSION;
+char gnuitar_version[] = "GNUitar " GNUITAR_VERSION;
 
 #ifdef linux
 /* Low-latency operation is improved if the CPUs do not change speed.

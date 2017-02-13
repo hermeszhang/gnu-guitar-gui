@@ -20,8 +20,8 @@
  * $Id$
  */
 
-#ifndef _MAIN_H_
-#define _MAIN_H_ 1
+#ifndef GNUITAR_MAIN_H
+#define GNUITAR_MAIN_H
 
 typedef enum {
     ERR_NOERROR = 0,
@@ -46,6 +46,7 @@ typedef enum {
     ERR_NOAUDIOAVAILABLE
 } GnuitarErr;
 
-extern char version[];
+extern char gnuitar_version[];
 
-#endif
+#endif /* GNUITAR_MAIN_H */
+

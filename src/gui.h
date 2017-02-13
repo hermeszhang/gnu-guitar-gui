@@ -87,7 +87,8 @@ int gnuitar_gui_set_size(gnuitar_gui_t * gui, unsigned int width, unsigned int h
 #define __GTKATTACHOPTIONS
 #endif
 
-#define VERSION "0.3.2"
+#define GNUITAR_VERSION "0.3.2"
+
 #define DISCLAIMER  "This program is free software; you can redistribute it and/or modify\n" \
 		    "it under the terms of the GNU General Public License as published by\n" \
 		    "the Free Software Foundation; either version 2, or (at your option)\n" \
