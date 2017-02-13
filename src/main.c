@@ -487,6 +487,6 @@ main(int argc, char **argv)
 
     gnuitar_package_decref(builtin_package);
 
-    return ERR_NOERROR;
+    return EXIT_SUCCESS;
 }
 
