@@ -382,7 +382,7 @@ test_linux_cpufreq()
     }
     /* we could change the scaling governor temporarily, but that would be impolite. */
 }
-#endif
+#endif /* linux */
 
 static void
 gnuitar_print_effects(const gnuitar_package_t *package)
