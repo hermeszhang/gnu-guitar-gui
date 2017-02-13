@@ -433,7 +433,7 @@ main(int argc, char **argv)
     printf(COPYRIGHT
        "This program is a free software under the GPL;\n"
        "see Help->About for details.\n");
-    gnuitar_printf("GNUitar " VERSION " debug window.\n");
+    gnuitar_printf("GNUitar " GNUITAR_VERSION " debug window.\n");
 #ifdef linux
     test_linux_cpufreq();
 #endif

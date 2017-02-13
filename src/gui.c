@@ -905,7 +905,7 @@ about_dlg(void)
     gtk_notebook_append_page (GTK_NOTEBOOK (notebook), license_scrolledwin, license_plabel);
     
     about_text = gnuitar_gtk_text_view_new(GTK_CONTAINER(about_scrolledwin));
-    gnuitar_gtk_text_view_append(about_text, "\n GNUitar " VERSION "\n\n");
+    gnuitar_gtk_text_view_append(about_text, "\n GNUitar " GNUITAR_VERSION "\n\n");
     gnuitar_gtk_text_view_append(about_text, about_txt);
     
     authors_text = gnuitar_gtk_text_view_new(GTK_CONTAINER(authors_scrolledwin));

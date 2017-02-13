@@ -95,7 +95,7 @@ int gnuitar_gui_set_size(gnuitar_gui_t * gui, unsigned int width, unsigned int h
 		    "any later version.\n\n" \
 		    "This program makes usage of Glib and GTK+ libraries that are distributed\n" \
 		    "under Library GNU Public License (LGPL).\n\n"
-#define COPYRIGHT   "GNUitar "VERSION"\n" \
+#define COPYRIGHT   "GNUitar " GNUITAR_VERSION"\n" \
 		    "Copyright (C) 2000,2001,2003,2004 Max Rudensky <fonin@omnistaronline.com>\n" \
 		    "http://www.omnistaronline.com/~fonin/\n"
 
