@@ -359,8 +359,8 @@ static void
 test_linux_cpufreq()
 {
     int i;
-    FILE           *cpufd;
-    char            entry[100];
+    FILE *cpufd;
+    char entry[100];
 
     /* examine sysfs and try to determine the used scaling governor. This might
      * fail for any number of reasons, so I'm pretty silent about errors. */
@@ -391,7 +391,7 @@ gnuitar_print_effects(const gnuitar_package_t *package)
     unsigned int count;
     count = gnuitar_package_get_effect_count(package);
     for (i = 0; i < count; i++) {
-        const char * name = gnuitar_package_get_effect_name(package, i);
+        const char *name = gnuitar_package_get_effect_name(package, i);
         gnuitar_printf("effect %u: %s\n", i, name);
     }
 }
