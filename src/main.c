@@ -348,7 +348,7 @@
 #include <pmmintrin.h>
 #endif
 
-char            version[13] = "GNUitar "VERSION;
+char version[13] = "GNUitar "VERSION;
 
 #ifdef linux
 /* Low-latency operation is improved if the CPUs do not change speed.
@@ -399,9 +399,9 @@ gnuitar_print_effects(const gnuitar_package_t *package)
 int
 main(int argc, char **argv)
 {
-    int             error = 0;
+    int error = 0;
 #ifndef _WIN32
-    int             max_priority;
+    int max_priority;
     struct sched_param p;
     sigset_t ignore_set;
 
@@ -486,3 +486,4 @@ main(int argc, char **argv)
 
     return ERR_NOERROR;
 }
+
