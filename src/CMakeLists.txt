@@ -90,6 +90,7 @@ ENDIF (FFTW3_LIBRARY)
 SET(CMAKE_C_FLAGS "${ARCH_FLAGS} ${CMAKE_C_FLAGS} ${WARNING_FLAGS} ${OPT_FLAGS}")
 
 SET(LIBGNUITAR_SOURCES
+    pipe.c
     amp.c
     error.c
     map.c
