@@ -36,7 +36,7 @@ struct gnuitar_audio_driver {
     /** Gets a parameter for the driver */
     int (*get_format_callback)(const gnuitar_audio_driver_t *driver, gnuitar_format_t *format);
     /** Gets the parameter map for the audio driver */
-    gnuitar_error_t (*get_map_callback)(const gnuitar_audio_driver_t *driver, gnuitar_map_t *map);
+    gnuitar_error_t (*get_map_callback)(const gnuitar_audio_driver_t *driver, struct GnuitarMap *map);
     /** Starts the audio stream */
     int (*start_callback)(gnuitar_audio_driver_t *driver);
     /** Stops the audio stream */
@@ -57,7 +57,7 @@ gnuitar_error_t gnuitar_audio_driver_add_effect(gnuitar_audio_driver_t *driver, 
 
 gnuitar_error_t gnuitar_audio_driver_erase_effect(gnuitar_audio_driver_t *driver, unsigned int index);
 
-gnuitar_error_t gnuitar_audio_driver_get_map(const gnuitar_audio_driver_t *driver, gnuitar_map_t *map);
+gnuitar_error_t gnuitar_audio_driver_get_map(const gnuitar_audio_driver_t *driver, struct GnuitarMap *map);
 
 int gnuitar_audio_driver_get_format(const gnuitar_audio_driver_t *driver, gnuitar_format_t *format);
 

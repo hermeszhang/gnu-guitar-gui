@@ -34,7 +34,7 @@ static int start_callback(gnuitar_audio_driver_t *driver);
 
 static int stop_callback(gnuitar_audio_driver_t *driver);
 
-static gnuitar_error_t get_map_callback(const gnuitar_audio_driver_t *driver, gnuitar_map_t *map);
+static gnuitar_error_t get_map_callback(const gnuitar_audio_driver_t *driver, struct GnuitarMap *map);
 
 static int get_format_callback(const gnuitar_audio_driver_t *driver, gnuitar_format_t *format);
 
@@ -210,7 +210,7 @@ stop_callback(gnuitar_audio_driver_t *driver)
 }
 
 static gnuitar_error_t
-get_map_callback(const gnuitar_audio_driver_t *driver, gnuitar_map_t *map)
+get_map_callback(const gnuitar_audio_driver_t *driver, struct GnuitarMap *map)
 {
     gnuitar_error_t error;
 

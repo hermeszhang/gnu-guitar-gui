@@ -7,7 +7,8 @@ int
 main(void)
 {
     gnuitar_error_t error;
-    gnuitar_map_t map;
+
+    struct GnuitarMap map;
 
     gnuitar_map_init(&map);
 

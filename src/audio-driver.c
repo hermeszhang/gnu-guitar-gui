@@ -97,7 +97,7 @@ gnuitar_audio_driver_stop(gnuitar_audio_driver_t *driver)
 }
 
 gnuitar_error_t
-gnuitar_audio_driver_get_map(const gnuitar_audio_driver_t *driver, gnuitar_map_t *map)
+gnuitar_audio_driver_get_map(const gnuitar_audio_driver_t *driver, struct GnuitarMap *map)
 {
     if (driver == NULL)
         return GNUITAR_ERROR_UNKNOWN;

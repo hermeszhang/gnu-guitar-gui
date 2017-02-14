@@ -9,7 +9,7 @@
 extern "C" {
 #endif /* __cplusplus */
 
-typedef enum gnuitar_map_type {
+enum GnuitarMapType {
     GNUITAR_MAP_TYPE_STRING,
     GNUITAR_MAP_TYPE_INT16,
     GNUITAR_MAP_TYPE_INT32,
@@ -21,46 +21,46 @@ typedef enum gnuitar_map_type {
     GNUITAR_MAP_TYPE_DOUBLE,
     GNUITAR_MAP_TYPE_BOOL,
     GNUITAR_MAP_TYPE_MAP
-} gnuitar_map_type_t;
+};
 
-size_t gnuitar_map_type_size(gnuitar_map_type_t type);
+size_t gnuitar_map_type_size(enum GnuitarMapType type);
 
-typedef struct gnuitar_map_entry {
+struct GnuitarMapEntry {
     char *name;
     void *data;
-    gnuitar_map_type_t type;
-} gnuitar_map_entry_t;
+    enum GnuitarMapType type;
+};
 
-const char * gnuitar_map_entry_get_name(const gnuitar_map_entry_t *entry);
+const char * gnuitar_map_entry_get_name(const struct GnuitarMapEntry *entry);
 
-void * gnuitar_map_entry_get_data(gnuitar_map_entry_t *entry);
+void * gnuitar_map_entry_get_data(struct GnuitarMapEntry *entry);
 
-gnuitar_map_type_t gnuitar_map_entry_get_type(const gnuitar_map_entry_t *entry);
+enum GnuitarMapType gnuitar_map_entry_get_type(const struct GnuitarMapEntry *entry);
 
-typedef struct gnuitar_map {
-    gnuitar_map_entry_t *entries;
+struct GnuitarMap {
+    struct GnuitarMapEntry *entries;
     size_t entries_count;
-} gnuitar_map_t;
+};
 
-void gnuitar_map_init(gnuitar_map_t *map);
+void gnuitar_map_init(struct GnuitarMap *map);
 
-void gnuitar_map_done(gnuitar_map_t *map);
+void gnuitar_map_done(struct GnuitarMap *map);
 
-gnuitar_error_t gnuitar_map_define(gnuitar_map_t *map, const char *name, gnuitar_map_type_t type);
+gnuitar_error_t gnuitar_map_define(struct GnuitarMap *map, const char *name, enum GnuitarMapType type);
 
-unsigned char gnuitar_map_exists(const gnuitar_map_t *map, const char *name);
+unsigned char gnuitar_map_exists(const struct GnuitarMap *map, const char *name);
 
-gnuitar_map_entry_t * gnuitar_map_find(const gnuitar_map_t *map, const char *name);
+struct GnuitarMapEntry * gnuitar_map_find(const struct GnuitarMap *map, const char *name);
 
-gnuitar_error_t gnuitar_map_set(gnuitar_map_t *map, const char *name, const void *data);
+gnuitar_error_t gnuitar_map_set(struct GnuitarMap *map, const char *name, const void *data);
 
-gnuitar_error_t gnuitar_map_get(gnuitar_map_t *map, const char *name, void *data);
+gnuitar_error_t gnuitar_map_get(struct GnuitarMap *map, const char *name, void *data);
 
-size_t gnuitar_map_get_count(const gnuitar_map_t *map);
+size_t gnuitar_map_get_count(const struct GnuitarMap *map);
 
-const char * gnuitar_map_get_name(const gnuitar_map_t *map, size_t i);
+const char * gnuitar_map_get_name(const struct GnuitarMap *map, size_t i);
 
-gnuitar_error_t gnuitar_map_get_type(const gnuitar_map_t *map, const char *name, gnuitar_map_type_t *type);
+gnuitar_error_t gnuitar_map_get_type(const struct GnuitarMap *map, const char *name, enum GnuitarMapType *type);
 
 #ifdef __cplusplus
 } /* extern "C" { */
