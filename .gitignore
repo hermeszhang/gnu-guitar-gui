@@ -1,6 +1,5 @@
-Makefile
-Makefile.in
 *.moc.cpp
 *.moc
+
 build/*
 
