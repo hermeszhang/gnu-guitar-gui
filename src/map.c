@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdint.h>
+#include <errno.h>
 
 #ifdef _MSC_VER
 #define gnuitar_strdup _strdup
@@ -85,7 +86,7 @@ gnuitar_map_done(struct GnuitarMap *map)
     }
 }
 
-gnuitar_error_t
+int
 gnuitar_map_define(struct GnuitarMap *map, const char *name, enum GnuitarMapType type)
 {
     struct GnuitarMapEntry *tmp_entries;
@@ -94,20 +95,20 @@ gnuitar_map_define(struct GnuitarMap *map, const char *name, enum GnuitarMapType
     size_t entries_size;
 
     if (gnuitar_map_exists(map, name))
-        return GNUITAR_ERROR_EEXISTS;
+        return EEXIST;
 
     tmp_entry.type = type;
 
     tmp_entry.name = gnuitar_strdup(name);
     if (tmp_entry.name == NULL)
-        return GNUITAR_ERROR_MALLOC;
+        return ENOMEM;
 
     entry_size = gnuitar_map_type_size(type);
 
     tmp_entry.data = malloc(entry_size);
     if (tmp_entry.data == NULL) {
         free(tmp_entry.name);
-        return GNUITAR_ERROR_MALLOC;
+	return ENOMEM;
     } else if (type == GNUITAR_MAP_TYPE_MAP) {
         gnuitar_map_init((struct GnuitarMap *)(tmp_entry.data));
     }
@@ -119,7 +120,7 @@ gnuitar_map_define(struct GnuitarMap *map, const char *name, enum GnuitarMapType
     if (tmp_entries == NULL) {
         free(tmp_entry.name);
         free(tmp_entry.data);
-        return GNUITAR_ERROR_MALLOC;
+	return ENOMEM;
     }
 
     tmp_entries[map->entries_count] = tmp_entry;
@@ -129,7 +130,7 @@ gnuitar_map_define(struct GnuitarMap *map, const char *name, enum GnuitarMapType
 
     qsort(map->entries, map->entries_count, sizeof(struct GnuitarMapEntry), gnuitar_map_entry_compare);
 
-    return GNUITAR_ERROR_NONE;
+    return 0;
 }
 
 unsigned char

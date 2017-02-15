@@ -1,8 +1,6 @@
 #ifndef GNUITAR_MAP_H
 #define GNUITAR_MAP_H
 
-#include "error.h"
-
 #include <stdlib.h>
 
 #ifdef __cplusplus
@@ -46,21 +44,21 @@ void gnuitar_map_init(struct GnuitarMap *map);
 
 void gnuitar_map_done(struct GnuitarMap *map);
 
-gnuitar_error_t gnuitar_map_define(struct GnuitarMap *map, const char *name, enum GnuitarMapType type);
+int gnuitar_map_define(struct GnuitarMap *map, const char *name, enum GnuitarMapType type);
 
 unsigned char gnuitar_map_exists(const struct GnuitarMap *map, const char *name);
 
 struct GnuitarMapEntry * gnuitar_map_find(const struct GnuitarMap *map, const char *name);
 
-gnuitar_error_t gnuitar_map_set(struct GnuitarMap *map, const char *name, const void *data);
+int gnuitar_map_set(struct GnuitarMap *map, const char *name, const void *data);
 
-gnuitar_error_t gnuitar_map_get(struct GnuitarMap *map, const char *name, void *data);
+int gnuitar_map_get(struct GnuitarMap *map, const char *name, void *data);
 
 size_t gnuitar_map_get_count(const struct GnuitarMap *map);
 
 const char * gnuitar_map_get_name(const struct GnuitarMap *map, size_t i);
 
-gnuitar_error_t gnuitar_map_get_type(const struct GnuitarMap *map, const char *name, enum GnuitarMapType *type);
+int gnuitar_map_get_type(const struct GnuitarMap *map, const char *name, enum GnuitarMapType *type);
 
 #ifdef __cplusplus
 } /* extern "C" { */
