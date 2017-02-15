@@ -4,5 +4,6 @@
 src/*.o
 src/*.a
 src/*.so
+src/html/*
 build/*
 
