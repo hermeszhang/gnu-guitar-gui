@@ -68,6 +68,11 @@ gnuitar_map_type_size(enum GnuitarMapType type)
     return 0;
 }
 
+/** Initializes a map structure.
+ * @param map An unitialized map structure.
+ * @ingroup libgnuitar-map
+ */
+
 void
 gnuitar_map_init(struct GnuitarMap *map)
 {

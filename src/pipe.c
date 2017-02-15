@@ -4,8 +4,12 @@
 #include <stdlib.h>
 #include <errno.h>
 
+/** The implementation specific data of the pipe. */
+
 struct GnuitarPipeData {
+    /** The input of the pipe */
     FILE * in;
+    /** The output of the pipe */
     FILE * out;
 };
 
