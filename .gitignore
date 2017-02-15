@@ -1,5 +1,8 @@
 *.moc.cpp
 *.moc
 
+src/*.o
+src/*.a
+src/*.so
 build/*
 
