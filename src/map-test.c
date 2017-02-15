@@ -2,30 +2,31 @@
 
 #include <assert.h>
 #include <string.h>
+#include <errno.h>
 
 int
 main(void)
 {
-    gnuitar_error_t error;
+    int error;
 
     struct GnuitarMap map;
 
     gnuitar_map_init(&map);
 
     error = gnuitar_map_define(&map, "Volume", GNUITAR_MAP_TYPE_FLOAT);
-    assert(error == GNUITAR_ERROR_NONE);
+    assert(error == 0);
     assert(map.entries_count == 1);
     assert(map.entries[0].type == GNUITAR_MAP_TYPE_FLOAT);
     assert(strcmp(map.entries[0].name, "Volume") == 0);
 
     error = gnuitar_map_define(&map, "Volume", GNUITAR_MAP_TYPE_UINT32);
-    assert(error == GNUITAR_ERROR_EEXISTS);
+    assert(error == EEXIST);
     assert(map.entries_count == 1);
     assert(map.entries[0].type == GNUITAR_MAP_TYPE_FLOAT);
     assert(strcmp(map.entries[0].name, "Volume") == 0);
 
     error = gnuitar_map_define(&map, "Distortion", GNUITAR_MAP_TYPE_UINT32);
-    assert(error == GNUITAR_ERROR_NONE);
+    assert(error == 0);
     assert(map.entries_count == 2);
     assert(map.entries[0].type == GNUITAR_MAP_TYPE_UINT32);
     assert(strcmp(map.entries[0].name, "Distortion") == 0);
@@ -33,7 +34,7 @@ main(void)
     assert(strcmp(map.entries[1].name, "Volume") == 0);
 
     error = gnuitar_map_define(&map, "Low Pass", GNUITAR_MAP_TYPE_DOUBLE);
-    assert(error == GNUITAR_ERROR_NONE);
+    assert(error == 0);
     assert(map.entries_count == 3);
     assert(map.entries[0].type == GNUITAR_MAP_TYPE_UINT32);
     assert(strcmp(map.entries[0].name, "Distortion") == 0);
