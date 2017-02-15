@@ -23,5 +23,5 @@ map-test: map-test.c libgnuitar.a
 
 .PHONY: clean
 clean:
-	$(RM) libgnuitar.a $(objfiles)
+	$(RM) libgnuitar.a $(objfiles) $(tests)
 
