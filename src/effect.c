@@ -1,13 +1,13 @@
 #include "effect.h"
 
 void
-gnuitar_effect_incref(gnuitar_effect_t *effect)
+gnuitar_effect_incref(struct GnuitarEffect *effect)
 {
     effect->ref_count++;
 }
 
 void
-gnuitar_effect_decref(gnuitar_effect_t *effect)
+gnuitar_effect_decref(struct GnuitarEffect *effect)
 {
     if ((effect == NULL) || (effect->ref_count == 0))
         return;
@@ -19,7 +19,7 @@ gnuitar_effect_decref(gnuitar_effect_t *effect)
 }
 
 void
-gnuitar_effect_process(gnuitar_effect_t *effect, gnuitar_packet_t *packet)
+gnuitar_effect_process(struct GnuitarEffect *effect, gnuitar_packet_t *packet)
 {
     if (effect->toggle)
         effect->proc_filter(effect, packet);

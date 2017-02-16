@@ -21,47 +21,38 @@
  * $Id$
  */
 
-#ifndef _EFFECT_H_
-#define _EFFECT_H_ 1
-
-#define MAX_EFFECTS 50
+#ifndef GNUITAR_EFFECT_H
+#define GNUITAR_EFFECT_H
 
 #ifdef __MINGW32__
 #include <malloc.h>
 #endif
 #include <string.h>
-#include <assert.h>
 #include <stdlib.h>
 #include <stdio.h>
 
-#include <gtk/gtk.h>
-#include "glib12-compat.h"
-
 #include "packet.h"
-#include "utils.h"
+#include "map.h"
 
-typedef struct gnuitar_effect {
+struct GnuitarEffect {
     /** The reference count of the effect. */
     unsigned int ref_count;
     void *params;
-    void (*proc_init) (struct gnuitar_effect *);
-    void (*proc_done) (struct gnuitar_effect *);
-    void (*proc_filter) (struct gnuitar_effect *, gnuitar_packet_t *);
-    void (*proc_save) (struct gnuitar_effect *, GKeyFile *, gchar *);
-    void (*proc_load) (struct gnuitar_effect *, GKeyFile *, gchar *, GError **error);
+    void (*proc_init) (struct GnuitarEffect *);
+    void (*proc_done) (struct GnuitarEffect *);
+    void (*proc_filter) (struct GnuitarEffect *, gnuitar_packet_t *);
+    int (*proc_get_map) (const struct GnuitarEffect *, struct GnuitarMap *);
+    int (*proc_set_map) (struct GnuitarEffect *, const struct GnuitarMap *);
     short toggle;
-    GtkWidget *control;
-} gnuitar_effect_t;
+};
 
-void gnuitar_effect_incref(gnuitar_effect_t *effect);
+void gnuitar_effect_incref(struct GnuitarEffect *effect);
 
-void gnuitar_effect_decref(gnuitar_effect_t *effect);
+void gnuitar_effect_decref(struct GnuitarEffect *effect);
 
-void gnuitar_effect_process(gnuitar_effect_t *effect, gnuitar_packet_t *packet);
+void gnuitar_effect_process(struct GnuitarEffect *effect, gnuitar_packet_t *packet);
 
-/* for compatibility */
-
-typedef struct gnuitar_effect effect_t;
+/* left for compatibility */
 
 #ifdef __GNUC__
 #define unlikely(x) __builtin_expect((x), 0)
@@ -123,15 +114,13 @@ static inline void *
 gnuitar_memalign(size_t num, size_t bytes) {
     void *mem = NULL;
 #ifndef __MINGW32__
-    if (posix_memalign(&mem, 16, num * bytes)) {
-        fprintf(stderr, "failed to allocate aligned memory.\n");
-        exit(1);
-    }
-#else
+    if (posix_memalign(&mem, 16, num * bytes))
+        return NULL;
+#else /* __MINGW32__ */
     mem = __mingw_aligned_malloc(num * bytes, 16);
-#endif
-    assert(mem != NULL);
-
+    if (mem == NULL)
+        return NULL;
+#endif /* __MINGW32__ */
     memset(mem, 0, num * bytes);
     return mem;
 }
@@ -140,13 +129,15 @@ static inline void
 gnuitar_free(void *memory) {
 #ifndef __MINGW32__
     free(memory);
-#else
+#else /* __MINGW32__ */
     __mingw_aligned_free(memory);
-#endif
+#endif /* __MINGW32__ */
 }
 
-#else
+#else /* defined(__SSE__) && !defined(__FreeBSD__) */
+
 /* without SSE we just wrap calloc */
+
 static inline void *
 gnuitar_memalign(unsigned int num, size_t bytes)
 {
@@ -162,6 +153,8 @@ static inline void
 gnuitar_free(void *memory) {
     free(memory);
 }
-#endif
 
-#endif
+#endif /* defined(__SSE__) && !defined(__FreeBSD__) */
+
+#endif /* GNUITAR_EFFECT_H */
+
