@@ -40,7 +40,7 @@ struct GnuitarEffect {
     void *params;
     void (*proc_init) (struct GnuitarEffect *);
     void (*proc_done) (struct GnuitarEffect *);
-    void (*proc_filter) (struct GnuitarEffect *, gnuitar_packet_t *);
+    void (*proc_filter) (struct GnuitarEffect *, struct GnuitarPacket *);
     int (*proc_get_map) (const struct GnuitarEffect *, struct GnuitarMap *);
     int (*proc_set_map) (struct GnuitarEffect *, const struct GnuitarMap *);
     short toggle;
@@ -50,7 +50,7 @@ void gnuitar_effect_incref(struct GnuitarEffect *effect);
 
 void gnuitar_effect_decref(struct GnuitarEffect *effect);
 
-void gnuitar_effect_process(struct GnuitarEffect *effect, gnuitar_packet_t *packet);
+void gnuitar_effect_process(struct GnuitarEffect *effect, struct GnuitarPacket *packet);
 
 /* left for compatibility */
 
@@ -98,7 +98,7 @@ sin_lookup(float pos) {
     return sin_lookup_table[(int) (pos * (float) SIN_LOOKUP_SIZE)];
 }
 
-static inline gnuitar_sample_t
+static inline float
 cos_lookup(float pos) {
     if (pos >= 0.75f)
         return sin_lookup(pos - 0.75f);

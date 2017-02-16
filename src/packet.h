@@ -4,6 +4,7 @@
 #include <stdint.h>
 
 /* get rid of __restrict__ type qualifier for MS Visual C */
+
 #ifdef _MSC_VER
 #define __restrict__
 #endif
@@ -14,23 +15,21 @@
 
 #define GNUITAR_SAMPLE_MIN (INT16_MIN * (1 << 8))
 
-typedef float gnuitar_sample_t;
+extern const float gnuitar_sample_max;
 
-extern const gnuitar_sample_t gnuitar_sample_max;
+extern const float gnuitar_sample_min;
 
-extern const gnuitar_sample_t gnuitar_sample_min;
-
-typedef struct gnuitar_packet {
-    gnuitar_sample_t * __restrict__ data;
-    gnuitar_sample_t * __restrict__ data_swap;
+struct GnuitarPacket {
+    float * __restrict__ data;
+    float * __restrict__ data_swap;
     unsigned int len;
     unsigned int channels;
     unsigned long int rate;
-} gnuitar_packet_t;
+};
 
-void gnuitar_packet_mul(gnuitar_packet_t *packet, float n);
+void gnuitar_packet_mul(struct GnuitarPacket *packet, float n);
 
-void gnuitar_packet_div(gnuitar_packet_t *packet, float n);
+void gnuitar_packet_div(struct GnuitarPacket *packet, float n);
 
 #endif /* GNUITAR_PACKET_H */
 

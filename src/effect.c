@@ -19,7 +19,7 @@ gnuitar_effect_decref(struct GnuitarEffect *effect)
 }
 
 void
-gnuitar_effect_process(struct GnuitarEffect *effect, gnuitar_packet_t *packet)
+gnuitar_effect_process(struct GnuitarEffect *effect, struct GnuitarPacket *packet)
 {
     if (effect->toggle)
         effect->proc_filter(effect, packet);
