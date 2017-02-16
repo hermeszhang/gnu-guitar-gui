@@ -1,6 +1,7 @@
 CC = gcc
 CFLAGS = -Wall -Wextra -Werror -Wfatal-errors
 
+objfiles += effect.o
 objfiles += pipe.o
 objfiles += map.o
 
@@ -12,6 +13,8 @@ all: libgnuitar.a $(tests)
 
 libgnuitar.a: $(objfiles)
 	$(AR) $(ARFLAGS) $@ $(objfiles)
+
+effect.o: effect.c effect.h packet.h
 
 pipe.o: pipe.c pipe.h
 
