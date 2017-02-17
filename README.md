@@ -1,26 +1,25 @@
-GNUitar
+Gnuitar
 =======
 
 [![Travis Badge](https://travis-ci.org/gnuitar/gnuitar.svg?branch=master)](https://travis-ci.org/gnuitar/gnuitar)
 
 The GNU Guitar Effects Processor
 
-### What is GNUitar ?
+### What is Gnuitar?
 
-GNUitar is a real-time sound effects software that allows you to use
-your computer as a guitar processor. It has GTK+ based interface. It
-can be compiled on any flavor of UNIX that have GTK+ 1.2, 2.0, Glib,
-pthreads and OSS sound driver. It also works on Windows.
+Gnuitar is a real-time sound effects software that allows you to use your computer as a guitar processor.
 
 It was originally written by Max Rudensky.
+
+Now it's being refactored and a number of things are being changed, the most significant being the change from Gtk interface to a Qt interface.
 
 This program was inspired by two earlier works:
  - [Ele]([1] http://www-personal.umich.edu/~mslutsky/elepage/index.html) by Morris Slutsky
  - Guitar FX Processor by Marin Vlah
 
-GNUitar is free software and is distributed under GNU GPL license.
+Gnuitar is free software and is distributed under GNU GPL license.
 
-GNUitar is pronounced like "GNU Guitar".
+Gnuitar is pronounced like "GNU Guitar".
 
 If you don't know how to pronounce GNU, read [this](https://www.gnu.org/gnu/pronunciation.en.html)
 
@@ -36,17 +35,16 @@ Here's a link to the original project on [SourceForge](http://sourceforge.net/pr
 
 #### Requirements
 
-You will need:
-  * GTK+ versions 1.2.6 or better, or GTK+ 2.0 or better
-  * GLIB 1.2 or better
-  * POSIX threads on UNIX
-  * full-duplex sound card
-  * To compile: GCC on UNIX, Microsoft Visual C++ 6.0 or 7.0 on
-    Windows
+A full list of requirements will be published once the next stable release is published.
+
+As of right now, they are:
+  * Qt4 and qmake (only for the GUI)
+  * alsa-lib
+  * libsndfile
 
 ### Performance
 
-GNUitar should run on even low-end hardware. It has been reported to
+Gnuitar should run on even low-end hardware. It has been reported to
 work on even a Pentium II / 300 MHz computer. However, some of the
 effects demand more CPU power, and probably ~1 GHz machine is required
 for running complicated effect setups.
@@ -55,31 +53,31 @@ When running the program, make sure you close all unnecessary
 applications, to free more resources. Avoid anything that can cause
 lots of disk I/O or sudden bursts of CPU usage.
 
-GNUitar runs with increased priority if available; this may cause
+Gnuitar runs with increased priority if available; this may cause
 hang-ups and delayed system response on low-end machines potentially
 making the computer unusable. Therefore you should take care to save
-all important data in other applications before launching GNUitar.
+all important data in other applications before launching Gnuitar.
 This situation probably does not occur in practice, but with elevated
 task priorities the consequences for misbehaviour become greater.
 
 Performance - UNIX notes
 
-GNUitar executable file should be setuid root to process sound using
+Gnuitar executable file should be setuid root to process sound using
 real-time priority class; otherwise you'll hear glitches and delays
 while switching between windows. The program drops privileges as soon
 as the effect-processing thread has been started, even before any GTK+
 initialization or command line handling, so it should be safe on any
-system. GNUitar has a latency of about 4-8ms on Linux/Pentium
+system. Gnuitar has a latency of about 4-8ms on Linux/Pentium
 II/450/AWE64 ISA!
 
 Performance - Windows notes
 
 Windows have complex problems with latency when processing audio in
 real time, mostly because of its non-uniform drivers architecture.
-GNUitar latency on Windows is much higher than on Linux. The real
+Gnuitar latency on Windows is much higher than on Linux. The real
 latency depends mostly on the sound card's driver.
 
-GNUitar for Windows has two playback methods:
+Gnuitar for Windows has two playback methods:
   * Playback via MME
   * Playback via DirectSound
 
@@ -534,12 +532,12 @@ doesn't work in the same way as commercial development. Every
 successful free software project has an active user base behind it.
 This means that your comments, ideas and bug reports are extremely
 important. If something doesn't work, or some feature is missing,
-please mail me about it. Thank you in advance! You can send GNUitar
+please mail me about it. Thank you in advance! You can send Gnuitar
 related mails to me at [10]fonin at gnuitar dot com.
 
 ### Legal Issues
 
-GNUitar is a free software and is distributed under the terms of GNU
+Gnuitar is a free software and is distributed under the terms of GNU
 GPL license. You are free to copy and share the program with other
 people, you are not limited with the number of computers where you can
 use it. You can redistribute the program and the works based on it
@@ -556,17 +554,16 @@ See [11] this page.
 
 [12]http://www.gnuitar.com/downloads.php and
 [13]http://freshmeat.net/projects/gnuitar and
-[14]http://sourceforge.net/projects/gnuitar - GNUitar project pages
-[15]http://www.linux-sound.org - excellent categorized list of Unix
-sound software
-[16]http://home.sprynet.com/~cbagwell/sox.html - SoX
-playback/record/processing software
+[14]http://sourceforge.net/projects/gnuitar - Gnuitar project pages
+[15]http://www.linux-sound.org - excellent categorized list of Unix sound software
+[16]http://home.sprynet.com/~cbagwell/sox.html - SoX playback/record/processing software
 [17]http://bladeenc.mp3.no/ - BladeEnc, free MP3 encoder
 
-                                 Authors
+### Authors
 
-[18]Max Rudensky <fonin at gnuitar dot com> <fonin at yahoo dot com>
-[19]Antti S. Lankila <alankila at bel dot fi>
-Eugen Bogdan (/Dexterus)  <dexterus at hackernetwork dot com>
-Vasily Khoruzhick <anarsoul at gmail dot com>
+ * Taylor Holberton
+ * [18]Max Rudensky <fonin at gnuitar dot com> <fonin at yahoo dot com>
+ * [19]Antti S. Lankila <alankila at bel dot fi>
+ * Eugen Bogdan (/Dexterus)  <dexterus at hackernetwork dot com>
+ * Vasily Khoruzhick <anarsoul at gmail dot com>
 
