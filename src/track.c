@@ -22,15 +22,16 @@
 #include <string.h>
 
 #include "utils.h"
-#include "audio-driver.h"
-#include "audio-alsa.h"
+#include "track.h"
+#include "track-alsa.h"
+
 #include "audio-oss.h"
 #include "audio-jack.h"
 #include "audio-winmm.h"
 #include "audio-dsound.h"
 
 void
-gnuitar_audio_driver_destroy(gnuitar_audio_driver_t *driver)
+gnuitar_audio_driver_destroy(struct GnuitarTrack *driver)
 {
     if (driver == NULL)
         return;
@@ -41,7 +42,7 @@ gnuitar_audio_driver_destroy(gnuitar_audio_driver_t *driver)
 }
 
 gnuitar_error_t
-gnuitar_audio_driver_add_effect(gnuitar_audio_driver_t *driver, gnuitar_effect_t *effect)
+gnuitar_audio_driver_add_effect(struct GnuitarTrack *driver, struct GnuitarEffect *effect)
 {
     gnuitar_error_t error;
 
@@ -62,7 +63,7 @@ gnuitar_audio_driver_add_effect(gnuitar_audio_driver_t *driver, gnuitar_effect_t
 }
 
 gnuitar_error_t
-gnuitar_audio_driver_erase_effect(gnuitar_audio_driver_t *driver, unsigned int index)
+gnuitar_audio_driver_erase_effect(struct GnuitarTrack *driver, unsigned int index)
 {
     if (driver->pump == NULL)
         return GNUITAR_ERROR_ENOENT;
@@ -71,7 +72,7 @@ gnuitar_audio_driver_erase_effect(gnuitar_audio_driver_t *driver, unsigned int i
 }
 
 int
-gnuitar_audio_driver_start(gnuitar_audio_driver_t *driver)
+gnuitar_audio_driver_start(struct GnuitarTrack *driver)
 {
     if (driver == NULL)
         return -1;
@@ -84,7 +85,7 @@ gnuitar_audio_driver_start(gnuitar_audio_driver_t *driver)
 }
 
 int
-gnuitar_audio_driver_stop(gnuitar_audio_driver_t *driver)
+gnuitar_audio_driver_stop(struct GnuitarTrack *driver)
 {
     if (driver == NULL)
         return -1;
@@ -97,7 +98,7 @@ gnuitar_audio_driver_stop(gnuitar_audio_driver_t *driver)
 }
 
 gnuitar_error_t
-gnuitar_audio_driver_get_map(const gnuitar_audio_driver_t *driver, struct GnuitarMap *map)
+gnuitar_audio_driver_get_map(const struct GnuitarTrack *driver, struct GnuitarMap *map)
 {
     if (driver == NULL)
         return GNUITAR_ERROR_UNKNOWN;
@@ -110,7 +111,7 @@ gnuitar_audio_driver_get_map(const gnuitar_audio_driver_t *driver, struct Gnuita
 }
 
 int
-gnuitar_audio_driver_get_format(const gnuitar_audio_driver_t *driver, gnuitar_format_t *format)
+gnuitar_audio_driver_get_format(const struct GnuitarTrack *driver, struct GnuitarFormat *format)
 {
     if (driver == NULL)
         return -1;
@@ -122,7 +123,7 @@ gnuitar_audio_driver_get_format(const gnuitar_audio_driver_t *driver, gnuitar_fo
 }
 
 int
-gnuitar_audio_driver_set_format(gnuitar_audio_driver_t *driver, const gnuitar_format_t *format)
+gnuitar_audio_driver_set_format(struct GnuitarTrack *driver, const struct GnuitarFormat *format)
 {
     if (driver == NULL)
         return -1;
@@ -134,7 +135,7 @@ gnuitar_audio_driver_set_format(gnuitar_audio_driver_t *driver, const gnuitar_fo
 }
 
 void
-gnuitar_format_defaults(gnuitar_format_t *format)
+gnuitar_format_defaults(struct GnuitarFormat *format)
 {
     format->input_channels = 2;
     format->input_bits = 32;
@@ -143,17 +144,17 @@ gnuitar_format_defaults(gnuitar_format_t *format)
 }
 
 #ifndef _WIN32
-gnuitar_sample_t procbuf[MAX_BUFFER_SIZE * MAX_CHANNELS];
-gnuitar_sample_t procbuf2[MAX_BUFFER_SIZE * MAX_CHANNELS];
+float procbuf[MAX_BUFFER_SIZE * MAX_CHANNELS];
+float procbuf2[MAX_BUFFER_SIZE * MAX_CHANNELS];
 #else
-gnuitar_sample_t procbuf[MAX_BUFFER_SIZE / sizeof(int16_t)];
-gnuitar_sample_t procbuf2[MAX_BUFFER_SIZE / sizeof(int16_t)];
+float procbuf[MAX_BUFFER_SIZE / sizeof(int16_t)];
+float procbuf2[MAX_BUFFER_SIZE / sizeof(int16_t)];
 #endif
 
-audio_driver_t  *audio_driver = NULL;
+struct GnuitarTrack *audio_driver = NULL;
 
 /* default settings */
-gnuitar_mutex_t effectlist_lock;
+struct GnuitarMutex effectlist_lock;
 #ifdef _WIN32
 unsigned int overrun_threshold = 4;
 unsigned int nbuffers = MAX_BUFFERS;
@@ -173,7 +174,7 @@ prng(void)
  * distribution still looks like triangle. Idea and implementation borrowed from
  * JACK. */
 void
-triangular_dither(gnuitar_packet_t *db, int16_t *target)
+triangular_dither(struct GnuitarPacket *db, int16_t *target)
 {
     static int32_t correlated_noise[MAX_CHANNELS] = { 0, 0, 0, 0 };
     uint_fast16_t i, current_channel = 0;
@@ -235,11 +236,11 @@ set_audio_driver_from_str(const char const *tmp)
         audio_driver = &jack_driver;
     } else
 #endif
-#ifdef HAVE_ALSA
+#ifdef GNUITAR_WITH_ALSA
     if (strcmp(tmp, "ALSA") == 0) {
         audio_driver = gnuitar_alsa_driver_create();
     } else
-#endif
+#endif /* GNUITAR_WITH_ALSA */
 #ifdef HAVE_OSS
     if (strcmp(tmp, "OSS") == 0) {
         audio_driver = &oss_driver;
@@ -258,3 +259,4 @@ set_audio_driver_from_str(const char const *tmp)
 #endif
         return;
 }
+

@@ -1,5 +1,5 @@
-#ifndef GNUITAR_AUDIO_DRIVER_H
-#define GNUITAR_AUDIO_DRIVER_H
+#ifndef GNUITAR_TRACK_H
+#define GNUITAR_TRACK_H
 
 #include <stdint.h>
 
@@ -8,70 +8,68 @@
 #include "pump.h"
 #include "map.h"
 
-typedef struct gnuitar_format {
+struct GnuitarFormat {
     unsigned int input_bits;
     unsigned int input_channels;
     unsigned int output_bits;
     unsigned int output_channels;
     unsigned int rate;
-} gnuitar_format_t;
+};
 
-void gnuitar_format_defaults(gnuitar_format_t * format);
+void gnuitar_format_defaults(struct GnuitarFormat * format);
 
 typedef struct gnuitar_chmap {
     unsigned int in, out;
 } gnuitar_chmap_t;
 
-typedef struct gnuitar_audio_driver gnuitar_audio_driver_t;
-
-struct gnuitar_audio_driver {
-    /** The name of the driver */
+struct GnuitarTrack {
+    /** The name of the track */
     char *name;
-    /** driver specific data */
+    /** track specific data */
     void *data;
-    /** Destroys the driver data */
+    /** Destroys the track data */
     void (*destroy_callback)(void *data_);
-    /** Sets a parameter for the driver */
-    int (*set_format_callback)(gnuitar_audio_driver_t *driver, const gnuitar_format_t *format);
-    /** Gets a parameter for the driver */
-    int (*get_format_callback)(const gnuitar_audio_driver_t *driver, gnuitar_format_t *format);
-    /** Gets the parameter map for the audio driver */
-    gnuitar_error_t (*get_map_callback)(const gnuitar_audio_driver_t *driver, struct GnuitarMap *map);
+    /** Sets a parameter for the track */
+    int (*set_format_callback)(struct GnuitarTrack *track, const struct GnuitarFormat *format);
+    /** Gets a parameter for the track */
+    int (*get_format_callback)(const struct GnuitarTrack *track, struct GnuitarFormat *format);
+    /** Gets the parameter map for the audio track */
+    gnuitar_error_t (*get_map_callback)(const struct GnuitarTrack *track, struct GnuitarMap *map);
     /** Starts the audio stream */
-    int (*start_callback)(gnuitar_audio_driver_t *driver);
+    int (*start_callback)(struct GnuitarTrack *track);
     /** Stops the audio stream */
-    int (*stop_callback)(gnuitar_audio_driver_t *driver);
-    /** The effects pump for the driver */
+    int (*stop_callback)(struct GnuitarTrack *track);
+    /** The effects pump for the track */
     gnuitar_pump_t *pump;
     /** The mutex for the pump */
-    gnuitar_mutex_t pump_mutex;
+    struct GnuitarMutex pump_mutex;
     /* old params */
     int enabled;
     /** The channel maps available */
     const gnuitar_chmap_t * chmaps;
 };
 
-void gnuitar_audio_driver_destroy(gnuitar_audio_driver_t *driver);
+void gnuitar_track_destroy(struct GnuitarTrack *track);
 
-gnuitar_error_t gnuitar_audio_driver_add_effect(gnuitar_audio_driver_t *driver, gnuitar_effect_t *effect);
+gnuitar_error_t gnuitar_track_add_effect(struct GnuitarTrack *track, struct GnuitarEffect *effect);
 
-gnuitar_error_t gnuitar_audio_driver_erase_effect(gnuitar_audio_driver_t *driver, unsigned int index);
+gnuitar_error_t gnuitar_track_erase_effect(struct GnuitarTrack *track, unsigned int index);
 
-gnuitar_error_t gnuitar_audio_driver_get_map(const gnuitar_audio_driver_t *driver, struct GnuitarMap *map);
+gnuitar_error_t gnuitar_track_get_map(const struct GnuitarTrack *track, struct GnuitarMap *map);
 
-int gnuitar_audio_driver_get_format(const gnuitar_audio_driver_t *driver, gnuitar_format_t *format);
+int gnuitar_track_get_format(const struct GnuitarTrack *track, struct GnuitarFormat *format);
 
-int gnuitar_audio_driver_set_format(gnuitar_audio_driver_t *driver, const gnuitar_format_t *format);
+int gnuitar_track_set_format(struct GnuitarTrack *track, const struct GnuitarFormat *format);
 
-int gnuitar_audio_driver_start(gnuitar_audio_driver_t *driver);
+int gnuitar_track_start(struct GnuitarTrack *track);
 
-int gnuitar_audio_driver_stop(gnuitar_audio_driver_t *driver);
+int gnuitar_track_stop(struct GnuitarTrack *track);
 
 /* for compatibility */
 
-typedef gnuitar_audio_driver_t audio_driver_t;
+typedef struct GnuitarTrack track_t;
 
-extern gnuitar_audio_driver_t *audio_driver;
+extern struct GnuitarTrack *track;
 
 #ifdef _WIN32
 #define MAX_BUFFERS 1024 /* number of input/output sound buffers */
@@ -95,9 +93,9 @@ extern gnuitar_sample_t procbuf[MAX_BUFFER_SIZE / sizeof(int16_t)];
 extern gnuitar_sample_t procbuf2[MAX_BUFFER_SIZE / sizeof(int16_t)];
 #endif
 
-void guess_audio_driver(void);
-void set_audio_driver_from_str(const char *str);
-void triangular_dither(gnuitar_packet_t *db, int16_t *target);
+void guess_track(void);
+void set_track_from_str(const char *str);
+void triangular_dither(struct GnuitarPacket *db, int16_t *target);
 
-#endif /* GNUITAR_AUDIO_DRIVER_H */
+#endif /* GNUITAR_TRACK_H */
 
