@@ -8,7 +8,7 @@ typedef struct gnuitar_pump {
     /** number of references */
     size_t ref_count;
     /** array of effects */
-    gnuitar_effect_t **effects;
+    struct GnuitarEffect **effects;
     /** number of effects in the pump */
     size_t n_effects;
 } gnuitar_pump_t;
@@ -19,17 +19,17 @@ void gnuitar_pump_incref(gnuitar_pump_t *pump);
 
 void gnuitar_pump_decref(gnuitar_pump_t *pump);
 
-gnuitar_error_t gnuitar_pump_add_effect(gnuitar_pump_t *pump, gnuitar_effect_t *effect);
+gnuitar_error_t gnuitar_pump_add_effect(gnuitar_pump_t *pump, struct GnuitarEffect *effect);
 
 gnuitar_error_t gnuitar_pump_erase_effect(gnuitar_pump_t *pump, unsigned int index);
 
 gnuitar_error_t gnuitar_pump_move_effect(gnuitar_pump_t *pump, unsigned int src, unsigned int dst);
 
-void gnuitar_pump_process(gnuitar_pump_t *pump, gnuitar_packet_t *packet);
+void gnuitar_pump_process(gnuitar_pump_t *pump, struct GnuitarPacket *packet);
 
 extern volatile unsigned short write_track;
 
-void     pump_sample(gnuitar_packet_t *db);
+void     pump_sample(struct GnuitarPacket *db);
 void     pump_start(void);
 void     pump_stop(void);
 void     save_pump(const char *fname);
