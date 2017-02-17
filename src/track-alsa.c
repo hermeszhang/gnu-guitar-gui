@@ -6,9 +6,10 @@
 #include <assert.h>
 #include <pthread.h>
 
-#include "audio-alsa.h"
+#include "track.h"
+#include "track-alsa.h"
+
 #include "audio-midi.h"
-#include "audio-driver.h"
 #include "gui.h"
 #include "pump.h"
 

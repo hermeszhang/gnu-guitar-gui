@@ -60,17 +60,15 @@
  *
  */
 
-#ifndef GNUITAR_AUDIO_ALSA_H
-#define GNUITAR_AUDIO_ALSA_H
+#ifndef GNUITAR_TRACK_ALSA_H
+#define GNUITAR_TRACK_ALSA_H
 
-#ifdef HAVE_ALSA
-
-#include "audio-driver.h"
+#include "track.h"
 
 #include <alsa/asoundlib.h>
 #include <pthread.h>
 
-typedef struct gnuitar_alsa_driver {
+struct GnuitarAlsaTrack {
     /** The name of the input PCM */
     char * input_name;
     /** The input PCM */
@@ -97,15 +95,13 @@ typedef struct gnuitar_alsa_driver {
     pthread_t thread;
     /** A flag to decide whether or not to keep to the thread running */
     unsigned int keep_thread_running;
-} gnuitar_alsa_driver_t;
+};
 
-gnuitar_audio_driver_t * gnuitar_alsa_driver_create(void);
+struct GnuitarTrack * gnuitar_alsa_driver_create(void);
 
 int gnuitar_alsa_available(void);
 
-extern gnuitar_audio_driver_t *global_alsa_driver;
+extern struct GnuitarTrack *global_alsa_driver;
 
-#endif /* HAVE_ALSA */
-
-#endif /* GNUITAR_AUDIO_ALSA_H */
+#endif /* GNUITAR_TRACK_ALSA_H */
 
