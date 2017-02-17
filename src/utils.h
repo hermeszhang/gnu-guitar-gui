@@ -51,25 +51,29 @@
 
 #include <windows.h>
 
-typedef HANDLE gnuitar_mutex;
+struct GnuitarMutex {
+    HANDLE handle;
+};
 
 #else /* _WIN32 */
 
 #define FILESEP "/"
 
-#include <glib.h>
+#include <pthread.h>
 
-typedef GMutex gnuitar_mutex_t;
+struct GnuitarMutex {
+    pthread_t handle;
+};
 
 #endif /* _WIN32 */
 
-void gnuitar_mutex_init(gnuitar_mutex_t *mutex);
+void gnuitar_mutex_init(struct GnuitarMutex *mutex);
 
-void gnuitar_mutex_done(gnuitar_mutex_t *mutex);
+void gnuitar_mutex_done(struct GnuitarMutex *mutex);
 
-void gnuitar_mutex_lock(gnuitar_mutex_t *mutex);
+void gnuitar_mutex_lock(struct GnuitarMutex *mutex);
 
-void gnuitar_mutex_unlock(gnuitar_mutex_t *mutex);
+void gnuitar_mutex_unlock(struct GnuitarMutex *mutex);
 
 #endif /* GNUITAR_UTILS_H */
 
