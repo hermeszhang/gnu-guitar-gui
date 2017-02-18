@@ -427,7 +427,7 @@ gnuitar_pump_decref(gnuitar_pump_t *pump)
         return;
     }
     for (i = 0; i < pump->n_effects; i++) {
-        gnuitar_effect_decref(pump->effects[i]);
+        gnuitar_effect_done(pump->effects[i]);
     }
     free(pump->effects);
 }
@@ -443,8 +443,6 @@ gnuitar_pump_add_effect(gnuitar_pump_t *pump, struct GnuitarEffect *effect)
     if (tmp == NULL)
         return GNUITAR_ERROR_MALLOC;
 
-    gnuitar_effect_incref(effect);
-
     tmp[pump->n_effects] = effect;
     pump->effects = tmp;
     pump->n_effects++;
@@ -457,7 +455,7 @@ gnuitar_pump_erase_effect(gnuitar_pump_t *pump, unsigned int index)
     if (index >= pump->n_effects)
         return GNUITAR_ERROR_ENOENT;
 
-    gnuitar_effect_decref(pump->effects[index]);
+    gnuitar_effect_done(pump->effects[index]);
 
     memmove(&pump->effects[index],
             &pump->effects[index + 1],
