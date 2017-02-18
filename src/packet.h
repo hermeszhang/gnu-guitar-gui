@@ -3,6 +3,10 @@
 
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif /* __cplusplus */
+
 /* get rid of __restrict__ type qualifier for MS Visual C */
 
 #ifdef _MSC_VER
@@ -28,6 +32,10 @@ struct GnuitarPacket {
 void gnuitar_packet_mul(struct GnuitarPacket *packet, int32_t n);
 
 void gnuitar_packet_div(struct GnuitarPacket *packet, int32_t n);
+
+#ifdef __cplusplus
+} /* extern "C" { */
+#endif /* __cplusplus */
 
 #endif /* GNUITAR_PACKET_H */
 
