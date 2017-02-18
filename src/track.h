@@ -48,7 +48,7 @@ struct GnuitarTrack {
     /** Stops the audio stream */
     int (*stop_callback)(struct GnuitarTrack *track);
     /** The effects pump for the track */
-    gnuitar_pump_t *pump;
+    struct GnuitarPump *pump;
     /** The mutex for the pump */
     struct GnuitarMutex pump_mutex;
     /* old params */
