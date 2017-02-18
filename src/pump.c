@@ -25,7 +25,7 @@
  *   support multiple midi continuous controls.
  *
  * Revision 1.89  2006/08/15 15:46:00  alankila
- * - move typecast to not overflow gnuitar_sample_t if it is integer. Shit.
+ * - move typecast to not overflow float if it is integer. Shit.
  *
  * Revision 1.88  2006/08/10 16:18:36  alankila
  * - improve const correctness and make gnuitar compile cleanly under
@@ -340,7 +340,7 @@
  * Few improvements with the effects save/load; fixed nasty bug with CR/LF translation when saving preset files on Win32
  *
  * Revision 1.16  2004/08/10 15:07:31  fonin
- * Support processing in float/int - type gnuitar_sample_t
+ * Support processing in float/int - type float
  *
  * Revision 1.15  2003/12/28 10:16:08  fonin
  * Code lickup
@@ -389,30 +389,12 @@
  *
  */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <dirent.h>
-#include <errno.h>
-#include <math.h>
-#ifndef _WIN32
-#    include <unistd.h>
-#else
-#    include <io.h>
-#    include <windows.h>
-#endif
-#include <assert.h>
-#include <fcntl.h>
-#include <stdint.h>
-#include <sys/stat.h>
 #include "pump.h"
-#include "gui.h"
-#include "glib12-compat.h"
-#include "audio-midi.h"
-#include "audio-driver.h"
-#include "effect.h"
-#include "tracker.h"
-#include "utils.h"
+
+/* track.h declares struct GnuitarFormat */
+#include "track.h"
+
+#include <math.h>
 
 gnuitar_pump_t *
 gnuitar_pump_create(void)
@@ -451,9 +433,9 @@ gnuitar_pump_decref(gnuitar_pump_t *pump)
 }
 
 gnuitar_error_t
-gnuitar_pump_add_effect(gnuitar_pump_t *pump, gnuitar_effect_t *effect)
+gnuitar_pump_add_effect(gnuitar_pump_t *pump, struct GnuitarEffect *effect)
 {
-    gnuitar_effect_t ** tmp;
+    struct GnuitarEffect ** tmp;
     size_t tmp_size;
 
     tmp_size = sizeof(*tmp) * (pump->n_effects + 1);
@@ -490,7 +472,7 @@ gnuitar_error_t
 gnuitar_pump_move_effect(gnuitar_pump_t *pump, unsigned int src, unsigned int dst)
 {
     unsigned int i;
-    gnuitar_effect_t *swap;
+    struct GnuitarEffect *swap;
 
     if ((src >= pump->n_effects)
      || (dst >= pump->n_effects)){
@@ -510,37 +492,20 @@ gnuitar_pump_move_effect(gnuitar_pump_t *pump, unsigned int src, unsigned int ds
     return GNUITAR_ERROR_NONE;
 }
 
-static void bias_elimination(gnuitar_packet_t *packet);
-
-static float vu_meter(gnuitar_packet_t *packet);
-
-static void adjust_master_volume(gnuitar_packet_t *packet);
-
-static void adjust_input_volume(gnuitar_packet_t *packet);
-
-static void adapt_to_output(gnuitar_packet_t *packet);
+static void bias_elimination(struct GnuitarPacket *packet);
 
 void
-gnuitar_pump_process(gnuitar_pump_t *pump, gnuitar_packet_t *packet)
+gnuitar_pump_process(gnuitar_pump_t *pump, struct GnuitarPacket *packet)
 {
     unsigned int i;
 
     bias_elimination(packet);
-    adjust_input_volume(packet);
-    set_vumeter_in_value(vu_meter(packet));
 
     for (i = 0; i < pump->n_effects; i++) {
         if (!pump->effects[i]->toggle)
             continue;
         gnuitar_effect_process(pump->effects[i], packet);
     }
-
-    adjust_master_volume(packet);
-    set_vumeter_out_value(vu_meter(packet));
-    adapt_to_output(packet);
-
-    if (write_track)
-        track_write(packet->data, packet->len);
 }
 
 /* flag for whether we are creating .wav */
@@ -552,11 +517,11 @@ float sin_lookup_table[SIN_LOOKUP_SIZE + 1];
  * compensate. Some soundcards would also need highpass filtering ~20 Hz
  * or so. */
 static void
-bias_elimination(gnuitar_packet_t *db) {
-    static gnuitar_sample_t       bias_s[MAX_CHANNELS] = { 0, 0, 0, 0 };
-    static int_least32_t    bias_n[MAX_CHANNELS] = { 10, 10, 10, 10 };
+bias_elimination(struct GnuitarPacket *db) {
+    static float bias_s[] = { 0, 0, 0, 0 };
+    static int_least32_t bias_n[] = { 10, 10, 10, 10 };
     uint_fast16_t i, curr_channel = 0;
-    gnuitar_sample_t biasadj = bias_s[curr_channel] / bias_n[curr_channel];
+    float biasadj = bias_s[curr_channel] / bias_n[curr_channel];
     
     for (i = 0; i < db->len; i += 1) {
         bias_s[curr_channel] += db->data[i];
@@ -565,224 +530,11 @@ bias_elimination(gnuitar_packet_t *db) {
         curr_channel = (curr_channel + 1) % db->channels;
     }
     /* keep bias within limits of shortest type (int_least32_t) */
-    for (i = 0; i < MAX_CHANNELS; i += 1) {
-        if (fabs(bias_s[i]) > (gnuitar_sample_t) 1E10 || bias_n[i] > (int_least32_t) 1E10) {
-            bias_s[i] /= (gnuitar_sample_t) 2;
+    for (i = 0; i < 4; i += 1) {
+        if (fabs(bias_s[i]) > (float) 1E10 || bias_n[i] > (int_least32_t) 1E10) {
+            bias_s[i] /= (float) 2;
             bias_n[i] /= 2;
         }
     }
 }
 
-/* accumulate power estimate and monitor clipping */
-static float
-vu_meter(gnuitar_packet_t *db) {
-    unsigned int i;
-    gnuitar_sample_t sample;
-    float power = 0;
-
-    for (i = 0; i < db->len; i += 1) {
-        sample = db->data[i];
-        power += (float) sample * (float) sample;
-    }
-    /* energy per sample scaled down to 0.0 - 1.0 */
-    return power / (float) db->len / (float) MAX_SAMPLE / (float) MAX_SAMPLE;
-}
-
-/* adjust master volume according to the main window slider and clip */
-static void
-adjust_master_volume(gnuitar_packet_t *db) {
-    unsigned int i;
-    float volume = pow(10, master_volume / 20.0);
-
-    for (i = 0; i < db->len; i += 1) {
-	float val = db->data[i] * volume;
-        CLIP_SAMPLE(val);
-        db->data[i] = val;
-    }
-}
-
-static void
-adjust_input_volume(gnuitar_packet_t *db) {
-    unsigned int i;
-    float	volume = pow(10, input_volume / 20.0);
-
-    for (i = 0; i < db->len; i += 1)
-        db->data[i] = db->data[i] * volume;
-}
-
-
-static void
-adapt_to_output(gnuitar_packet_t *db)
-{
-    int i;
-    int size = db->len;
-    gnuitar_format_t format;
-    unsigned int output_channels;
-    gnuitar_sample_t *s = db->data;
-
-    if (gnuitar_audio_driver_get_format(audio_driver, &format) < 0) {
-        output_channels = 2;
-    } else {
-        output_channels = format.output_channels;
-    }
-
-    assert(db->channels <= output_channels);
-
-    /* nothing to do */
-    if (db->channels == output_channels)
-        return;
-    /* clone 1 to 2 */
-    if (db->channels == 1 && output_channels == 2) {
-        for (i = size - 1; i >= 0; i -= 1) {
-            s[i*2+1] = s[i];
-            s[i*2  ] = s[i];
-        }
-        db->channels = 2;
-        db->len *= 2;
-        return;
-    }
-    /* clone 1 to 4, mute channels 2 & 3 (the rear channels) */
-    if (db->channels == 1 && output_channels == 4) {
-        for (i = size - 1; i >= 0; i -= 1) {
-            s[i*4+3] = 0;
-            s[i*4+2] = 0;
-            s[i*4+1] = s[i];
-            s[i*4  ] = s[i];
-        }
-        db->channels = 4;
-        db->len *= 4;
-        return;
-    }
-    /* clone 2 to 4, mute channels 2 & 3 */
-    if (db->channels == 2 && output_channels == 4) {
-        for (i = size/2-1; i >= 0; i -= 1) {
-            s[i*4+3] = 0;
-            s[i*4+2] = 0;
-            s[i*4+1] = s[i*2+1];
-            s[i*4+0] = s[i*2+0];
-        }
-        db->channels = 4;
-        db->len *= 2;
-        return;
-    }
-    /* we shouldn't have more than 2 channels coming in, and we don't support
-     * generating to 5 channels, so error out */
-
-    gnuitar_printf( "unknown channel combination: %d in and %d out",
-            db->channels, output_channels);
-}
-
-static void
-init_sin_lookup_table(void) {
-    int i = 0;
-    for (i = 0; i < SIN_LOOKUP_SIZE + 1; i += 1)
-        sin_lookup_table[i] = sin(2 * M_PI * i / SIN_LOOKUP_SIZE);
-}
-
-gchar *
-discover_preset_path(void) {
-    return g_strdup_printf("%s" FILESEP "%s", g_get_home_dir(), ".gnuitar_presets");
-}
-
-void
-load_initial_state(char **argv, int argc)
-{
-    char *path = discover_preset_path();
-    DIR *dir;
-    struct dirent *ent;
-    GList *list = NULL;
-    GList *cur;
-
-    (void) argv;
-    (void) argc;
-
-    dir = opendir(path);
-    if (dir == NULL) {
-        if (errno == ENOENT) {
-            /* doesn't exist, create it */
-#ifdef _WIN32
-            mkdir(path);
-#else
-            mkdir(path, 0777);
-#endif
-        }
-        /* whether it succeeded or not doesn't matter, there's nothing to load */
-        return;
-    }
-
-    /* scan the settings directory, load into preset control */
-    while ((ent = readdir(dir)) != NULL) {
-        gchar *entry;
-        /* entry must terminate with .gnuitar to be considered */
-        if (strstr(ent->d_name, ".gnuitar") == NULL)
-            continue;
-        /* construct full path to entry */
-        entry = g_strdup_printf("%s" FILESEP "%s", path, ent->d_name);
-        list = g_list_append(list, entry);
-    }
-    if (errno) {
-        gnuitar_printf("Error reading presets from directory '%s': %s\n",
-                       path, strerror(errno));
-    }
-    g_free(path);
-
-    /* order the entries to guarantee same loading order anywhere */
-    list = g_list_sort(list, (GCompareFunc) strcmp);
-
-    /* iterate the entires now, add into preset list */
-    for (cur = g_list_first(list); cur != NULL; cur = g_list_next(cur)) {
-        if (strstr(cur->data, FILESEP "__default__.gnuitar") != NULL) {
-            /* if the entry is the default entry, load it, don't append it.
-             * If user gave cmdline arguments, load the effects from cmdline. */
-            if (argc < 2)
-                load_pump(cur->data);
-        } else {
-            /* add it to preset list */
-            bank_append_entry(cur->data);
-        }
-        g_free(cur->data);
-    }
-    /* free GList memory */
-    g_list_free(list);
-}
-
-void
-load_settings(void) {
-    /* deprecated */
-}
-
-void
-save_settings(void) {
-    /* deprecated */
-}
-
-void
-pump_start(void)
-{
-    init_sin_lookup_table();
-
-    master_volume = 0.0;
-    input_volume = 0.0;
-    write_track = 0;
-}
-
-void
-pump_stop(void)
-{
-    if (write_track) {
-        write_track = 0;
-        tracker_done();
-    }
-}
-
-void
-save_pump(const char *fname)
-{
-    (void) fname;
-}
-
-void
-load_pump(const char *fname)
-{
-    (void) fname;
-}
