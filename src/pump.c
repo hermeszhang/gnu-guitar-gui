@@ -490,49 +490,15 @@ gnuitar_pump_move_effect(gnuitar_pump_t *pump, unsigned int src, unsigned int ds
     return GNUITAR_ERROR_NONE;
 }
 
-static void bias_elimination(struct GnuitarPacket *packet);
-
 void
 gnuitar_pump_process(gnuitar_pump_t *pump, struct GnuitarPacket *packet)
 {
     unsigned int i;
 
-    bias_elimination(packet);
-
     for (i = 0; i < pump->n_effects; i++) {
         if (!pump->effects[i]->toggle)
             continue;
         gnuitar_effect_process(pump->effects[i], packet);
-    }
-}
-
-/* flag for whether we are creating .wav */
-volatile unsigned short  write_track = 0;
-/* sin table */
-float sin_lookup_table[SIN_LOOKUP_SIZE + 1];
-
-/* If the long-term average of input data does not exactly equal to 0,
- * compensate. Some soundcards would also need highpass filtering ~20 Hz
- * or so. */
-static void
-bias_elimination(struct GnuitarPacket *db) {
-    static float bias_s[] = { 0, 0, 0, 0 };
-    static int_least32_t bias_n[] = { 10, 10, 10, 10 };
-    uint_fast16_t i, curr_channel = 0;
-    float biasadj = bias_s[curr_channel] / bias_n[curr_channel];
-    
-    for (i = 0; i < db->len; i += 1) {
-        bias_s[curr_channel] += db->data[i];
-        bias_n[curr_channel] += 1;
-        db->data[i] -= biasadj;
-        curr_channel = (curr_channel + 1) % db->channels;
-    }
-    /* keep bias within limits of shortest type (int_least32_t) */
-    for (i = 0; i < 4; i += 1) {
-        if (fabs(bias_s[i]) > (float) 1E10 || bias_n[i] > (int_least32_t) 1E10) {
-            bias_s[i] /= (float) 2;
-            bias_n[i] /= 2;
-        }
     }
 }
 
