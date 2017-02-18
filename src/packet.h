@@ -15,21 +15,21 @@
 
 #define GNUITAR_SAMPLE_MIN (INT16_MIN * (1 << 8))
 
-extern const float gnuitar_sample_max;
+extern const double gnuitar_sample_max;
 
-extern const float gnuitar_sample_min;
+extern const double gnuitar_sample_min;
 
 struct GnuitarPacket {
-    float * __restrict__ data;
-    float * __restrict__ data_swap;
+    double * __restrict__ data;
+    double * __restrict__ data_swap;
     unsigned int len;
     unsigned int channels;
     unsigned long int rate;
 };
 
-void gnuitar_packet_mul(struct GnuitarPacket *packet, float n);
+void gnuitar_packet_mul(struct GnuitarPacket *packet, double n);
 
-void gnuitar_packet_div(struct GnuitarPacket *packet, float n);
+void gnuitar_packet_div(struct GnuitarPacket *packet, double n);
 
 #endif /* GNUITAR_PACKET_H */
 

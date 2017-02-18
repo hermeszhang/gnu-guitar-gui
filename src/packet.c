@@ -1,11 +1,11 @@
 #include "packet.h"
 
-const float gnuitar_sample_max = GNUITAR_SAMPLE_MAX;
+const double gnuitar_sample_max = GNUITAR_SAMPLE_MAX;
 
-const float gnuitar_sample_min = GNUITAR_SAMPLE_MIN;
+const double gnuitar_sample_min = GNUITAR_SAMPLE_MIN;
 
 void
-gnuitar_packet_mul(struct GnuitarPacket *packet, float n)
+gnuitar_packet_mul(struct GnuitarPacket *packet, double n)
 {
     unsigned int i;
     for (i = 0; i < packet->len; i++) {
@@ -14,7 +14,7 @@ gnuitar_packet_mul(struct GnuitarPacket *packet, float n)
 }
 
 void
-gnuitar_packet_div(struct GnuitarPacket *packet, float n)
+gnuitar_packet_div(struct GnuitarPacket *packet, double n)
 {
     unsigned int i;
     for (i = 0; i < packet->len; i++) {
