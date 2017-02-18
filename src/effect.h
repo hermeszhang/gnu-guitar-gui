@@ -36,29 +36,31 @@
  */
 
 struct GnuitarEffect {
-    /** The reference count of the effect. */
-    unsigned int ref_count;
     /** Effect specific data */
     void *params;
     /** Initializes the effect */
-    void (*proc_init) (struct GnuitarEffect *);
+    void (*init) (struct GnuitarEffect *);
     /** Releases resources allocated by the effect */
-    void (*proc_done) (struct GnuitarEffect *);
+    void (*done) (struct GnuitarEffect *);
     /** The processing callback of the effect */
-    void (*proc_filter) (struct GnuitarEffect *, struct GnuitarPacket *);
+    int (*process) (struct GnuitarEffect *, struct GnuitarPacket *);
     /** Gets the parameter map of the effect */
-    int (*proc_get_map) (const struct GnuitarEffect *, struct GnuitarMap *);
+    int (*get_map) (const struct GnuitarEffect *, struct GnuitarMap *);
     /** Sets the parameter map of the effect */
-    int (*proc_set_map) (struct GnuitarEffect *, const struct GnuitarMap *);
+    int (*set_map) (struct GnuitarEffect *, const struct GnuitarMap *);
     /** Toggles the effect on and off */
     short toggle;
 };
 
-void gnuitar_effect_incref(struct GnuitarEffect *effect);
+void gnuitar_effect_init(struct GnuitarEffect *effect);
 
-void gnuitar_effect_decref(struct GnuitarEffect *effect);
+void gnuitar_effect_done(struct GnuitarEffect *effect);
 
-void gnuitar_effect_process(struct GnuitarEffect *effect, struct GnuitarPacket *packet);
+int gnuitar_effect_process(struct GnuitarEffect *effect, struct GnuitarPacket *packet);
+
+int gnuitar_effect_get_map(const struct GnuitarEffect *effect, struct GnuitarMap *map);
+
+int gnuitar_effect_set_map(struct GnuitarEffect *effect, const struct GnuitarMap *map);
 
 /* left for compatibility */
 
