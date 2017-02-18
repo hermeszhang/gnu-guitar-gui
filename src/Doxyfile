@@ -775,6 +775,7 @@ INPUT += "gnuitar.h"
 INPUT += "map.c" "map.h"
 INPUT += "packet.c" "packet.h"
 INPUT += "pipe.c" "pipe.h"
+INPUT += "chain.c" "chain.h"
 INPUT += "effect.h" "effect.c"
 
 # This tag can be used to specify the character encoding of the source files
