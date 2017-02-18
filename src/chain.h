@@ -22,11 +22,9 @@ struct GnuitarChain {
     size_t n_effects;
 };
 
-struct GnuitarChain * gnuitar_chain_create(void);
+void gnuitar_chain_init(struct GnuitarChain *chain);
 
-void gnuitar_chain_incref(struct GnuitarChain *chain);
-
-void gnuitar_chain_decref(struct GnuitarChain *chain);
+void gnuitar_chain_done(struct GnuitarChain *chain);
 
 int gnuitar_chain_add_effect(struct GnuitarChain *chain, struct GnuitarEffect *effect);
 
