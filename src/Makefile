@@ -4,7 +4,10 @@ CFLAGS = -Wall -Wextra -Werror -Wfatal-errors
 objfiles += effect.o
 objfiles += pipe.o
 objfiles += map.o
+objfiles += packet.o
+objfiles += pump.o
 objfiles += track.o
+objfiles += utils.o
 
 tests += pipe-test
 tests += map-test
@@ -17,8 +20,9 @@ endif
 
 ifdef gnuitar_with_alsa
 CFLAGS += -DGNUITAR_WITH_ALSA
-objfiles += track-alsa.o
 endif
+
+objfiles += track-alsa.o
 
 .PHONY: all
 all: libgnuitar.a $(tests)
@@ -36,9 +40,15 @@ map.o: map.c map.h
 
 map-test: map-test.c libgnuitar.a
 
+packet.o: packet.c packet.h
+
+pump.o: pump.c pump.h effect.h
+
 track.o: track.c track.h packet.h pump.h map.h
 
 track-alsa.o: track-alsa.c track-alsa.h track.h packet.h pump.h map.h
+
+utils.o: utils.c utils.h
 
 .PHONY: clean
 clean:
