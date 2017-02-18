@@ -41,3 +41,7 @@ track.o: track.c track.h packet.h pump.h map.h
 clean:
 	$(RM) libgnuitar.a $(objfiles) $(tests)
 
+.PHONY: doc
+doc:
+	doxygen
+
