@@ -18,9 +18,12 @@ struct GnuitarFormat {
 
 void gnuitar_format_defaults(struct GnuitarFormat * format);
 
-typedef struct gnuitar_chmap {
-    unsigned int in, out;
-} gnuitar_chmap_t;
+struct GnuitarChannelMap {
+    /** The number of input channels */
+    unsigned int in;
+    /** The number of output channels */
+    unsigned int out;
+};
 
 struct GnuitarTrack {
     /** The name of the track */
@@ -46,7 +49,7 @@ struct GnuitarTrack {
     /* old params */
     int enabled;
     /** The channel maps available */
-    const gnuitar_chmap_t * chmaps;
+    const struct GnuitarChannelMap* chmaps;
 };
 
 struct GnuitarTrack * gnuitar_track_create(const char * name);
@@ -68,10 +71,6 @@ int gnuitar_track_start(struct GnuitarTrack *track);
 int gnuitar_track_stop(struct GnuitarTrack *track);
 
 /* for compatibility */
-
-typedef struct GnuitarTrack track_t;
-
-extern struct GnuitarTrack *track;
 
 #ifdef _WIN32
 #define MAX_BUFFERS 1024 /* number of input/output sound buffers */
