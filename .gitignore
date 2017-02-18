@@ -1,10 +1,14 @@
-*.moc.cpp
-*.moc
+*.o
+*.a
+*.so
+*-test
 
-src/*.o
-src/*.a
-src/*.so
-src/*-test
+src/gnuitar-sh/gnuitar-sh
+src/gnuitar-qt/gnuitar-qt
+src/gnuitar-qt/ui_*
+src/gnuitar-qt/moc_*
+src/gnuitar-qt/Makefile
+
 src/html/*
 
 build/*
