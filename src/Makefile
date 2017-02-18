@@ -17,6 +17,7 @@ endif
 
 ifdef gnuitar_with_alsa
 CFLAGS += -DGNUITAR_WITH_ALSA
+objfiles += track-alsa.o
 endif
 
 .PHONY: all
@@ -36,6 +37,8 @@ map.o: map.c map.h
 map-test: map-test.c libgnuitar.a
 
 track.o: track.c track.h packet.h pump.h map.h
+
+track-alsa.o: track-alsa.c track-alsa.h track.h packet.h pump.h map.h
 
 .PHONY: clean
 clean:
