@@ -1,0 +1,10 @@
+CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
+
+IF (CMAKE_COMPILER_IS_GNUCC)
+    SET (CMAKE_C_FLAGS "-Wall -Wextra -Werror -Wfatal-errors")
+ENDIF (CMAKE_COMPILER_IS_GNUCC)
+
+ADD_EXECUTABLE(gnuitar-sh gnuitar-sh.c)
+
+TARGET_LINK_LIBRARIES(gnuitar-sh gnuitar)
+
