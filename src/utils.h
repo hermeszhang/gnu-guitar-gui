@@ -62,7 +62,7 @@ struct GnuitarMutex {
 #include <pthread.h>
 
 struct GnuitarMutex {
-    pthread_t handle;
+    pthread_mutex_t handle;
 };
 
 #endif /* _WIN32 */
