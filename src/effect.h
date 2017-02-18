@@ -24,25 +24,33 @@
 #ifndef GNUITAR_EFFECT_H
 #define GNUITAR_EFFECT_H
 
-#ifdef __MINGW32__
-#include <malloc.h>
-#endif
-#include <string.h>
-#include <stdlib.h>
-#include <stdio.h>
-
 #include "packet.h"
 #include "map.h"
+
+/** @defgroup libgnuitar-effect Audio Effects
+ * The API that's associated with audio effects.
+ */
+
+/** An audio effect structure.
+ * @ingroup libgnuitar-effect
+ */
 
 struct GnuitarEffect {
     /** The reference count of the effect. */
     unsigned int ref_count;
+    /** Effect specific data */
     void *params;
+    /** Initializes the effect */
     void (*proc_init) (struct GnuitarEffect *);
+    /** Releases resources allocated by the effect */
     void (*proc_done) (struct GnuitarEffect *);
+    /** The processing callback of the effect */
     void (*proc_filter) (struct GnuitarEffect *, struct GnuitarPacket *);
+    /** Gets the parameter map of the effect */
     int (*proc_get_map) (const struct GnuitarEffect *, struct GnuitarMap *);
+    /** Sets the parameter map of the effect */
     int (*proc_set_map) (struct GnuitarEffect *, const struct GnuitarMap *);
+    /** Toggles the effect on and off */
     short toggle;
 };
 
@@ -53,6 +61,14 @@ void gnuitar_effect_decref(struct GnuitarEffect *effect);
 void gnuitar_effect_process(struct GnuitarEffect *effect, struct GnuitarPacket *packet);
 
 /* left for compatibility */
+
+#ifdef __MINGW32__
+#include <malloc.h>
+#endif
+
+#include <string.h>
+#include <stdlib.h>
+#include <stdio.h>
 
 #ifdef __GNUC__
 #define unlikely(x) __builtin_expect((x), 0)
