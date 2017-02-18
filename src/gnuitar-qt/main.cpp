@@ -57,7 +57,8 @@ main(int argc, char *argv[])
 
     QApplication a(argc, argv);
 
-    MainWindow w;
+    Gnuitar::MainWindow w;
+
     w.show();
 
     return a.exec();
