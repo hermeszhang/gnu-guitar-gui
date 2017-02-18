@@ -97,11 +97,7 @@ struct GnuitarAlsaTrack {
     unsigned int keep_thread_running;
 };
 
-struct GnuitarTrack * gnuitar_alsa_driver_create(void);
-
-int gnuitar_alsa_available(void);
-
-extern struct GnuitarTrack *global_alsa_driver;
+struct GnuitarTrack * gnuitar_alsa_track_create(void);
 
 #endif /* GNUITAR_TRACK_ALSA_H */
 
