@@ -1,19 +1,7 @@
-#ifdef HAVE_ALSA
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <alsa/asoundlib.h>
-#include <assert.h>
-#include <pthread.h>
-
 #include "track.h"
 #include "track-alsa.h"
 
-#include "audio-midi.h"
-#include "gui.h"
-#include "pump.h"
-
-const gnuitar_chmap_t chmaps_avail[] = {
+const struct GnuitarChannelMap chmaps_avail[] = {
     { 1, 1 },
     { 1, 2 },
     { 2, 1 },
@@ -31,15 +19,15 @@ static void * create_callback(void);
 
 static void destroy_callback(void *data);
 
-static int start_callback(gnuitar_audio_driver_t *driver);
+static int start_callback(struct GnuitarTrack *track);
 
-static int stop_callback(gnuitar_audio_driver_t *driver);
+static int stop_callback(struct GnuitarTrack *track);
 
-static gnuitar_error_t get_map_callback(const gnuitar_audio_driver_t *driver, struct GnuitarMap *map);
+static gnuitar_error_t get_map_callback(const struct GnuitarTrack *track, struct GnuitarMap *map);
 
-static int get_format_callback(const gnuitar_audio_driver_t *driver, gnuitar_format_t *format);
+static int get_format_callback(const struct GnuitarTrack *track, struct GnuitarFormat *format);
 
-static int set_format_callback(gnuitar_audio_driver_t *driver, const gnuitar_format_t *format);
+static int set_format_callback(struct GnuitarTrack *track, const struct GnuitarFormat *format);
 
 static void * alsa_audio_thread(void *data);
 
@@ -51,43 +39,43 @@ static int alsa_configure_audio(snd_pcm_t *device,
                                 unsigned int *bits,
                                 int adapting);
 
-gnuitar_audio_driver_t *
-gnuitar_alsa_driver_create(void)
+struct GnuitarTrack *
+gnuitar_alsa_track_create(void)
 {
-    gnuitar_audio_driver_t *driver;
+    struct GnuitarTrack *track;
 
-    driver = malloc(sizeof(*driver));
-    if (driver == NULL)
+    track = malloc(sizeof(*track));
+    if (track == NULL)
         return NULL;
 
-    driver->name = gnuitar_strdup("ALSA");
-    if (driver->name == NULL) {
-        free(driver);
+    track->name = gnuitar_strdup("ALSA");
+    if (track->name == NULL) {
+        free(track);
         return NULL;
     }
 
-    gnuitar_mutex_init(&driver->pump_mutex);
-    driver->pump = gnuitar_pump_create();
+    gnuitar_mutex_init(&track->pump_mutex);
+    track->pump = gnuitar_pump_create();
 
-    driver->destroy_callback = destroy_callback;
-    driver->start_callback = start_callback;
-    driver->stop_callback = stop_callback;
-    driver->set_format_callback = set_format_callback;
-    driver->get_map_callback = get_map_callback;
-    driver->get_format_callback = get_format_callback;
+    track->destroy_callback = destroy_callback;
+    track->start_callback = start_callback;
+    track->stop_callback = stop_callback;
+    track->set_format_callback = set_format_callback;
+    track->get_map_callback = get_map_callback;
+    track->get_format_callback = get_format_callback;
 
-    driver->data = create_callback();
-    if (driver->data == NULL) {
-        free(driver->name);
-        free(driver);
+    track->data = create_callback();
+    if (track->data == NULL) {
+        free(track->name);
+        free(track);
         return NULL;
     }
 
     /* old params */
-    driver->enabled = 1;
-    driver->chmaps = chmaps_avail;
+    track->enabled = 1;
+    track->chmaps = chmaps_avail;
 
-    return driver;
+    return track;
 }
 
 int
@@ -99,94 +87,94 @@ gnuitar_alsa_available(void)
 static void *
 create_callback(void)
 {
-    gnuitar_alsa_driver_t *alsa_driver;
+    struct GnuitarAlsaTrack *alsa_track;
 
-    alsa_driver = malloc(sizeof(*alsa_driver));
-    if (alsa_driver == NULL)
+    alsa_track = malloc(sizeof(*alsa_track));
+    if (alsa_track == NULL)
         return NULL;
 
-    alsa_driver->input_name = "plughw:1,0";
-    alsa_driver->input_pcm = NULL;
-    alsa_driver->input_channels = 2;
-    alsa_driver->input_bits = 32;
+    alsa_track->input_name = gnuitar_strdup("default");
+    alsa_track->input_pcm = NULL;
+    alsa_track->input_channels = 2;
+    alsa_track->input_bits = 32;
 
-    alsa_driver->output_name = "default";
-    alsa_driver->output_pcm = NULL;
-    alsa_driver->output_channels = 2;
-    alsa_driver->output_bits = 32;
+    alsa_track->output_name = gnuitar_strdup("default");
+    alsa_track->output_pcm = NULL;
+    alsa_track->output_channels = 2;
+    alsa_track->output_bits = 32;
 
-    alsa_driver->period_size = 128;
-    alsa_driver->periods = 4;
-    alsa_driver->rate = 48000;
+    alsa_track->period_size = 128;
+    alsa_track->periods = 4;
+    alsa_track->rate = 48000;
 
-    alsa_driver->keep_thread_running = 0;
+    alsa_track->keep_thread_running = 0;
 
-    return alsa_driver;
+    return alsa_track;
 }
 
 static void
 destroy_callback(void *data)
 {
-    gnuitar_alsa_driver_t *alsa_driver;
-    alsa_driver = (gnuitar_alsa_driver_t *)(data);
-    if (alsa_driver != NULL) {
-        if (alsa_driver->input_pcm != NULL)
-            snd_pcm_close(alsa_driver->input_pcm);
-        if (alsa_driver->input_name != NULL)
-            free(alsa_driver->input_name);
-        if (alsa_driver->output_pcm != NULL)
-            snd_pcm_close(alsa_driver->output_pcm);
-        if (alsa_driver->output_name != NULL)
-            free(alsa_driver->output_name);
+    struct GnuitarAlsaTrack *alsa_track;
+    alsa_track = (struct GnuitarAlsaTrack *)(data);
+    if (alsa_track != NULL) {
+        if (alsa_track->input_pcm != NULL)
+            snd_pcm_close(alsa_track->input_pcm);
+        if (alsa_track->input_name != NULL)
+            free(alsa_track->input_name);
+        if (alsa_track->output_pcm != NULL)
+            snd_pcm_close(alsa_track->output_pcm);
+        if (alsa_track->output_name != NULL)
+            free(alsa_track->output_name);
     }
 }
 
 static int
-start_callback(gnuitar_audio_driver_t *driver)
+start_callback(struct GnuitarTrack *track)
 {
-    gnuitar_alsa_driver_t *alsa_driver;
+    struct GnuitarAlsaTrack *alsa_track;
 
-    alsa_driver = (gnuitar_alsa_driver_t *)(driver->data);
-    if (alsa_driver == NULL)
+    alsa_track = (struct GnuitarAlsaTrack *)(track->data);
+    if (alsa_track == NULL)
         return -1;
 
-    if (snd_pcm_open(&alsa_driver->input_pcm,
-                     alsa_driver->input_name,
+    if (snd_pcm_open(&alsa_track->input_pcm,
+                     alsa_track->input_name,
                      SND_PCM_STREAM_CAPTURE,
                      0 /* mode flags */) != 0) {
         return -2;
     }
 
-    if (alsa_configure_audio(alsa_driver->input_pcm,
-                             &alsa_driver->periods,
-                             &alsa_driver->period_size,
-                             alsa_driver->input_channels,
-                             &alsa_driver->rate,
-                             &alsa_driver->input_bits,
+    if (alsa_configure_audio(alsa_track->input_pcm,
+                             &alsa_track->periods,
+                             &alsa_track->period_size,
+                             alsa_track->input_channels,
+                             &alsa_track->rate,
+                             &alsa_track->input_bits,
                              1 /* 1 means values may be changed */) != 0) {
         return -3;
     }
 
-    if (snd_pcm_open(&alsa_driver->output_pcm,
-                     alsa_driver->output_name,
+    if (snd_pcm_open(&alsa_track->output_pcm,
+                     alsa_track->output_name,
                      SND_PCM_STREAM_PLAYBACK,
                      0 /* mode flags */) != 0) {
         return -2;
     }
 
-    if (alsa_configure_audio(alsa_driver->output_pcm,
-                             &alsa_driver->periods,
-                             &alsa_driver->period_size,
-                             alsa_driver->output_channels,
-                             &alsa_driver->rate,
-                             &alsa_driver->output_bits,
+    if (alsa_configure_audio(alsa_track->output_pcm,
+                             &alsa_track->periods,
+                             &alsa_track->period_size,
+                             alsa_track->output_channels,
+                             &alsa_track->rate,
+                             &alsa_track->output_bits,
                              1 /* 1 means values may be changed */) != 0) {
         return -3;
     }
 
-    alsa_driver->keep_thread_running = 1;
+    alsa_track->keep_thread_running = 1;
 
-    if (pthread_create(&alsa_driver->thread, NULL, alsa_audio_thread, driver)) {
+    if (pthread_create(&alsa_track->thread, NULL, alsa_audio_thread, track)) {
         return -4;
     }
 
@@ -194,28 +182,28 @@ start_callback(gnuitar_audio_driver_t *driver)
 }
 
 static int
-stop_callback(gnuitar_audio_driver_t *driver)
+stop_callback(struct GnuitarTrack *track)
 {
-    gnuitar_alsa_driver_t *alsa_driver;
+    struct GnuitarAlsaTrack *alsa_track;
 
-    alsa_driver = (gnuitar_alsa_driver_t *)(driver->data);
-    if (alsa_driver == NULL)
+    alsa_track = (struct GnuitarAlsaTrack *)(track->data);
+    if (alsa_track == NULL)
         return -1;
 
-    alsa_driver->keep_thread_running = 0;
+    alsa_track->keep_thread_running = 0;
 
-    if (pthread_join(alsa_driver->thread, NULL) != 0)
+    if (pthread_join(alsa_track->thread, NULL) != 0)
         return -1;
 
     return 0;
 }
 
 static gnuitar_error_t
-get_map_callback(const gnuitar_audio_driver_t *driver, struct GnuitarMap *map)
+get_map_callback(const struct GnuitarTrack *track, struct GnuitarMap *map)
 {
     gnuitar_error_t error;
 
-    (void) driver;
+    (void) track;
 
     error = gnuitar_map_define(map, "Rate", GNUITAR_MAP_TYPE_UINT32);
     if (error)
@@ -241,32 +229,32 @@ get_map_callback(const gnuitar_audio_driver_t *driver, struct GnuitarMap *map)
 }
 
 static int
-get_format_callback(const gnuitar_audio_driver_t *driver, gnuitar_format_t *format)
+get_format_callback(const struct GnuitarTrack *track, struct GnuitarFormat *format)
 {
-    const gnuitar_alsa_driver_t *alsa_driver;
+    const struct GnuitarAlsaTrack *alsa_track;
 
-    alsa_driver = (gnuitar_alsa_driver_t *)(driver->data);
-    if (alsa_driver == NULL)
+    alsa_track = (struct GnuitarAlsaTrack *)(track->data);
+    if (alsa_track == NULL)
         return -1;
 
-    format->output_bits = alsa_driver->output_bits;
-    format->output_channels = alsa_driver->output_channels;
+    format->output_bits = alsa_track->output_bits;
+    format->output_channels = alsa_track->output_channels;
 
-    format->input_bits = alsa_driver->input_bits;
-    format->input_channels = alsa_driver->input_channels;
+    format->input_bits = alsa_track->input_bits;
+    format->input_channels = alsa_track->input_channels;
 
-    format->rate = alsa_driver->rate;
+    format->rate = alsa_track->rate;
 
     return 0;
 }
 
 static int
-set_format_callback(gnuitar_audio_driver_t *driver, const gnuitar_format_t *format)
+set_format_callback(struct GnuitarTrack *track, const struct GnuitarFormat *format)
 {
-    gnuitar_alsa_driver_t *alsa_driver;
+    struct GnuitarAlsaTrack *alsa_track;
 
-    alsa_driver = (gnuitar_alsa_driver_t *)(driver->data);
-    if (alsa_driver == NULL)
+    alsa_track = (struct GnuitarAlsaTrack *)(track->data);
+    if (alsa_track == NULL)
         return -1;
 
     /* not implemented */
@@ -280,35 +268,35 @@ alsa_audio_thread(void *data)
 {
     unsigned int i;
     int inframes, outframes;
-    gnuitar_packet_t db;
+    struct GnuitarPacket db;
     unsigned int restarting = 0;
     unsigned int data_size = 0;
 
-    gnuitar_audio_driver_t *driver;
-    gnuitar_alsa_driver_t *alsa_driver;
+    struct GnuitarTrack *track;
+    struct GnuitarAlsaTrack *alsa_track;
 
     snd_pcm_t * input_pcm;
     snd_pcm_t * output_pcm;
 
-    driver = (gnuitar_audio_driver_t *)(data);
-    if (driver == NULL)
+    track = (struct GnuitarTrack *)(data);
+    if (track == NULL)
         return NULL;
 
-    alsa_driver = (gnuitar_alsa_driver_t *)(driver->data);
-    if (alsa_driver == NULL)
+    alsa_track = (struct GnuitarAlsaTrack *)(track->data);
+    if (alsa_track == NULL)
         return NULL;
 
-    input_pcm = alsa_driver->input_pcm;
+    input_pcm = alsa_track->input_pcm;
     if (input_pcm == NULL)
         return NULL;
 
-    output_pcm = alsa_driver->output_pcm;
+    output_pcm = alsa_track->output_pcm;
     if (output_pcm == NULL)
         return NULL;
 
-    data_size = (alsa_driver->output_channels
-               * alsa_driver->period_size
-               * alsa_driver->output_bits) / 8;
+    data_size = (alsa_track->output_channels
+               * alsa_track->period_size
+               * alsa_track->output_bits) / 8;
 
     db.data = malloc(data_size);
     if (db.data == NULL)
@@ -320,13 +308,13 @@ alsa_audio_thread(void *data)
         return NULL;
     }
 
-    db.len = alsa_driver->output_channels
-           * alsa_driver->period_size;
-    db.channels = alsa_driver->output_channels;
-    db.rate = alsa_driver->rate;
+    db.len = alsa_track->output_channels
+           * alsa_track->period_size;
+    db.channels = alsa_track->output_channels;
+    db.rate = alsa_track->rate;
 
     /* frame counts are always the same to both read and write */
-    while (alsa_driver->keep_thread_running) {
+    while (alsa_track->keep_thread_running) {
 
         if (restarting) {
             restarting = 0;
@@ -338,7 +326,7 @@ alsa_audio_thread(void *data)
             snd_pcm_prepare(output_pcm);
             /* prefill audio area */
             memset(db.data, 0, data_size);
-            for (i = 0; i < alsa_driver->periods; i += 1)
+            for (i = 0; i < alsa_track->periods; i += 1)
                 if (snd_pcm_avail_update(output_pcm) > 0)
                     snd_pcm_writei(output_pcm, db.data, db.len / db.channels);
         }
@@ -352,9 +340,9 @@ alsa_audio_thread(void *data)
 
         gnuitar_packet_mul(&db, MAX_SAMPLE);
 
-        gnuitar_mutex_lock(&driver->pump_mutex);
-        gnuitar_pump_process(driver->pump, &db);
-        gnuitar_mutex_unlock(&driver->pump_mutex);
+        gnuitar_mutex_lock(&track->pump_mutex);
+        gnuitar_pump_process(track->pump, &db);
+        gnuitar_mutex_unlock(&track->pump_mutex);
 
         gnuitar_packet_div(&db, MAX_SAMPLE);
         /* write output */
@@ -378,22 +366,15 @@ alsa_configure_audio(snd_pcm_t *device, unsigned int *fragments, unsigned int *f
     unsigned int        tmp;
     snd_pcm_uframes_t   alsa_frames;
     
-    if ((err = snd_pcm_hw_params_malloc(&hw_params)) < 0) {
-        gnuitar_printf( "can't allocate parameter structure: %s\n",
-                 snd_strerror(err));
+    if ((err = snd_pcm_hw_params_malloc(&hw_params)) < 0)
 	return 1;
-    }
     
     if ((err = snd_pcm_hw_params_any(device, hw_params)) < 0) {
-        gnuitar_printf( "can't initialize parameter structure: %s\n",
-                 snd_strerror(err));
         snd_pcm_hw_params_free(hw_params);
 	return 1;
     }
 
     if ((err = snd_pcm_hw_params_set_access(device, hw_params, SND_PCM_ACCESS_RW_INTERLEAVED)) < 0) {
-        gnuitar_printf("can't set access type RW_INTERLEAVE (try using plughw): %s\n",
-                 snd_strerror(err));
         snd_pcm_hw_params_free(hw_params);
 	return 1;
     }
@@ -401,8 +382,6 @@ alsa_configure_audio(snd_pcm_t *device, unsigned int *fragments, unsigned int *f
     /* XXX we should support floating-point sample format */
     if ((err = snd_pcm_hw_params_set_format(device, hw_params, SND_PCM_FORMAT_FLOAT)) < 0) {
         if ((err = snd_pcm_hw_params_set_format(device, hw_params, SND_PCM_FORMAT_S16)) < 0) {
-            gnuitar_printf("can't set sample format to neither 32 nor 16 bits: %s\n",
-                            snd_strerror(err));
             snd_pcm_hw_params_free(hw_params);
 	    return 1;
         } else {
@@ -413,7 +392,6 @@ alsa_configure_audio(snd_pcm_t *device, unsigned int *fragments, unsigned int *f
     }
 
     if ((err = snd_pcm_hw_params_set_channels(device, hw_params, channels)) < 0) {
-        gnuitar_printf( "can't set channel count %d: %s\n", channels, snd_strerror(err));
         snd_pcm_hw_params_free(hw_params);
         return 1;
     }
@@ -422,7 +400,6 @@ alsa_configure_audio(snd_pcm_t *device, unsigned int *fragments, unsigned int *f
      * resampling and GNUitar adapted to proper frequency than with it. */
 #if(SND_LIB_MAJOR >=1 && SND_LIB_MINOR >= 0 && SND_LIB_SUBMINOR >8)
     if ((err = snd_pcm_hw_params_set_rate_resample(device, hw_params, 0)) < 0) {
-        gnuitar_printf("warning: can't disallow ALSA-lib resampling: %s\n", snd_strerror(err));
         /* this isn't fatal, though. We'll just continue. */
     }
 #endif
@@ -432,40 +409,34 @@ alsa_configure_audio(snd_pcm_t *device, unsigned int *fragments, unsigned int *f
          * sampling rate, fragment size, number of fragments. */
         tmp = *rate;
         if ((err = snd_pcm_hw_params_set_rate_near(device, hw_params, &tmp, 0)) < 0) {
-            gnuitar_printf("can't set sample rate %d: %s\n", tmp, snd_strerror(err));
             snd_pcm_hw_params_free(hw_params);
             return 1;
         }
         if (tmp != *rate) {
-            gnuitar_printf("info: hardware adjusted sample rate to %d.\n", tmp);
             *rate = tmp;
         }
 
         /* tell alsa how many periods we would like to have */
         if ((err = snd_pcm_hw_params_set_periods(device, hw_params, *fragments, 0)) < 0) {
-            gnuitar_printf("warning: can't set fragments %d value on ALSA device: %s\n", *fragments, snd_strerror(err));
             /* If it doesn't work, well, no matter. Next time *fragments will have
              * another value which hopefully works. And set_buffer_time_near() may
              * still work. The message to take home is: ALSA is difficult to program. */
         }
 
-        /* let the sound driver pick period size as appropriate. */
+        /* let the sound track pick period size as appropriate. */
         tmp = (float) (*frames * *fragments) / (*rate) * 1E6;
 
         if ((err = snd_pcm_hw_params_set_buffer_time_near(device, hw_params, &tmp, NULL)) < 0) {
-            gnuitar_printf("can't set buffer time near %d: %s\n", tmp, snd_strerror(err));
             snd_pcm_hw_params_free(hw_params);
             return 1;
         }
         /* obtain the frames and fragments chosen by ALSA */
         if ((err = snd_pcm_hw_params_get_period_size(hw_params, &alsa_frames, NULL)) < 0) {
-            gnuitar_printf( "can't get period size value from ALSA (read: %d): %s\n", (int) alsa_frames, snd_strerror(err));
             snd_pcm_hw_params_free(hw_params);
             return 1;
         }
         *frames = alsa_frames;
         if ((err = snd_pcm_hw_params_get_periods(hw_params, fragments, NULL)) < 0) {
-            gnuitar_printf( "can't get fragments value from ALSA (read: %d): %s\n", *fragments, snd_strerror(err));
             snd_pcm_hw_params_free(hw_params);
             return 1;
         }
@@ -473,39 +444,27 @@ alsa_configure_audio(snd_pcm_t *device, unsigned int *fragments, unsigned int *f
         /* use the fixed values given before */
         tmp = *rate;
         if ((err = snd_pcm_hw_params_set_rate(device, hw_params, tmp, 0)) < 0) {
-            gnuitar_printf("can't set sample rate %d: %s\n", tmp, snd_strerror(err));
             snd_pcm_hw_params_free(hw_params);
             return 1;
         }
         if ((err = snd_pcm_hw_params_set_period_size(device, hw_params, *frames, 0)) < 0) {
-            gnuitar_printf( "can't set period size to %d frames: %s\n", (int) *frames, snd_strerror(err));
             snd_pcm_hw_params_free(hw_params);
             return 1;
         }
         
         if ((err = snd_pcm_hw_params_set_periods(device, hw_params, *fragments, 0)) < 0) {
-            gnuitar_printf("can't set periods to %d: %s\n", *fragments, snd_strerror(err));
             snd_pcm_hw_params_free(hw_params);
             return 1;
         }        
     }
 
     if ((err = snd_pcm_hw_params(device, hw_params)) < 0) {
-        gnuitar_printf("Error setting HW params: %s\n", snd_strerror(err));
         snd_pcm_hw_params_free(hw_params);
         return 1;
     }
+
     snd_pcm_hw_params_free(hw_params);
+
     return 0;
 }
-
-#else /* HAVE_ALSA */
-
-int
-gnuitar_alsa_available(void)
-{
-    return 0;
-}
-
-#endif /* HAVE_ALSA */
 
