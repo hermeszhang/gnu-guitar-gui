@@ -7,6 +7,7 @@
 #include "packet.h"
 #include "pump.h"
 #include "map.h"
+#include "utils.h"
 
 struct GnuitarFormat {
     unsigned int input_bits;
