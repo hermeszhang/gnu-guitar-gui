@@ -1,9 +1,6 @@
 #ifndef GNUITAR_TRACK_H
 #define GNUITAR_TRACK_H
 
-#include <stdint.h>
-
-#include "error.h"
 #include "packet.h"
 #include "chain.h"
 #include "map.h"
@@ -13,63 +10,46 @@
 extern "C" {
 #endif /* __cplusplus */
 
-struct GnuitarFormat {
-    unsigned int input_bits;
-    unsigned int input_channels;
-    unsigned int output_bits;
-    unsigned int output_channels;
-    unsigned int rate;
-};
+/** @defgroup libgnuitar-track Guitar Tracks
+ * Guitar Track API
+ */
 
-void gnuitar_format_defaults(struct GnuitarFormat * format);
-
-struct GnuitarChannelMap {
-    /** The number of input channels */
-    unsigned int in;
-    /** The number of output channels */
-    unsigned int out;
-};
+/** A guitar track.
+ * @ingroup libgnuitar-track
+ */
 
 struct GnuitarTrack {
-    /** The name of the track */
-    char *name;
     /** track specific data */
     void *data;
     /** Destroys the track data */
-    void (*destroy_callback)(void *data_);
-    /** Sets a parameter for the track */
-    int (*set_format_callback)(struct GnuitarTrack *track, const struct GnuitarFormat *format);
-    /** Gets a parameter for the track */
-    int (*get_format_callback)(const struct GnuitarTrack *track, struct GnuitarFormat *format);
+    void (*done)(void *data_);
     /** Gets the parameter map for the audio track */
-    gnuitar_error_t (*get_map_callback)(const struct GnuitarTrack *track, struct GnuitarMap *map);
+    int (*get_map)(const struct GnuitarTrack *track, struct GnuitarMap *map);
+    /** Sets the parameter map of the audio track */
+    int (*set_map)(struct GnuitarTrack *track, const struct GnuitarMap *map);
     /** Starts the audio stream */
-    int (*start_callback)(struct GnuitarTrack *track);
+    int (*start)(struct GnuitarTrack *track);
     /** Stops the audio stream */
-    int (*stop_callback)(struct GnuitarTrack *track);
+    int (*stop)(struct GnuitarTrack *track);
     /** The effects pump for the track */
-    struct GnuitarChain *chain;
+    struct GnuitarChain chain;
     /** The mutex for the pump */
     struct GnuitarMutex chain_mutex;
-    /* old params */
-    int enabled;
-    /** The channel maps available */
-    const struct GnuitarChannelMap* chmaps;
 };
 
-struct GnuitarTrack * gnuitar_track_create(const char * name);
+int gnuitar_track_init(struct GnuitarTrack *track, const char *name);
 
-void gnuitar_track_destroy(struct GnuitarTrack *track);
+void gnuitar_track_done(struct GnuitarTrack *track);
 
-gnuitar_error_t gnuitar_track_add_effect(struct GnuitarTrack *track, struct GnuitarEffect *effect);
+int gnuitar_track_add_effect(struct GnuitarTrack *track, struct GnuitarEffect *effect);
 
-gnuitar_error_t gnuitar_track_erase_effect(struct GnuitarTrack *track, unsigned int index);
+int gnuitar_track_erase_effect(struct GnuitarTrack *track, unsigned int index);
 
-gnuitar_error_t gnuitar_track_get_map(const struct GnuitarTrack *track, struct GnuitarMap *map);
+int gnuitar_track_move_effect(struct GnuitarTrack *track, size_t dst, size_t src);
 
-int gnuitar_track_get_format(const struct GnuitarTrack *track, struct GnuitarFormat *format);
+int gnuitar_track_get_map(const struct GnuitarTrack *track, struct GnuitarMap *map);
 
-int gnuitar_track_set_format(struct GnuitarTrack *track, const struct GnuitarFormat *format);
+int gnuitar_track_set_map(struct GnuitarTrack *track, const struct GnuitarMap *map);
 
 int gnuitar_track_start(struct GnuitarTrack *track);
 

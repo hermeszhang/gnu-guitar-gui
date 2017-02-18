@@ -1,5 +1,5 @@
 /*
- * Audio driver interface to reduce file interdependencies and give home to
+ * Audio track interface to reduce file interdependencies and give home to
  * various state variables. (c) 2006 Antti S. Lankila. Licensed under GPL.
  *
  * $Id$
@@ -13,7 +13,7 @@
  * - optimize gnuitar: this breaks dsound, I'll fix it later
  *
  * Revision 1.1  2006/08/07 12:55:30  alankila
- * - construct audio-driver.c to hold globals and provide some utility
+ * - construct audio-track.c to hold globals and provide some utility
  *   functions to its users. This slashes interdependencies somewhat.
  *
  */
@@ -30,132 +30,122 @@
 #include "audio-winmm.h"
 #include "audio-dsound.h"
 
-struct GnuitarTrack *
-gnuitar_track_create(const char *name)
+/** Initializes a track, using a specified API.
+ * @param track An unitialized track.
+ * @param api_name The name of the API to use.
+ * @returns On success, zero.
+ *  If @p api_name is an invalid name, EINVAL is returned.
+ *  If @p api_name is NULL, EFAULT is returned.
+ * @ingroup libgnuitar-track
+ */
+
+int
+gnuitar_track_init(struct GnuitarTrack *track, const char *api_name)
 {
+    gnuitar_mutex_init(&track->chain_mutex);
+    gnuitar_chain_init(&track->chain);
+
+    if (api_name == NULL)
+        return EFAULT;
+
 #ifdef GNUITAR_WITH_ALSA
-    if (strcmp(name, "ALSA") == 0) {
-        return gnuitar_alsa_track_create();
+    if (strcmp(api_name, "ALSA") == 0) {
+        return gnuitar_alsa_track_init(track);
     }
 #endif /* GNUITAR_WITH_ALSA */
-    if (strcmp(name, "Null") == 0) {
+    if (strcmp(api_name, "Null") == 0) {
         /* TODO */
-        return NULL;
+	return EFAULT;
     }
-    return NULL;
+    return EINVAL;
 }
+
+/** Releases memory allocated by the track.
+ * @param track An initialized track
+ * @ingroup libgnuitar-track
+ */
 
 void
-gnuitar_track_destroy(struct GnuitarTrack *driver)
+gnuitar_track_done(struct GnuitarTrack *track)
 {
-    if (driver == NULL)
-        return;
-    if (driver->destroy_callback != NULL)
-        driver->destroy_callback(driver->data);
-    if (driver->chain)
-        gnuitar_chain_decref(driver->chain);
-}
+    if (track->done != NULL)
+        track->done(track->data);
 
-gnuitar_error_t
-gnuitar_track_add_effect(struct GnuitarTrack *driver, struct GnuitarEffect *effect)
-{
-    gnuitar_error_t error;
-
-    gnuitar_mutex_lock(&driver->chain_mutex);
-
-    if (driver->chain == NULL)
-        driver->chain = gnuitar_chain_create();
-    if (driver->chain == NULL)
-        return GNUITAR_ERROR_MALLOC;
-
-    error = gnuitar_chain_add_effect(driver->chain, effect);
-    if (error)
-        return error;
-
-    gnuitar_mutex_unlock(&driver->chain_mutex);
-
-    return GNUITAR_ERROR_NONE;
-}
-
-gnuitar_error_t
-gnuitar_track_erase_effect(struct GnuitarTrack *driver, unsigned int index)
-{
-    if (driver->chain == NULL)
-        return GNUITAR_ERROR_ENOENT;
-
-    return gnuitar_chain_erase_effect(driver->chain, index);
+    gnuitar_chain_done(&track->chain);
 }
 
 int
-gnuitar_track_start(struct GnuitarTrack *driver)
+gnuitar_track_add_effect(struct GnuitarTrack *track, struct GnuitarEffect *effect)
 {
-    if (driver == NULL)
+    int err;
+
+    err = gnuitar_mutex_lock(&track->chain_mutex);
+    if (err != 0)
+        return err;
+
+    err = gnuitar_chain_add_effect(&track->chain, effect);
+    if (err != 0)
+        return err;
+
+    err = gnuitar_mutex_unlock(&track->chain_mutex);
+    if (err != 0)
+        return err;
+
+    return 0;
+}
+
+int
+gnuitar_track_erase_effect(struct GnuitarTrack *track, unsigned int index)
+{
+
+    int err;
+
+    err = gnuitar_mutex_lock(&track->chain_mutex);
+    if (err != 0)
+        return err;
+
+    err = gnuitar_chain_erase_effect(&track->chain, index);
+    if (err != 0)
+        return err;
+
+    err = gnuitar_mutex_unlock(&track->chain_mutex);
+    if (err != 0)
+        return err;
+
+    return 0;
+}
+
+int
+gnuitar_track_start(struct GnuitarTrack *track)
+{
+    if (track == NULL)
         return -1;
-    if (driver->start_callback == NULL)
+    if (track->start == NULL)
         return -2;
-    if (driver->start_callback(driver) != 0)
+    if (track->start(track) != 0)
         return -3;
 
     return 0;
 }
 
 int
-gnuitar_track_stop(struct GnuitarTrack *driver)
+gnuitar_track_stop(struct GnuitarTrack *track)
 {
-    if (driver == NULL)
-        return -1;
-    if (driver->stop_callback == NULL)
-        return -2;
-    if (driver->stop_callback(driver) != 0)
-        return -3;
+    if (track->stop == NULL)
+        return EFAULT;
 
-    return 0;
+    return track->stop(track);
 }
 
-gnuitar_error_t
-gnuitar_track_get_map(const struct GnuitarTrack *driver, struct GnuitarMap *map)
+int
+gnuitar_track_get_map(const struct GnuitarTrack *track, struct GnuitarMap *map)
 {
-    if (driver == NULL)
-        return GNUITAR_ERROR_UNKNOWN;
-    if (driver->get_map_callback == NULL)
-        return GNUITAR_ERROR_UNKNOWN;
+    if (track->get_map == NULL)
+        return EFAULT;
 
     gnuitar_map_init(map);
 
-    return driver->get_map_callback(driver, map);
-}
-
-int
-gnuitar_track_get_format(const struct GnuitarTrack *driver, struct GnuitarFormat *format)
-{
-    if (driver == NULL)
-        return -1;
-    if (driver->get_format_callback == NULL)
-        return -2;
-    if (driver->get_format_callback(driver, format) != 0)
-        return -3;
-    return 0;
-}
-
-int
-gnuitar_track_set_format(struct GnuitarTrack *driver, const struct GnuitarFormat *format)
-{
-    if (driver == NULL)
-        return -1;
-    if (driver->set_format_callback == NULL)
-        return -2;
-    if (driver->set_format_callback(driver, format) != 0)
-        return -3;
-    return 0;
-}
-
-void
-gnuitar_format_defaults(struct GnuitarFormat *format)
-{
-    format->input_channels = 2;
-    format->input_bits = 32;
-    format->output_channels = 2;
-    format->output_bits = 32;
+    return track->get_map(track, map);
 }
 
 #ifndef _WIN32
@@ -166,7 +156,7 @@ float procbuf[MAX_BUFFER_SIZE / sizeof(int16_t)];
 float procbuf2[MAX_BUFFER_SIZE / sizeof(int16_t)];
 #endif
 
-struct GnuitarTrack *audio_driver = NULL;
+struct GnuitarTrack *audio_track = NULL;
 
 /* default settings */
 struct GnuitarMutex effectlist_lock;
