@@ -71,9 +71,9 @@ void gnuitar_mutex_init(struct GnuitarMutex *mutex);
 
 void gnuitar_mutex_done(struct GnuitarMutex *mutex);
 
-void gnuitar_mutex_lock(struct GnuitarMutex *mutex);
+int gnuitar_mutex_lock(struct GnuitarMutex *mutex);
 
-void gnuitar_mutex_unlock(struct GnuitarMutex *mutex);
+int gnuitar_mutex_unlock(struct GnuitarMutex *mutex);
 
 #endif /* GNUITAR_UTILS_H */
 

@@ -70,12 +70,12 @@ inline void gnuitar_mutex_done(struct GnuitarMutex *m) {
     pthread_mutex_destroy(&m->handle);
 }
 
-inline void gnuitar_mutex_lock(struct GnuitarMutex *m) {
-    pthread_mutex_lock(&m->handle);
+inline int gnuitar_mutex_lock(struct GnuitarMutex *m) {
+    return pthread_mutex_lock(&m->handle);
 }
 
-inline void gnuitar_mutex_unlock(struct GnuitarMutex *m) {
-    pthread_mutex_unlock(&m->handle);
+inline int gnuitar_mutex_unlock(struct GnuitarMutex *m) {
+    return pthread_mutex_unlock(&m->handle);
 }
 
 #else /* _WIN32 */
