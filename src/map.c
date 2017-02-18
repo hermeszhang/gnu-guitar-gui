@@ -38,6 +38,12 @@ gnuitar_map_name_compare(const void *a_ptr, const void *b_ptr)
     return strcmp(a, b->name);
 }
 
+/** Returns the size of the type, in bytes.
+ * @param type The type in question.
+ * @returns The size of the type.
+ * @ingroup libgnuitar-map
+ */
+
 size_t
 gnuitar_map_type_size(enum GnuitarMapType type)
 {
@@ -80,6 +86,10 @@ gnuitar_map_init(struct GnuitarMap *map)
     map->entries_count = 0;
 }
 
+/** Releases resources allocated by map.
+ * @param map An initialized map structure.
+ * @ingroup libgnuitar-map
+ */
 void
 gnuitar_map_done(struct GnuitarMap *map)
 {
@@ -90,6 +100,17 @@ gnuitar_map_done(struct GnuitarMap *map)
         free(map->entries);
     }
 }
+
+/** Defines a new entry in the map.
+ * This function fails if the entry already exists.
+ * @param map An initialized map structure.
+ * @param name The name of the entry
+ * @param type The type of the entry
+ * @returns On success, zero is returned.
+ *  If the entry already exists, EEXIST is returned.
+ *  If a memory allocation fails, ENOMEM is returned.
+ * @ingroup libgnuitar-map
+ */
 
 int
 gnuitar_map_define(struct GnuitarMap *map, const char *name, enum GnuitarMapType type)
@@ -138,6 +159,14 @@ gnuitar_map_define(struct GnuitarMap *map, const char *name, enum GnuitarMapType
     return 0;
 }
 
+/** Checks to see if the entry exists.
+ * @param map An initialized map
+ * @param name The name of the entry
+ * @returns If the entry is found, non-zero is returned.
+ *  If the entry is not found, zero is returned.
+ * @ingroup libgnuitar-map
+ */
+
 unsigned char
 gnuitar_map_exists(const struct GnuitarMap *map, const char *name)
 {
@@ -145,6 +174,14 @@ gnuitar_map_exists(const struct GnuitarMap *map, const char *name)
         return 0;
     return 1;
 }
+
+/** Finds an entry.
+ * @param map An initialized map
+ * @param name The name of the entry
+ * @returns A pointer to the entry, if it is found.
+ *  If it is not found, NULL is returned.
+ * @ingroup libgnuitar-map
+ */
 
 struct GnuitarMapEntry *
 gnuitar_map_find(const struct GnuitarMap *map, const char *name)
@@ -158,17 +195,32 @@ gnuitar_map_find(const struct GnuitarMap *map, const char *name)
     return (struct GnuitarMapEntry *)(result);
 }
 
+/** Returns the number of entries in the map.
+ * @param map An initialized map
+ * @returns The number of entries in the map.
+ * @ingroup libgnuitar-map
+ */
+
 size_t
 gnuitar_map_get_count(const struct GnuitarMap *map)
 {
     return map->entries_count;
 }
 
+/** Returns the name of a entry by index.
+ * The function fails if the index is out of boundaries.
+ * @param map An initialized map
+ * @param index The index of the entry
+ * @returns On success, the name of the entry is returned.
+ *  On failure, NULL is returned.
+ * @ingroup libgnuitar-map
+ */
+
 const char *
-gnuitar_map_get_name(const struct GnuitarMap *map, size_t i)
+gnuitar_map_get_name(const struct GnuitarMap *map, size_t index)
 {
-    if (i >= map->entries_count)
+    if (index >= map->entries_count)
         return NULL;
-    return map->entries[i].name;
+    return map->entries[index].name;
 }
 
