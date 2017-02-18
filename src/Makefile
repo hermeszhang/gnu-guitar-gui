@@ -30,6 +30,8 @@ all: libgnuitar.a $(tests)
 libgnuitar.a: $(objfiles)
 	$(AR) $(ARFLAGS) $@ $(objfiles)
 
+chain.o: chain.c chain.h effect.h
+
 effect.o: effect.c effect.h packet.h
 
 pipe.o: pipe.c pipe.h
@@ -41,8 +43,6 @@ map.o: map.c map.h
 map-test: map-test.c libgnuitar.a
 
 packet.o: packet.c packet.h
-
-chain.o: chain.c chain.h effect.h
 
 track.o: track.c track.h packet.h chain.h map.h
 
