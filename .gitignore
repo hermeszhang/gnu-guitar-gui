@@ -6,5 +6,7 @@ src/*.a
 src/*.so
 src/*-test
 src/html/*
+
 build/*
+src/build/*
 
