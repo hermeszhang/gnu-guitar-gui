@@ -46,7 +46,7 @@ gnuitar_track_create(const char *name)
 }
 
 void
-gnuitar_audio_driver_destroy(struct GnuitarTrack *driver)
+gnuitar_track_destroy(struct GnuitarTrack *driver)
 {
     if (driver == NULL)
         return;
@@ -57,7 +57,7 @@ gnuitar_audio_driver_destroy(struct GnuitarTrack *driver)
 }
 
 gnuitar_error_t
-gnuitar_audio_driver_add_effect(struct GnuitarTrack *driver, struct GnuitarEffect *effect)
+gnuitar_track_add_effect(struct GnuitarTrack *driver, struct GnuitarEffect *effect)
 {
     gnuitar_error_t error;
 
@@ -78,7 +78,7 @@ gnuitar_audio_driver_add_effect(struct GnuitarTrack *driver, struct GnuitarEffec
 }
 
 gnuitar_error_t
-gnuitar_audio_driver_erase_effect(struct GnuitarTrack *driver, unsigned int index)
+gnuitar_track_erase_effect(struct GnuitarTrack *driver, unsigned int index)
 {
     if (driver->pump == NULL)
         return GNUITAR_ERROR_ENOENT;
@@ -87,7 +87,7 @@ gnuitar_audio_driver_erase_effect(struct GnuitarTrack *driver, unsigned int inde
 }
 
 int
-gnuitar_audio_driver_start(struct GnuitarTrack *driver)
+gnuitar_track_start(struct GnuitarTrack *driver)
 {
     if (driver == NULL)
         return -1;
@@ -100,7 +100,7 @@ gnuitar_audio_driver_start(struct GnuitarTrack *driver)
 }
 
 int
-gnuitar_audio_driver_stop(struct GnuitarTrack *driver)
+gnuitar_track_stop(struct GnuitarTrack *driver)
 {
     if (driver == NULL)
         return -1;
@@ -113,7 +113,7 @@ gnuitar_audio_driver_stop(struct GnuitarTrack *driver)
 }
 
 gnuitar_error_t
-gnuitar_audio_driver_get_map(const struct GnuitarTrack *driver, struct GnuitarMap *map)
+gnuitar_track_get_map(const struct GnuitarTrack *driver, struct GnuitarMap *map)
 {
     if (driver == NULL)
         return GNUITAR_ERROR_UNKNOWN;
@@ -126,7 +126,7 @@ gnuitar_audio_driver_get_map(const struct GnuitarTrack *driver, struct GnuitarMa
 }
 
 int
-gnuitar_audio_driver_get_format(const struct GnuitarTrack *driver, struct GnuitarFormat *format)
+gnuitar_track_get_format(const struct GnuitarTrack *driver, struct GnuitarFormat *format)
 {
     if (driver == NULL)
         return -1;
@@ -138,7 +138,7 @@ gnuitar_audio_driver_get_format(const struct GnuitarTrack *driver, struct Gnuita
 }
 
 int
-gnuitar_audio_driver_set_format(struct GnuitarTrack *driver, const struct GnuitarFormat *format)
+gnuitar_track_set_format(struct GnuitarTrack *driver, const struct GnuitarFormat *format)
 {
     if (driver == NULL)
         return -1;
