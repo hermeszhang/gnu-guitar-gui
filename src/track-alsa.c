@@ -338,13 +338,10 @@ alsa_audio_thread(void *data)
         }
         db.len = inframes * db.channels;
 
-        gnuitar_packet_mul(&db, MAX_SAMPLE);
-
         gnuitar_mutex_lock(&track->pump_mutex);
         gnuitar_pump_process(track->pump, &db);
         gnuitar_mutex_unlock(&track->pump_mutex);
 
-        gnuitar_packet_div(&db, MAX_SAMPLE);
         /* write output */
         while ((outframes = snd_pcm_writei(output_pcm, db.data, db.len / db.channels)) < 0) {
             restarting = 1;
@@ -380,13 +377,8 @@ alsa_configure_audio(snd_pcm_t *device, unsigned int *fragments, unsigned int *f
     }
 
     /* XXX we should support floating-point sample format */
-    if ((err = snd_pcm_hw_params_set_format(device, hw_params, SND_PCM_FORMAT_FLOAT)) < 0) {
-        if ((err = snd_pcm_hw_params_set_format(device, hw_params, SND_PCM_FORMAT_S16)) < 0) {
-            snd_pcm_hw_params_free(hw_params);
-	    return 1;
-        } else {
-            *bits = 16;
-        }
+    if ((err = snd_pcm_hw_params_set_format(device, hw_params, SND_PCM_FORMAT_S32)) < 0) {
+        return 1;
     } else {
         *bits = 32;
     }
