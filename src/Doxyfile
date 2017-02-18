@@ -773,6 +773,7 @@ WARN_LOGFILE           =
 
 INPUT += "gnuitar.h"
 INPUT += "map.c" "map.h"
+INPUT += "packet.c" "packet.h"
 INPUT += "pipe.c" "pipe.h"
 INPUT += "effect.h" "effect.c"
 
