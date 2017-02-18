@@ -4,6 +4,10 @@
 #include "effect.h"
 #include "error.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif /* __cplusplus */
+
 struct GnuitarPump {
     /** number of references */
     size_t ref_count;
@@ -26,6 +30,10 @@ gnuitar_error_t gnuitar_pump_erase_effect(struct GnuitarPump *pump, unsigned int
 gnuitar_error_t gnuitar_pump_move_effect(struct GnuitarPump *pump, unsigned int src, unsigned int dst);
 
 void gnuitar_pump_process(struct GnuitarPump *pump, struct GnuitarPacket *packet);
+
+#ifdef __cplusplus
+} /* extern "C" { */
+#endif /* __cplusplus */
 
 #endif /* GNUITAR_PUMP_H */
 
