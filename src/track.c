@@ -52,8 +52,8 @@ gnuitar_track_destroy(struct GnuitarTrack *driver)
         return;
     if (driver->destroy_callback != NULL)
         driver->destroy_callback(driver->data);
-    if (driver->pump)
-        gnuitar_pump_decref(driver->pump);
+    if (driver->chain)
+        gnuitar_chain_decref(driver->chain);
 }
 
 gnuitar_error_t
@@ -61,18 +61,18 @@ gnuitar_track_add_effect(struct GnuitarTrack *driver, struct GnuitarEffect *effe
 {
     gnuitar_error_t error;
 
-    gnuitar_mutex_lock(&driver->pump_mutex);
+    gnuitar_mutex_lock(&driver->chain_mutex);
 
-    if (driver->pump == NULL)
-        driver->pump = gnuitar_pump_create();
-    if (driver->pump == NULL)
+    if (driver->chain == NULL)
+        driver->chain = gnuitar_chain_create();
+    if (driver->chain == NULL)
         return GNUITAR_ERROR_MALLOC;
 
-    error = gnuitar_pump_add_effect(driver->pump, effect);
+    error = gnuitar_chain_add_effect(driver->chain, effect);
     if (error)
         return error;
 
-    gnuitar_mutex_unlock(&driver->pump_mutex);
+    gnuitar_mutex_unlock(&driver->chain_mutex);
 
     return GNUITAR_ERROR_NONE;
 }
@@ -80,10 +80,10 @@ gnuitar_track_add_effect(struct GnuitarTrack *driver, struct GnuitarEffect *effe
 gnuitar_error_t
 gnuitar_track_erase_effect(struct GnuitarTrack *driver, unsigned int index)
 {
-    if (driver->pump == NULL)
+    if (driver->chain == NULL)
         return GNUITAR_ERROR_ENOENT;
 
-    return gnuitar_pump_erase_effect(driver->pump, index);
+    return gnuitar_chain_erase_effect(driver->chain, index);
 }
 
 int

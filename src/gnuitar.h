@@ -6,9 +6,9 @@
  * Welcome to the Gnuitar API.
  */
 
+#include "chain.h"
 #include "effect.h"
 #include "packet.h"
-#include "pump.h"
 #include "track.h"
 #include "version.h"
 

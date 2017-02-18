@@ -5,6 +5,8 @@ IF(CMAKE_COMPILER_IS_GNUCC)
 ENDIF(CMAKE_COMPILER_IS_GNUCC)
 
 SET(SOURCES
+    chain.h
+    chain.c
     effect.h
     effect.c
     map.c
@@ -13,8 +15,6 @@ SET(SOURCES
     packet.c
     pipe.h
     pipe.c
-    pump.h
-    pump.c
     track.h
     track.c
     utils.h

@@ -1,6 +1,6 @@
 /*
  * GNUitar
- * Pump module - processeing sound
+ * Chain module - processeing sound
  * Copyright (C) 2000,2001,2003 Max Rudensky         <fonin@ziet.zhitomir.ua>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -42,15 +42,15 @@
  *
  * Revision 1.84  2006/08/07 13:20:42  alankila
  * - group all effects through effect.h rather than enumerating them in
- *   pump.c.
+ *   chain.c.
  *
  * Revision 1.83  2006/08/07 12:55:30  alankila
  * - construct audio-driver.c to hold globals and provide some utility
  *   functions to its users. This slashes interdependencies somewhat.
  *
  * Revision 1.82  2006/08/06 20:14:54  alankila
- * - split pump.h into several domain-specific headers to reduce file
- *   interdependencies (everyone included pump.h). New files are:
+ * - split chain.h into several domain-specific headers to reduce file
+ *   interdependencies (everyone included chain.h). New files are:
  *   - effect.h for effect definitions
  *   - audio-driver.h for work relating to audio drivers
  *   - audio-midi.h for MIDI interaction.
@@ -115,7 +115,7 @@
  *
  * Revision 1.65  2006/07/15 20:42:56  alankila
  * - remove global dithering code for now. JACK does its own dithering if
- *   configured, so the decision to dither in pump is no longer appropriate.
+ *   configured, so the decision to dither in chain is no longer appropriate.
  *
  * Revision 1.64  2006/06/20 20:41:07  anarsoul
  * Added some kind of status window. Now we can use gnuitar_printf(char *fmt, ...) that redirects debug information in this window.
@@ -181,7 +181,7 @@
  * - allow sin_lookup(1.0) to work
  *
  * Revision 1.54  2006/05/13 07:44:50  alankila
- * - remove pump's noise reduction -- we'll have the real effect soon enough
+ * - remove chain's noise reduction -- we'll have the real effect soon enough
  * - add rotary speaker simulator based on hilbert transform
  *
  * Revision 1.53  2006/05/07 13:22:12  alankila
@@ -247,7 +247,7 @@
  * - make multichannel processing selectable
  * - new GUI (it sucks as much as the old one and I'll need to grok GTK
  *   tables first before it gets better)
- * - make pump.c do the multichannel adapting bits
+ * - make chain.c do the multichannel adapting bits
  * - effects can now change channel counts
  *
  * Revision 1.35  2005/09/01 00:35:35  alankila
@@ -257,7 +257,7 @@
  * Portability: introduced new functions for mutexes
  *
  * Revision 1.33  2005/08/28 12:42:27  alankila
- * move write_track flag properly into pump.h, make it volatile because it's
+ * move write_track flag properly into chain.h, make it volatile because it's
  * shared by threads
  *
  * Revision 1.32  2005/08/28 12:39:01  alankila
@@ -287,12 +287,12 @@
  * - close fd at end
  *
  * Revision 1.26  2005/08/22 11:07:27  alankila
- * - move last bits of tracker support off main.c to pump.c
+ * - move last bits of tracker support off main.c to chain.c
  * - add settings loader/saver for GTK2, now needs GTK+ 2.6 in minimum
  *
  * Revision 1.25  2005/08/21 23:44:13  alankila
  * - use libsndfile on Linux to write audio as .wav
- * - move clipping tests into pump.c to save writing it in tracker and 3 times
+ * - move clipping tests into chain.c to save writing it in tracker and 3 times
  *   in main.c
  * - give default name to .wav from current date and time (in ISO format)
  * - there's a weird bug if you cancel the file dialog, it pops up again!
@@ -330,7 +330,7 @@
  * - new tuner plugin / effect
  * - some gcc -Wall shutups
  * - added the entry required for gnuitar.vcproj as well but I can't test it
- * - changed pump.h to use enum instead of bunch-of-defines. Hopefully it's
+ * - changed chain.h to use enum instead of bunch-of-defines. Hopefully it's
  *   better that way.
  *
  * Revision 1.18  2005/04/24 19:11:22  fonin
@@ -364,7 +364,7 @@
  * Cleanup before release.
  *
  * Revision 1.8  2003/02/03 17:23:26  fonin
- * One more newline after the effects were loaded by pump_start().
+ * One more newline after the effects were loaded by chain_start().
  *
  * Revision 1.7  2003/02/03 11:39:25  fonin
  * Copyright year changed.
@@ -389,116 +389,116 @@
  *
  */
 
-#include "pump.h"
+#include "chain.h"
 
 /* track.h declares struct GnuitarFormat */
 #include "track.h"
 
 #include <math.h>
 
-struct GnuitarPump *
-gnuitar_pump_create(void)
+struct GnuitarChain *
+gnuitar_chain_create(void)
 {
-    struct GnuitarPump *pump;
-    pump = malloc(sizeof(*pump));
-    if (pump == NULL)
+    struct GnuitarChain *chain;
+    chain = malloc(sizeof(*chain));
+    if (chain == NULL)
         return NULL;
-    pump->ref_count = 1;
-    pump->effects = NULL;
-    pump->n_effects = 0;
-    return pump;
+    chain->ref_count = 1;
+    chain->effects = NULL;
+    chain->n_effects = 0;
+    return chain;
 }
 
 void
-gnuitar_pump_incref(struct GnuitarPump *pump)
+gnuitar_chain_incref(struct GnuitarChain *chain)
 {
-    pump->ref_count++;
+    chain->ref_count++;
 }
 
 void
-gnuitar_pump_decref(struct GnuitarPump *pump)
+gnuitar_chain_decref(struct GnuitarChain *chain)
 {
     size_t i;
-    if (pump->ref_count <= 0) {
+    if (chain->ref_count <= 0) {
         return;
     }
-    pump->ref_count--;
-    if (pump->ref_count > 0) {
+    chain->ref_count--;
+    if (chain->ref_count > 0) {
         return;
     }
-    for (i = 0; i < pump->n_effects; i++) {
-        gnuitar_effect_done(pump->effects[i]);
+    for (i = 0; i < chain->n_effects; i++) {
+        gnuitar_effect_done(chain->effects[i]);
     }
-    free(pump->effects);
+    free(chain->effects);
 }
 
 gnuitar_error_t
-gnuitar_pump_add_effect(struct GnuitarPump *pump, struct GnuitarEffect *effect)
+gnuitar_chain_add_effect(struct GnuitarChain *chain, struct GnuitarEffect *effect)
 {
     struct GnuitarEffect ** tmp;
     size_t tmp_size;
 
-    tmp_size = sizeof(*tmp) * (pump->n_effects + 1);
-    tmp = realloc(pump->effects, tmp_size);
+    tmp_size = sizeof(*tmp) * (chain->n_effects + 1);
+    tmp = realloc(chain->effects, tmp_size);
     if (tmp == NULL)
         return GNUITAR_ERROR_MALLOC;
 
-    tmp[pump->n_effects] = effect;
-    pump->effects = tmp;
-    pump->n_effects++;
+    tmp[chain->n_effects] = effect;
+    chain->effects = tmp;
+    chain->n_effects++;
     return GNUITAR_ERROR_NONE;
 }
 
 gnuitar_error_t
-gnuitar_pump_erase_effect(struct GnuitarPump *pump, unsigned int index)
+gnuitar_chain_erase_effect(struct GnuitarChain *chain, unsigned int index)
 {
-    if (index >= pump->n_effects)
+    if (index >= chain->n_effects)
         return GNUITAR_ERROR_ENOENT;
 
-    gnuitar_effect_done(pump->effects[index]);
+    gnuitar_effect_done(chain->effects[index]);
 
-    memmove(&pump->effects[index],
-            &pump->effects[index + 1],
-            (pump->n_effects - (index + 1)) * sizeof(*pump->effects));
+    memmove(&chain->effects[index],
+            &chain->effects[index + 1],
+            (chain->n_effects - (index + 1)) * sizeof(*chain->effects));
 
-    pump->n_effects--;
+    chain->n_effects--;
 
     return GNUITAR_ERROR_NONE;
 }
 
 gnuitar_error_t
-gnuitar_pump_move_effect(struct GnuitarPump *pump, unsigned int src, unsigned int dst)
+gnuitar_chain_move_effect(struct GnuitarChain *chain, unsigned int src, unsigned int dst)
 {
     unsigned int i;
     struct GnuitarEffect *swap;
 
-    if ((src >= pump->n_effects)
-     || (dst >= pump->n_effects)){
+    if ((src >= chain->n_effects)
+     || (dst >= chain->n_effects)){
         return GNUITAR_ERROR_ENOENT;
     }
 
-    swap = pump->effects[src];
+    swap = chain->effects[src];
     if (src < dst) {
         for (i = src; i < dst; i++)
-            pump->effects[i] = pump->effects[i + 1];
+            chain->effects[i] = chain->effects[i + 1];
     } else if (src > dst) {
         for (i = src; i > dst; i--)
-            pump->effects[i] = pump->effects[i - 1];
+            chain->effects[i] = chain->effects[i - 1];
     }
-    pump->effects[dst] = swap;
+    chain->effects[dst] = swap;
 
     return GNUITAR_ERROR_NONE;
 }
 
 void
-gnuitar_pump_process(struct GnuitarPump *pump, struct GnuitarPacket *packet)
+gnuitar_chain_process(struct GnuitarChain *chain, struct GnuitarPacket *packet)
 {
     unsigned int i;
 
-    for (i = 0; i < pump->n_effects; i++) {
-        if (!pump->effects[i]->toggle)
+    for (i = 0; i < chain->n_effects; i++) {
+        if (!chain->effects[i]->toggle)
             continue;
-        gnuitar_effect_process(pump->effects[i], packet);
+        gnuitar_effect_process(chain->effects[i], packet);
     }
 }
 

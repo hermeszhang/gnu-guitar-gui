@@ -5,7 +5,7 @@
 
 #include "error.h"
 #include "packet.h"
-#include "pump.h"
+#include "chain.h"
 #include "map.h"
 #include "utils.h"
 
@@ -48,9 +48,9 @@ struct GnuitarTrack {
     /** Stops the audio stream */
     int (*stop_callback)(struct GnuitarTrack *track);
     /** The effects pump for the track */
-    struct GnuitarPump *pump;
+    struct GnuitarChain *chain;
     /** The mutex for the pump */
-    struct GnuitarMutex pump_mutex;
+    struct GnuitarMutex chain_mutex;
     /* old params */
     int enabled;
     /** The channel maps available */

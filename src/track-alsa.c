@@ -54,8 +54,8 @@ gnuitar_alsa_track_create(void)
         return NULL;
     }
 
-    gnuitar_mutex_init(&track->pump_mutex);
-    track->pump = gnuitar_pump_create();
+    gnuitar_mutex_init(&track->chain_mutex);
+    track->chain = gnuitar_chain_create();
 
     track->destroy_callback = destroy_callback;
     track->start_callback = start_callback;
@@ -338,9 +338,9 @@ alsa_audio_thread(void *data)
         }
         db.len = inframes * db.channels;
 
-        gnuitar_mutex_lock(&track->pump_mutex);
-        gnuitar_pump_process(track->pump, &db);
-        gnuitar_mutex_unlock(&track->pump_mutex);
+        gnuitar_mutex_lock(&track->chain_mutex);
+        gnuitar_chain_process(track->chain, &db);
+        gnuitar_mutex_unlock(&track->chain_mutex);
 
         /* write output */
         while ((outframes = snd_pcm_writei(output_pcm, db.data, db.len / db.channels)) < 0) {
