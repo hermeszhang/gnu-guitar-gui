@@ -30,6 +30,21 @@
 #include "audio-winmm.h"
 #include "audio-dsound.h"
 
+struct GnuitarTrack *
+gnuitar_track_create(const char *name)
+{
+#ifdef GNUITAR_WITH_ALSA
+    if (strcmp(name, "ALSA") == 0) {
+        return gnuitar_alsa_driver_create();
+    }
+#endif /* GNUITAR_WITH_ALSA */
+    if (strcmp(name, "Null") == 0) {
+        /* TODO */
+        return NULL;
+    }
+    return NULL;
+}
+
 void
 gnuitar_audio_driver_destroy(struct GnuitarTrack *driver)
 {

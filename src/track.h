@@ -49,6 +49,8 @@ struct GnuitarTrack {
     const gnuitar_chmap_t * chmaps;
 };
 
+struct GnuitarTrack * gnuitar_track_create(const char * name);
+
 void gnuitar_track_destroy(struct GnuitarTrack *track);
 
 gnuitar_error_t gnuitar_track_add_effect(struct GnuitarTrack *track, struct GnuitarEffect *effect);
