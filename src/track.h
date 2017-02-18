@@ -9,6 +9,10 @@
 #include "map.h"
 #include "utils.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif /* __cplusplus */
+
 struct GnuitarFormat {
     unsigned int input_bits;
     unsigned int input_channels;
@@ -98,6 +102,10 @@ extern gnuitar_sample_t procbuf2[MAX_BUFFER_SIZE / sizeof(int16_t)];
 void guess_track(void);
 void set_track_from_str(const char *str);
 void triangular_dither(struct GnuitarPacket *db, int16_t *target);
+
+#ifdef __cplusplus
+} /* extern "C" { */
+#endif /* __cplusplus */
 
 #endif /* GNUITAR_TRACK_H */
 
