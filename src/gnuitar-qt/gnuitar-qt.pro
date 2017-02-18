@@ -12,3 +12,6 @@ HEADERS += "main-window.h"
 
 FORMS += "main-window.ui"
 
+LIBS +=  ../libgnuitar.a
+LIBS += -lasound
+
