@@ -35,7 +35,7 @@ gnuitar_track_create(const char *name)
 {
 #ifdef GNUITAR_WITH_ALSA
     if (strcmp(name, "ALSA") == 0) {
-        return gnuitar_alsa_driver_create();
+        return gnuitar_alsa_track_create();
     }
 #endif /* GNUITAR_WITH_ALSA */
     if (strcmp(name, "Null") == 0) {
@@ -208,70 +208,5 @@ triangular_dither(struct GnuitarPacket *db, int16_t *target)
         target[i] = tmp;
         current_channel = (current_channel + 1) % db->channels;
     }
-}
-
-void
-guess_audio_driver(void)
-{
-    audio_driver = NULL;
-
-#ifdef HAVE_JACK
-    if (jack_available()) {
-        audio_driver = &jack_driver;
-    } else
-#endif
-#ifdef HAVE_ALSA
-    if (gnuitar_alsa_available()) {
-        audio_driver = gnuitar_alsa_driver_create();
-    } else
-#endif
-#ifdef HAVE_OSS
-    if (oss_available()) {
-        audio_driver = &oss_driver;
-    } else
-#endif
-#ifdef HAVE_DSOUND
-    if (audio_driver == NULL) {
-	audio_driver = &dsound_driver;
-    } else
-#endif
-#ifdef HAVE_WINMM
-    if (audio_driver == NULL) {
-	audio_driver = &winmm_driver;
-    } else
-#endif
-        return;
-}
-
-void
-set_audio_driver_from_str(const char const *tmp)
-{
-#ifdef HAVE_JACK
-    if (strcmp(tmp, "JACK") == 0) {
-        audio_driver = &jack_driver;
-    } else
-#endif
-#ifdef GNUITAR_WITH_ALSA
-    if (strcmp(tmp, "ALSA") == 0) {
-        audio_driver = gnuitar_alsa_driver_create();
-    } else
-#endif /* GNUITAR_WITH_ALSA */
-#ifdef HAVE_OSS
-    if (strcmp(tmp, "OSS") == 0) {
-        audio_driver = &oss_driver;
-    } else
-#endif
-#ifdef HAVE_DSOUND
-    if(strcmp(tmp, "DirectX") == 0) {
-        audio_driver = &dsound_driver;
-    } else
-#endif
-#ifdef HAVE_WINMM
-    if(strcmp(tmp, "MMSystem") == 0) {
-        audio_driver = &winmm_driver;
-        buffer_size = pow(2, (int) (log(buffer_size) / log(2)));
-    } else
-#endif
-        return;
 }
 
