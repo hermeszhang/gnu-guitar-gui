@@ -16,10 +16,8 @@ extern "C" {
  */
 
 struct GnuitarChain {
-    /** number of references */
-    size_t ref_count;
     /** array of effects */
-    struct GnuitarEffect **effects;
+    struct GnuitarEffect *effects;
     /** number of effects in the chain */
     size_t n_effects;
 };

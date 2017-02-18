@@ -393,62 +393,51 @@
 
 #include <errno.h>
 
-/** Allocates a chain.
- * If an error occurs, NULL is returned.
+/** Initializes a chain
+ * @param chain An uninitialized chain
  * @ingroup libgnuitar-chain
  */
 
-struct GnuitarChain *
-gnuitar_chain_create(void)
+void
+gnuitar_chain_init(struct GnuitarChain *chain)
 {
-    struct GnuitarChain *chain;
-    chain = malloc(sizeof(*chain));
-    if (chain == NULL)
-        return NULL;
-    chain->ref_count = 1;
     chain->effects = NULL;
     chain->n_effects = 0;
-    return chain;
 }
 
-void
-gnuitar_chain_incref(struct GnuitarChain *chain)
-{
-    chain->ref_count++;
-}
+/** Releases resources allocated by a chain.
+ * This function is double-free safe.
+ * Calling it twice in a row will not cause a fault.
+ * @param chain An initialized chain.
+ * @ingroup libgnuitar-chain
+ */
 
 void
-gnuitar_chain_decref(struct GnuitarChain *chain)
+gnuitar_chain_done(struct GnuitarChain *chain)
 {
     size_t i;
-    if (chain->ref_count <= 0) {
-        return;
-    }
-    chain->ref_count--;
-    if (chain->ref_count > 0) {
-        return;
-    }
-    for (i = 0; i < chain->n_effects; i++) {
-        gnuitar_effect_done(chain->effects[i]);
-    }
+
+    for (i = 0; i < chain->n_effects; i++)
+        gnuitar_effect_done(&chain->effects[i]);
     free(chain->effects);
+
+    chain->effects = NULL;
+    chain->n_effects = 0;
 }
 
 /** Adds an effect to the chain.
- * The effect is assigned to the chain, not copied.
- * Do not free the effect if this function is successful.
- * The effect will be destroyed when the chain is destroyed.
- * @param chain An initialized chain
- * @param effect An initialized effect
- * @returns On success, zero is returned.
- *  If a memory allocation failure occurs, ENOMEM is returned.
+ * The effect is added to the end of the chain.
+ * @param chain An initialized chain.
+ * @param effect An initialized effect.
+ * @returns On success, zero.
+ *  If a memory allocation fails, ENOMEM is returned.
  * @ingroup libgnuitar-chain
  */
 
 int
 gnuitar_chain_add_effect(struct GnuitarChain *chain, struct GnuitarEffect *effect)
 {
-    struct GnuitarEffect ** tmp;
+    struct GnuitarEffect * tmp;
     size_t tmp_size;
 
     tmp_size = sizeof(*tmp) * (chain->n_effects + 1);
@@ -456,7 +445,7 @@ gnuitar_chain_add_effect(struct GnuitarChain *chain, struct GnuitarEffect *effec
     if (tmp == NULL)
         return ENOMEM;
 
-    tmp[chain->n_effects] = effect;
+    tmp[chain->n_effects] = *effect;
     chain->effects = tmp;
     chain->n_effects++;
     return 0;
@@ -477,7 +466,7 @@ gnuitar_chain_erase_effect(struct GnuitarChain *chain, unsigned int index)
     if (index >= chain->n_effects)
         return ENOENT;
 
-    gnuitar_effect_done(chain->effects[index]);
+    gnuitar_effect_done(&chain->effects[index]);
 
     memmove(&chain->effects[index],
             &chain->effects[index + 1],
@@ -509,7 +498,7 @@ gnuitar_chain_move_effect(struct GnuitarChain *chain, unsigned int src, unsigned
         return ENOENT;
     }
 
-    swap = chain->effects[src];
+    swap = &chain->effects[src];
     if (src < dst) {
         for (i = src; i < dst; i++)
             chain->effects[i] = chain->effects[i + 1];
@@ -517,7 +506,7 @@ gnuitar_chain_move_effect(struct GnuitarChain *chain, unsigned int src, unsigned
         for (i = src; i > dst; i--)
             chain->effects[i] = chain->effects[i - 1];
     }
-    chain->effects[dst] = swap;
+    chain->effects[dst] = *swap;
 
     return 0;
 }
@@ -534,9 +523,9 @@ gnuitar_chain_process(struct GnuitarChain *chain, struct GnuitarPacket *packet)
     unsigned int i;
 
     for (i = 0; i < chain->n_effects; i++) {
-        if (!chain->effects[i]->toggle)
+        if (!chain->effects[i].toggle)
             continue;
-        gnuitar_effect_process(chain->effects[i], packet);
+        gnuitar_effect_process(&chain->effects[i], packet);
     }
 }
 
