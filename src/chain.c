@@ -391,10 +391,12 @@
 
 #include "chain.h"
 
-/* track.h declares struct GnuitarFormat */
-#include "track.h"
+#include <errno.h>
 
-#include <math.h>
+/** Allocates a chain.
+ * If an error occurs, NULL is returned.
+ * @ingroup libgnuitar-chain
+ */
 
 struct GnuitarChain *
 gnuitar_chain_create(void)
@@ -432,7 +434,18 @@ gnuitar_chain_decref(struct GnuitarChain *chain)
     free(chain->effects);
 }
 
-gnuitar_error_t
+/** Adds an effect to the chain.
+ * The effect is assigned to the chain, not copied.
+ * Do not free the effect if this function is successful.
+ * The effect will be destroyed when the chain is destroyed.
+ * @param chain An initialized chain
+ * @param effect An initialized effect
+ * @returns On success, zero is returned.
+ *  If a memory allocation failure occurs, ENOMEM is returned.
+ * @ingroup libgnuitar-chain
+ */
+
+int
 gnuitar_chain_add_effect(struct GnuitarChain *chain, struct GnuitarEffect *effect)
 {
     struct GnuitarEffect ** tmp;
@@ -441,19 +454,28 @@ gnuitar_chain_add_effect(struct GnuitarChain *chain, struct GnuitarEffect *effec
     tmp_size = sizeof(*tmp) * (chain->n_effects + 1);
     tmp = realloc(chain->effects, tmp_size);
     if (tmp == NULL)
-        return GNUITAR_ERROR_MALLOC;
+        return ENOMEM;
 
     tmp[chain->n_effects] = effect;
     chain->effects = tmp;
     chain->n_effects++;
-    return GNUITAR_ERROR_NONE;
+    return 0;
 }
 
-gnuitar_error_t
+/** Removes an effect from the chain by it's index.
+ * If the index is out of bounds, the function fails.
+ * @param chain An initialized chain.
+ * @param index The index of the effect.
+ * @returns On success, zero.
+ *  If the index is out of bounds, ENOENT is returned.
+ * @ingroup libgnuitar-chain
+ */
+
+int
 gnuitar_chain_erase_effect(struct GnuitarChain *chain, unsigned int index)
 {
     if (index >= chain->n_effects)
-        return GNUITAR_ERROR_ENOENT;
+        return ENOENT;
 
     gnuitar_effect_done(chain->effects[index]);
 
@@ -463,10 +485,20 @@ gnuitar_chain_erase_effect(struct GnuitarChain *chain, unsigned int index)
 
     chain->n_effects--;
 
-    return GNUITAR_ERROR_NONE;
+    return 0;
 }
 
-gnuitar_error_t
+/** Moves an effect position within the chain.
+ * If either of the indices are out of boundaries, the function fails.
+ * @param chain An initialized chain.
+ * @param src The source index.
+ * @param dst The destination index.
+ * @returns On success, zero.
+ *  If either of the indices are out of bounds, ENOENT is returned.
+ * @ingroup libgnuitar-chain
+ */
+
+int
 gnuitar_chain_move_effect(struct GnuitarChain *chain, unsigned int src, unsigned int dst)
 {
     unsigned int i;
@@ -474,7 +506,7 @@ gnuitar_chain_move_effect(struct GnuitarChain *chain, unsigned int src, unsigned
 
     if ((src >= chain->n_effects)
      || (dst >= chain->n_effects)){
-        return GNUITAR_ERROR_ENOENT;
+        return ENOENT;
     }
 
     swap = chain->effects[src];
@@ -487,8 +519,14 @@ gnuitar_chain_move_effect(struct GnuitarChain *chain, unsigned int src, unsigned
     }
     chain->effects[dst] = swap;
 
-    return GNUITAR_ERROR_NONE;
+    return 0;
 }
+
+/** Runs the packet through the effects in the chain.
+ * @param chain An initialized effects chain.
+ * @param packet An initialized audio packet.
+ * @ingroup libgnuitar-chain
+ */
 
 void
 gnuitar_chain_process(struct GnuitarChain *chain, struct GnuitarPacket *packet)
