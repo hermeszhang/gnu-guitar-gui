@@ -8,6 +8,14 @@
 extern "C" {
 #endif /* __cplusplus */
 
+/** @defgroup libgnuitar-chain Effects Chain
+ * The API for manipulating effect chains.
+ */
+
+/** An effects chain.
+ * @ingroup libgnuitar-chain
+ */
+
 struct GnuitarChain {
     /** number of references */
     size_t ref_count;
