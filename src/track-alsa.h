@@ -97,7 +97,7 @@ struct GnuitarAlsaTrack {
     unsigned int keep_thread_running;
 };
 
-struct GnuitarTrack * gnuitar_alsa_track_create(void);
+int gnuitar_alsa_track_init(struct GnuitarTrack *track);
 
 #endif /* GNUITAR_TRACK_ALSA_H */
 

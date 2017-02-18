@@ -1,33 +1,21 @@
 #include "track.h"
 #include "track-alsa.h"
 
-const struct GnuitarChannelMap chmaps_avail[] = {
-    { 1, 1 },
-    { 1, 2 },
-    { 2, 1 },
-    { 2, 2 },
-    { 0, 0 }
-};
-
 #ifdef _MSC_VER
 #define gnuitar_strdup _strdup
 #else
 #define gnuitar_strdup strdup
 #endif
 
-static void * create_callback(void);
+static void * create(void);
 
-static void destroy_callback(void *data);
+static void done(void *data);
 
-static int start_callback(struct GnuitarTrack *track);
+static int start(struct GnuitarTrack *track);
 
-static int stop_callback(struct GnuitarTrack *track);
+static int stop(struct GnuitarTrack *track);
 
-static gnuitar_error_t get_map_callback(const struct GnuitarTrack *track, struct GnuitarMap *map);
-
-static int get_format_callback(const struct GnuitarTrack *track, struct GnuitarFormat *format);
-
-static int set_format_callback(struct GnuitarTrack *track, const struct GnuitarFormat *format);
+static int get_map(const struct GnuitarTrack *track, struct GnuitarMap *map);
 
 static void * alsa_audio_thread(void *data);
 
@@ -39,53 +27,28 @@ static int alsa_configure_audio(snd_pcm_t *device,
                                 unsigned int *bits,
                                 int adapting);
 
-struct GnuitarTrack *
-gnuitar_alsa_track_create(void)
-{
-    struct GnuitarTrack *track;
-
-    track = malloc(sizeof(*track));
-    if (track == NULL)
-        return NULL;
-
-    track->name = gnuitar_strdup("ALSA");
-    if (track->name == NULL) {
-        free(track);
-        return NULL;
-    }
-
-    gnuitar_mutex_init(&track->chain_mutex);
-    track->chain = gnuitar_chain_create();
-
-    track->destroy_callback = destroy_callback;
-    track->start_callback = start_callback;
-    track->stop_callback = stop_callback;
-    track->set_format_callback = set_format_callback;
-    track->get_map_callback = get_map_callback;
-    track->get_format_callback = get_format_callback;
-
-    track->data = create_callback();
-    if (track->data == NULL) {
-        free(track->name);
-        free(track);
-        return NULL;
-    }
-
-    /* old params */
-    track->enabled = 1;
-    track->chmaps = chmaps_avail;
-
-    return track;
-}
-
 int
-gnuitar_alsa_available(void)
+gnuitar_alsa_track_create(struct GnuitarTrack *track)
 {
-    return 1;
+    gnuitar_mutex_init(&track->chain_mutex);
+
+    gnuitar_chain_init(&track->chain);
+
+    track->done = done;
+    track->start = start;
+    track->stop = stop;
+    track->get_map = get_map;
+
+    track->data = create();
+    if (track->data == NULL) {
+        return ENOMEM;
+    }
+
+    return 0;
 }
 
 static void *
-create_callback(void)
+create(void)
 {
     struct GnuitarAlsaTrack *alsa_track;
 
@@ -113,7 +76,7 @@ create_callback(void)
 }
 
 static void
-destroy_callback(void *data)
+done(void *data)
 {
     struct GnuitarAlsaTrack *alsa_track;
     alsa_track = (struct GnuitarAlsaTrack *)(data);
@@ -130,7 +93,7 @@ destroy_callback(void *data)
 }
 
 static int
-start_callback(struct GnuitarTrack *track)
+start(struct GnuitarTrack *track)
 {
     struct GnuitarAlsaTrack *alsa_track;
 
@@ -182,7 +145,7 @@ start_callback(struct GnuitarTrack *track)
 }
 
 static int
-stop_callback(struct GnuitarTrack *track)
+stop(struct GnuitarTrack *track)
 {
     struct GnuitarAlsaTrack *alsa_track;
 
@@ -198,69 +161,34 @@ stop_callback(struct GnuitarTrack *track)
     return 0;
 }
 
-static gnuitar_error_t
-get_map_callback(const struct GnuitarTrack *track, struct GnuitarMap *map)
+static int
+get_map(const struct GnuitarTrack *track, struct GnuitarMap *map)
 {
-    gnuitar_error_t error;
+    int err;
 
     (void) track;
 
-    error = gnuitar_map_define(map, "Rate", GNUITAR_MAP_TYPE_UINT32);
-    if (error)
-        return error;
+    err = gnuitar_map_define(map, "Rate", GNUITAR_MAP_TYPE_UINT32);
+    if (err)
+        return err;
 
-    error = gnuitar_map_define(map, "Periods", GNUITAR_MAP_TYPE_UINT32);
-    if (error)
-        return error;
+    err = gnuitar_map_define(map, "Periods", GNUITAR_MAP_TYPE_UINT32);
+    if (err)
+        return err;
 
-    error = gnuitar_map_define(map, "Period Size", GNUITAR_MAP_TYPE_UINT32);
-    if (error)
-        return error;
+    err = gnuitar_map_define(map, "Period Size", GNUITAR_MAP_TYPE_UINT32);
+    if (err)
+        return err;
 
-    error = gnuitar_map_define(map, "Input Device", GNUITAR_MAP_TYPE_STRING);
-    if (error)
-        return error;
+    err = gnuitar_map_define(map, "Input Device", GNUITAR_MAP_TYPE_STRING);
+    if (err)
+        return err;
 
-    error = gnuitar_map_define(map, "Output Device", GNUITAR_MAP_TYPE_STRING);
-    if (error)
-        return error;
-
-    return GNUITAR_ERROR_NONE;
-}
-
-static int
-get_format_callback(const struct GnuitarTrack *track, struct GnuitarFormat *format)
-{
-    const struct GnuitarAlsaTrack *alsa_track;
-
-    alsa_track = (struct GnuitarAlsaTrack *)(track->data);
-    if (alsa_track == NULL)
-        return -1;
-
-    format->output_bits = alsa_track->output_bits;
-    format->output_channels = alsa_track->output_channels;
-
-    format->input_bits = alsa_track->input_bits;
-    format->input_channels = alsa_track->input_channels;
-
-    format->rate = alsa_track->rate;
+    err = gnuitar_map_define(map, "Output Device", GNUITAR_MAP_TYPE_STRING);
+    if (err)
+        return err;
 
     return 0;
-}
-
-static int
-set_format_callback(struct GnuitarTrack *track, const struct GnuitarFormat *format)
-{
-    struct GnuitarAlsaTrack *alsa_track;
-
-    alsa_track = (struct GnuitarAlsaTrack *)(track->data);
-    if (alsa_track == NULL)
-        return -1;
-
-    /* not implemented */
-    (void) format;
-
-    return -2;
 }
 
 static void *
@@ -339,7 +267,7 @@ alsa_audio_thread(void *data)
         db.len = inframes * db.channels;
 
         gnuitar_mutex_lock(&track->chain_mutex);
-        gnuitar_chain_process(track->chain, &db);
+        gnuitar_chain_process(&track->chain, &db);
         gnuitar_mutex_unlock(&track->chain_mutex);
 
         /* write output */
