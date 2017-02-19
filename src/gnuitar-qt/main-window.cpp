@@ -7,20 +7,20 @@ namespace Gnuitar {
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    track = gnuitar_track_create("ALSA");
+
+    gnuitar_track_init(&track, "ALSA");
 }
 
 MainWindow::~MainWindow(void)
 {
-    if (track != NULL)
-        gnuitar_track_destroy(track);
+    gnuitar_track_done(&track);
     delete ui;
 }
 
 
 void MainWindow::on_startButton_clicked(void)
 {
-    if (gnuitar_track_start(track) != 0) {
+    if (gnuitar_track_start(&track) != 0) {
         /* error */
     }
 }

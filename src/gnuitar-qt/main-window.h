@@ -23,7 +23,7 @@ private slots:
     void on_startButton_clicked(void);
 private:
     Ui::MainWindow *ui;
-    GnuitarTrack *track;
+    GnuitarTrack track;
 }; /* class MainWindow */
 
 } /* namespace Gnuitar */
