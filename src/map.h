@@ -21,12 +21,36 @@ extern "C" {
 enum GnuitarMapType {
     /** The entry is a string */
     GNUITAR_MAP_TYPE_STRING,
+    /** The entry is a character */
+    GNUITAR_MAP_TYPE_CHAR,
+    /** The entry is a signed character */
+    GNUITAR_MAP_TYPE_SCHAR,
+    /** The entry is an unsigned character */
+    GNUITAR_MAP_TYPE_UCHAR,
+    /** The entry is a short, signed integer */
+    GNUITAR_MAP_TYPE_SHRT,
+    /** The entry is an short, unsigned integer */
+    GNUITAR_MAP_TYPE_USHRT,
+    /** The entry is a signed integer */
+    GNUITAR_MAP_TYPE_INT,
+    /** The entry is an unsigned integer */
+    GNUITAR_MAP_TYPE_UINT,
+    /** The entry is a long, signed integer */
+    GNUITAR_MAP_TYPE_LONG,
+    /** The entry is a long, unsigned integer */
+    GNUITAR_MAP_TYPE_ULONG,
+    /** The entry is a size_t value */
+    GNUITAR_MAP_TYPE_SIZE,
+    /** The entry is a 8-bit, signed integer */
+    GNUITAR_MAP_TYPE_INT8,
     /** The entry is a 16-bit, signed integer */
     GNUITAR_MAP_TYPE_INT16,
     /** The entry is a 32-bit, signed integer */
     GNUITAR_MAP_TYPE_INT32,
     /** The entry is a 64-bit, signed integer */
     GNUITAR_MAP_TYPE_INT64,
+    /** The entry is a 8-bit, unsigned integer */
+    GNUITAR_MAP_TYPE_UINT8,
     /** The entry is a 16-bit, unsigned integer */
     GNUITAR_MAP_TYPE_UINT16,
     /** The entry is a 32-bit, unsigned integer */

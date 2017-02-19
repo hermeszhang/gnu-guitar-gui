@@ -50,12 +50,36 @@ gnuitar_map_type_size(enum GnuitarMapType type)
     switch (type) {
     case GNUITAR_MAP_TYPE_STRING:
         return sizeof(char*);
+    case GNUITAR_MAP_TYPE_CHAR:
+        return sizeof(char);
+    case GNUITAR_MAP_TYPE_SCHAR:
+        return sizeof(signed char);
+    case GNUITAR_MAP_TYPE_UCHAR:
+        return sizeof(unsigned char);
+    case GNUITAR_MAP_TYPE_SHRT:
+        return sizeof(short);
+    case GNUITAR_MAP_TYPE_USHRT:
+        return sizeof(unsigned short);
+    case GNUITAR_MAP_TYPE_INT:
+        return sizeof(int);
+    case GNUITAR_MAP_TYPE_UINT:
+        return sizeof(unsigned int);
+    case GNUITAR_MAP_TYPE_LONG:
+        return sizeof(long);
+    case GNUITAR_MAP_TYPE_ULONG:
+        return sizeof(unsigned long);
+    case GNUITAR_MAP_TYPE_SIZE:
+        return sizeof(size_t);
+    case GNUITAR_MAP_TYPE_INT8:
+        return sizeof(int8_t);
     case GNUITAR_MAP_TYPE_INT16:
         return sizeof(int16_t);
     case GNUITAR_MAP_TYPE_INT32:
         return sizeof(int32_t);
     case GNUITAR_MAP_TYPE_INT64:
         return sizeof(int64_t);
+    case GNUITAR_MAP_TYPE_UINT8:
+        return sizeof(uint8_t);
     case GNUITAR_MAP_TYPE_UINT16:
         return sizeof(uint16_t);
     case GNUITAR_MAP_TYPE_UINT32:
