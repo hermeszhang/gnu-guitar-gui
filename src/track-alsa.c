@@ -28,7 +28,7 @@ static int alsa_configure_audio(snd_pcm_t *device,
                                 int adapting);
 
 int
-gnuitar_alsa_track_create(struct GnuitarTrack *track)
+gnuitar_alsa_track_init(struct GnuitarTrack *track)
 {
     gnuitar_mutex_init(&track->chain_mutex);
 
