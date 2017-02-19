@@ -74,11 +74,12 @@ gnuitar_read_cmd(struct GnuitarString *string)
 int
 main(void)
 {
+    int err;
     struct GnuitarString cmd;
-    struct GnuitarTrack *track;
+    struct GnuitarTrack track;
 
-    track = gnuitar_track_create("ALSA");
-    if (track == NULL) {
+    err = gnuitar_track_init(&track, "ALSA");
+    if (err != 0) {
         fprintf(stderr, "failed to create track\n");
         return EXIT_FAILURE;
     }
@@ -87,16 +88,16 @@ main(void)
 
         if (gnuitar_read_cmd(&cmd) != 0) {
             fprintf(stderr, "failed to read next command\n");
-	    gnuitar_track_destroy(track);
+	    gnuitar_track_done(&track);
 	    return EXIT_FAILURE;
 	}
 
 	if (gnuitar_string_cmp_literal(&cmd, "start") == 0) {
-            if (gnuitar_track_start(track) != 0) {
+            if (gnuitar_track_start(&track) != 0) {
 	        fprintf(stderr, "failed to start track\n");
 	    }
 	} else if (gnuitar_string_cmp_literal(&cmd, "stop") == 0) {
-            if (gnuitar_track_stop(track) != 0) {
+            if (gnuitar_track_stop(&track) != 0) {
 	        fprintf(stderr, "failed to stop track\n");
 	    }
 	} else if (gnuitar_string_cmp_literal(&cmd, "help") == 0) {
@@ -115,7 +116,7 @@ main(void)
 	gnuitar_string_done(&cmd);
     }
 
-    gnuitar_track_destroy(track);
+    gnuitar_track_done(&track);
 
     return EXIT_SUCCESS;
 }
