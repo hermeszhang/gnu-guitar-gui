@@ -1,11 +1,12 @@
 CC = gcc
 CFLAGS = -Wall -Wextra -Werror -Wfatal-errors
 
-objfiles += effect.o
-objfiles += pipe.o
-objfiles += map.o
-objfiles += packet.o
 objfiles += chain.o
+objfiles += effect.o
+objfiles += map.o
+objfiles += package.o
+objfiles += packet.o
+objfiles += pipe.o
 objfiles += track.o
 objfiles += utils.o
 
@@ -34,8 +35,6 @@ chain.o: chain.c chain.h effect.h
 
 effect.o: effect.c effect.h packet.h
 
-pipe.o: pipe.c pipe.h
-
 pipe-test: pipe-test.c libgnuitar.a
 
 map.o: map.c map.h
@@ -43,6 +42,10 @@ map.o: map.c map.h
 map-test: map-test.c libgnuitar.a
 
 packet.o: packet.c packet.h
+
+package.o: package.c package.h
+
+pipe.o: pipe.c pipe.h
 
 track.o: track.c track.h packet.h chain.h map.h
 
