@@ -219,6 +219,71 @@ gnuitar_map_find(const struct GnuitarMap *map, const char *name)
     return (struct GnuitarMapEntry *)(result);
 }
 
+/** Sets the value of an entry.
+ * If the entry does not exist, this function fails.
+ * The entry must exist so that the type is known.
+ * @param amp An initialized map.
+ * @param name The name of the entry.
+ * @param data The data to set the entry to.
+ * @returns On success, zero.
+ *  If the entry is not found, ENOENT is returned.
+ *  If a memory allocation fails, ENOMEM is returned.
+ * @ingroup libgnuitar-map
+ */
+
+int
+gnuitar_map_set(struct GnuitarMap *map, const char *name, const void *data)
+{
+    struct GnuitarMapEntry *entry;
+    size_t entry_size;
+
+    entry = gnuitar_map_find(map, name);
+    if (entry == NULL)
+        return ENOENT;
+
+    entry_size = gnuitar_map_type_size(entry->type);
+
+    if (entry->data == NULL)
+        entry->data = malloc(entry_size);
+    if (entry->data == NULL)
+        return ENOMEM;
+
+    memcpy(entry->data, data, entry_size);
+
+    return 0;
+}
+
+/** Gets the value of an entry.
+ * If the entry is not found, this function fails.
+ * @param map An initialized map.
+ * @param name The name of the entry.
+ * @param data The address to copy the data to.
+ * @returns On success, zero.
+ *  If the entry is not found, ENOENT is returned.
+ *  If for some reason the entry contains no data, EFAULT is returned.
+ * @ingroup libgnuitar-map
+ */
+
+int
+gnuitar_map_get(struct GnuitarMap *map, const char *name, void *data)
+{
+    struct GnuitarMapEntry *entry;
+    size_t entry_size;
+
+    entry = gnuitar_map_find(map, name);
+    if (entry == NULL)
+        return ENOENT;
+
+    if (entry->data == NULL)
+        return EFAULT;
+
+    entry_size = gnuitar_map_type_size(entry->type);
+
+    memcpy(data, entry->data, entry_size);
+
+    return 0;
+}
+
 /** Returns the number of entries in the map.
  * @param map An initialized map
  * @returns The number of entries in the map.
