@@ -1,22 +1,23 @@
 language: c
-
 compiler:
-  - gcc
-  - clang
-
+- gcc
+- clang
 addons:
   apt:
-    sources:
-      - ubuntu-toolchain-r-test
-      - george-edison55-precise-backports
     packages:
-      - cmake
-      - cmake-data
-      - libgtk2.0-dev
-      - libasound2-dev
-      - libjack-dev
-      - libsndfile-dev
-
+    - sshpass
+    - libasound2-dev
+    - libqt5core5a
+    - libqt5widgets5
 script:
-  - bash scripts/cmake-build.sh
+- bash scripts/travis-build.sh
+after_success:
+- export SSHPASS=$GNUITAR_DEPLOY_PASS
+- sshpass -e scp build/Gnuitar-0.4.0-Linux.tgz $GNUITAR_DEPLOY_USER@$GNUITAR_DEPLOY_HOST:$GNUITAR_DEPLOY_PATH/Gnuitar-0.4.0-Linux.tgz
+env:
+  global:
+  - secure: rWDcSCuDFzzC8pTYCFeEQ0LZV6B9WJOw2HKJ7CL/Bma1G7Rs92whJk5hYfVRTJ3mbFXjDq689lja8f2gT81YluDitts+QUNsGjJO7AkSw1YbP+hVu8fc8qv7cOU+tB7ec5AqZjecaxGE3EVvddXGBU8m18G4ZkPdkbx5zfkj3D62CYBgGfk2EuaMOMU7uIkjPhMcLknfbUTaK1ClcN76E1ApoYWaymLfYUyLLxQ0UBlilCSkfZmwIO1nCz08IavYGnd6rnjyo0ZJdpy49b3P+S4lfCLm1wCLfzxyX0B06LbtWTfKCs9uwijEuUV9Mj+0588tGiN+RfF5pRL/G1IWSqfis3/pYoIyNcV7Xk6IbINBdG3W4xM1qILHBMrbON4pHHPkgfTnDG1119O+1AylAf8QWffOBxtTmiCbxMUIf9hQHmFsla6WuNlJ8KyvdjJMS2hABseu6ZFCXUhxsAs3ehCwgOjiBsZCjhY2e/9vKeQAL1DHb39F0KsBrzbkXQuCxVbiRzkH26Ho2q6BE3IvBFBo7ArLK3FBKhNiRp6lzNIc+BCfoHdl3Fu6sDOKswNZVC0CUjVZHLOieDTrCiwThT0b9xzP1yLZeJ7FrtKmR4xj3ceZFQK0yenmH98PoQjlOrO4ULQhgjVgFpvMqmh3XefbSsPbi4DFoljunE0tsbI=
+  - secure: kctA7AbZ3ktK5WUnbJa4eNIvXIkjzQNIYk1aks2K+Xc8pJF5WgbbtTRuMjNbbqhFFtgkMV/kyDC/PfDuGu048ln1XmBIBdTmLcBEiw5aQfDm3E9LBVmD0kN/ElYdeCvsd/bFa07S2/BjkslOuAgTgfw43LJXPPlR4JoQEUYdMYpo744/yDxVZB1rRjgZxG59bECkQu7mncBOITL+qyU9oYZN2a130eMgBGU53plke7KBqGCBA+L/DTmwB9AajH5+AR+AqB7wkymqrGgebfdPJiPwnvOUnEwTAaNr3AVjQRTrO3w9NEG62ho10cmKZI+woq7IIp+O1LdNDawCC95U6JS1/XqozP/ZLHk6sxNQ5d6RbRYLjYUxen80Hfn9K6iFskeQNsVS4p7KI5EdKQfKnAjYNX1+3wqKGuiKiDt29nlpubw9yBcVmC9aoSM5DoqJ1m9fc7JCWnDvzjExk5039JYJEGIj1EGv7RmqhjCgzMIknqkFRCZ/kNWQ6mXZ2ASoogVTeo3P6QXrnKS0bpnMiIfUEaoKdiAk92ftHXZJ1ll1YhcAGHfH8SBxmzYla2+X6DKwI4aX/dyClbHg+Heh/kDGh8u46vtkMx9QgwhC8a34WwgYeUuzCzPlJryoBaGJV6ipzvU+X4Shx3prB+eCQcbnuAEJTDqzEMO+15GUiw8=
+  - secure: OQt0pDmsDLz0H8HODMlSgNzgyK/RHmqH0z8q5EPTWLHM9+rfx5//JOTpAJvrt6S5N0crsOB6UeWAxMSGlEv+iji/VN0iIsE4YOw4mI68Sj5uAwqSGMxhTbG3crA7vHyUz3+XjqLrTSSsTY579SWW14AAqCjqZpvageFmtWNDdBKIf9enWteHrHb00zmNWVrrWeAXEEmhrW/H4e01FYQdAdiOO1qbcKF7mI0D2MIUZ4z7X7uVUbsCRxaaO9Kk3SvDYjE0e0uG4IUQISD98CQYo/Onom5r0mLf9baZk8lM2ZGPwFAqxMc0XaC9ww4Tj78/haVvVKm2zs9tx5JvE3joQva6bk0Kl024H25aWDTs+uUQ87LAWl3Md+bH+c0OSU/djgeEPnfKQj1akRvi7O02VQi/KPG5CZMyRzbbKom/xO4wDJTGwYAH/BQBdaMxMYxIH9B7Y72X7YAF476cpTcA7LP/3apMraHfoJpczpSzffFxphDPX1eM5AdQgtYRFzHQDT83VqcxY/ItjTtm03SJxHxs2BeaZ83x6QShtT4XZb9GNZYjrmGqttAba3dVThPT1UgpKt0hhck9H3CETpfl4QEqrFT1BIWzeVdyhGZ5pDrwaFdPspHMU/gIjoDvn+Zo17PeulVIQEkcCij24ExtNK5ospLT/FSO1YU1kMW9BVo=
+  - secure: WNklYpEvByZ69G/EeGJhXLGb0gAgyLctY00gWBueOi7/bOsSatv8htJgWtc7vzDwurhwArhF0mb+KQ4cte8hpqx34kPGAK4quVmNfCahvH7VuapsvES3KjePStsyMyhvz5SbnH0jcSih1V+nNUGy5kUSvGbNfgpVc5V+OahxlrUi3G+L5AF5jC3hEMsMMesT9uJ+jJgDOzIylbhIX3w+Q2bA86vQ3H9qxsBAy1KDaQXsX7iPzoPd+OlzcGLquBdmcb9EJCyPQKWHw+xkYMRfRkF/oGxGYQE2Tj4aUgN0zU/TQIVfRL8ieeKiTDTYIjB03BrBiGlElgtOA+CsX3gqgt+I9qYGfPNIulNuOU6bUlrtFbwgDRBhvxfjGSMk/seJip7f8XqboB22XTXnM3p6PuBXlWA3WjqOeqHzAHCK65i5NmY+47c2uoI97+wk40TxQ7h2OuvAFTonHz92y/XJZw1f/a6k6QjDfV/KbhQPFeJn4Eh2FitpjgknD3825Zu9hBwLBvkF2hXhO2mrwyOIXqWVm9NLGA17QaVSmfcDISu5/+Xu7rq9LYFEWfxCIEq8/kC0p/kZRvd8sU7O7r2WCCnE+nPyXOOEbIKZW+ruDbpwbKmYyxh5/b1K4K/zBb9LmyhFhJMh9Nae78/F91hRY1AvgqPI3Z8Fm4+YpH7dM08=
 
