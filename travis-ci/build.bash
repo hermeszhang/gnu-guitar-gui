@@ -1,6 +1,6 @@
 #!/bin/bash
 
-if [ ! -e "scripts/travis-build.sh" ]; then
+if [ ! -e "travis-ci/build.bash" ]; then
     echo "must be run from top level directory"
     exit 1
 fi
