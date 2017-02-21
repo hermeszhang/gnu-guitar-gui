@@ -22,7 +22,7 @@ main(int argc, char *argv[])
 
     /* increase the priority of the process for lower latency */
 
-    auto max_priority = sched_get_priority_max(SCHED_FIFO);
+    int max_priority = sched_get_priority_max(SCHED_FIFO);
 
     struct sched_param p;
 
