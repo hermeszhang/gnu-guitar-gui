@@ -6,7 +6,7 @@ compiler:
 before_install:
 - sudo add-apt-repository --yes ppa:ubuntu-sdk-team/ppa
 install:
-- sudo apt-get install qtbase5-dv
+- sudo apt-get install qtbase5-dev
 addons:
   apt:
     packages:
