@@ -4,13 +4,13 @@ compiler:
 - clang
 before_install:
 - sudo add-apt-repository ppa:ubuntu-sdk-team/ppa -y
+install:
+- sudo apt-get install libqt5core5a libqt5widgets5
 addons:
   apt:
     packages:
     - sshpass
     - libasound2-dev
-    - libqt5core5a
-    - libqt5widgets5
 script:
 - bash scripts/travis-build.sh
 after_success:
