@@ -4,6 +4,8 @@ compiler:
 - clang
 addons:
   apt:
+    sources:
+    - ubuntu-sdk-team-ppa
     packages:
     - sshpass
     - libasound2-dev
