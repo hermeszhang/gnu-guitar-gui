@@ -8,3 +8,8 @@ ADD_EXECUTABLE(gnuitar-sh gnuitar-sh.c)
 
 TARGET_LINK_LIBRARIES(gnuitar-sh gnuitar)
 
+INSTALL(TARGETS gnuitar-sh
+    RUNTIME DESTINATION bin
+    ARCHIVE DESTINATION lib
+    LIBRARY DESTINATION lib)
+
