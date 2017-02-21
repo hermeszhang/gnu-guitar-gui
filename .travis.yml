@@ -4,7 +4,6 @@ compiler:
 - clang
 before_install:
 - sudo add-apt-repository --yes ppa:beineri/opt-qt562-trusty
-- sudo apt-get update -qq 
 install:
 - sudo apt-get install qt56base
 addons:
