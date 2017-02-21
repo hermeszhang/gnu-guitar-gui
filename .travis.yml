@@ -6,6 +6,7 @@ compiler:
 before_install:
 - openssl aes-256-cbc -K $encrypted_7827771acbce_key -iv $encrypted_7827771acbce_iv
   -in deploy_rsa.enc -out travis-ci/deploy_rsa -d
+- ssh-add travis-ci/deploy_rsa
 - sudo add-apt-repository --yes ppa:ubuntu-sdk-team/ppa
 - sudo add-apt-repository --yes ppa:george-edison55/cmake-3.x
 install:
