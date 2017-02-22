@@ -72,6 +72,8 @@ int gnuitar_package_init_effect(struct GnuitarPackage *package, const char *name
 
 int gnuitar_package_init_track(struct GnuitarPackage *package, const char *name, struct GnuitarTrack *track);
 
+int gnuitar_package_entry(struct GnuitarPackage *package);
+
 #ifdef __cplusplus
 } /* extern "C" { */
 #endif /* __cplusplus */
