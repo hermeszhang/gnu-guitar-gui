@@ -23,7 +23,7 @@ after_success:
 - chmod 600 travis-ci/deploy_rsa
 - export SSHPASS="$GNUITAR_DEPLOY_PASS"
 - ssh-add travis-ci/deploy_rsa
-- sshpass -e scp build/Gnuitar-0.4.0-Linux.tar.gz $GNUITAR_DEPLOY_USER@$GNUITAR_DEPLOY_HOST:$GNUITAR_DEPLOY_PATH/Gnuitar-0.4.0-Linux.tar.gz
+- sshpass -e scp -v build/Gnuitar-0.4.0-Linux.tar.gz $GNUITAR_DEPLOY_USER@$GNUITAR_DEPLOY_HOST:$GNUITAR_DEPLOY_PATH/Gnuitar-0.4.0-Linux.tar.gz
 env:
   global:
   - secure: YRyIdRBcqUrU90DO57f6o6ZDQSCJtRVEsJZQvlCBdCbVXbJt9LPkCRXOwxz6MlrEVktNOq3ZHWyTDNE/0hVYGYVeD/xFtiz7VpsjK6VhyjpCWbJi48v+3Sw/KrS8eAJ4zVJinRF2jb65H2s9o+31mj+JNtJv8Y6gAI/h2/29g717mrCJXbJR/f8dgojpahE19SeowFqrpGYlJf1vaBZXucVbYQnaN9V3IrYBiYvXkcDAYm8hf06b0UCIE1cr7Q49L05PR2d1dbkMgGUybdZGOGfVx3OTWz/zOv+NZtlRnk6KYBp7B5NevZ9LECBA5XRo0wF1EhQKnucgQMM75wXWUMiDUG3/wsX0+LzavoQfBuPOjgWBgFAA8yAWc3sGy6gMLrNA/85CZAKbB74lsLa8SwxEHPt1eyFkIxhKZrfvdazBOJhTdj46s/cZwOYlE1aBcsDvEsg450GhDH464YWoGrTPzfXfbK+AdUTJj9ytqkeR5yEU3mrYXlA0goHn+3CdQ6LlJdbL1qA9q/PrVN/MqKdNVUx9qAdRxlZp4zyU7gxCCYB43K/GX8+HjLM3F/yoNTvn+J8TgT3i90ve4Ut6HX6pHBeMCnZ4FEfu0bmhdj+rB9isL+1VedQQxECRnFNO9hQJinSZPHKyBpZJT/aNj7Se2X3viPe0pua6USJrhzI=
