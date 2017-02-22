@@ -21,7 +21,7 @@ after_success:
 - eval "$(ssh-agent -s)"
 - chmod 600 travis-ci/deploy_rsa
 - export SSHPASS=$GNUITAR_DEPLOY_PASS
-- sshpass -p $GNUITAR_DEPLOY_PASS ssh-add travis-ci/deploy_rsa
+- ssh-add travis-ci/deploy_rsa
 - sshpass -e scp build/Gnuitar-0.4.0-Linux.tgz $GNUITAR_DEPLOY_USER@$GNUITAR_DEPLOY_HOST:$GNUITAR_DEPLOY_PATH/Gnuitar-0.4.0-Linux.tgz
 env:
   global:
