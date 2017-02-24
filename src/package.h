@@ -12,6 +12,12 @@
 extern "C" {
 #endif /* __cplusplus */
 
+#ifdef _WIN32
+#define GNUITAR_BUILTINS_PACKAGE "gnuitar-builtins.dll"
+#else /* _WIN32 */
+#define GNUITAR_BUILTINS_PACKAGE "libgnuitar-builtins.so"
+#endif /* _WIN32 */
+
 /** @defgroup libgnuitar-package Package
  * The API related to Gnuitar packages (plugins)
  */
