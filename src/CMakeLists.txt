@@ -7,6 +7,8 @@ ENDIF(CMAKE_COMPILER_IS_GNUCC)
 SET(SOURCES
     chain.h
     chain.c
+    conversion.h
+    conversion.c
     effect.h
     effect.c
     map.c
@@ -30,7 +32,7 @@ ENDIF (ALSA_FOUND)
 
 FIND_PACKAGE(Threads REQUIRED)
 
-ADD_LIBRARY(gnuitar ${SOURCES})
+ADD_LIBRARY(gnuitar SHARED ${SOURCES})
 
 TARGET_LINK_LIBRARIES(gnuitar ${ALSA_LIBRARIES})
 TARGET_LINK_LIBRARIES(gnuitar ${CMAKE_THREAD_LIBS_INIT})
