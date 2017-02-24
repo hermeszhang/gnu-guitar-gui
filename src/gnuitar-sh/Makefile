@@ -15,5 +15,9 @@ endif
 .PHONY: all
 all: gnuitar-sh
 
-gnuitar-sh: gnuitar-sh.c ../libgnuitar.a
+gnuitar-sh: gnuitar-sh.c ../libgnuitar.so
+
+.PHONY: clean
+clean:
+	$(RM) gnuitar-sh
 
