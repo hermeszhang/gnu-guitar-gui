@@ -31,7 +31,7 @@ struct GnuitarPackageEffect {
     const char * name;
     /** The method to create the effect */
     int (*init)(struct GnuitarEffect *);
-} gnuitar_package_effect_t;
+};
 
 /** An audio track that's part of a package.
  * @ingroup libgnuitar-package
