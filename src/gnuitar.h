@@ -8,6 +8,7 @@
 
 #include "chain.h"
 #include "effect.h"
+#include "package.h"
 #include "packet.h"
 #include "track.h"
 #include "version.h"
