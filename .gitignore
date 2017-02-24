@@ -9,7 +9,7 @@ src/gnuitar-qt/ui_*
 src/gnuitar-qt/moc_*
 src/gnuitar-qt/Makefile
 
-src/html/*
+src/gnuitar-doc/*
 
 build/*
 src/build/*
