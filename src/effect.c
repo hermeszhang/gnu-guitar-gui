@@ -13,7 +13,6 @@ void
 gnuitar_effect_init(struct GnuitarEffect *effect)
 {
     effect->params = NULL;
-    effect->init = NULL;
     effect->done = NULL;
     effect->process = NULL;
     effect->get_map = NULL;

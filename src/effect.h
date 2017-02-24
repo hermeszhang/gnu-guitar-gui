@@ -38,8 +38,6 @@
 struct GnuitarEffect {
     /** Effect specific data */
     void *params;
-    /** Initializes the effect */
-    void (*init) (struct GnuitarEffect *);
     /** Releases resources allocated by the effect */
     void (*done) (struct GnuitarEffect *);
     /** The processing callback of the effect */
