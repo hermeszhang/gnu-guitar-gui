@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>MainWindow</class>
- <widget class="QMainWindow" name="MainWindow">
+ <widget class="QMainWindow" name="main_window">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -13,8 +13,8 @@
   <property name="windowTitle">
    <string>Gnuitar</string>
   </property>
-  <widget class="QWidget" name="centralWidget">
-   <widget class="QPushButton" name="startButton">
+  <widget class="QWidget" name="central_widget">
+   <widget class="QPushButton" name="start_button">
     <property name="geometry">
      <rect>
       <x>10</x>
@@ -27,7 +27,7 @@
      <string>Start</string>
     </property>
    </widget>
-   <widget class="QListView" name="CurrentEffects">
+   <widget class="QListView" name="current_effects">
     <property name="geometry">
      <rect>
       <x>350</x>
@@ -37,7 +37,7 @@
      </rect>
     </property>
    </widget>
-   <widget class="QListView" name="KnownEffects">
+   <widget class="QListView" name="known_effects">
     <property name="geometry">
      <rect>
       <x>540</x>
@@ -47,7 +47,7 @@
      </rect>
     </property>
    </widget>
-   <widget class="QPushButton" name="recordButton">
+   <widget class="QPushButton" name="record_button">
     <property name="geometry">
      <rect>
       <x>10</x>
@@ -92,7 +92,7 @@
      <set>Qt::AlignCenter</set>
     </property>
    </widget>
-   <widget class="QProgressBar" name="InputVolume">
+   <widget class="QProgressBar" name="input_volume">
     <property name="geometry">
      <rect>
       <x>350</x>
@@ -230,7 +230,7 @@
      <string>Add Preset</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="removePresetButton">
+   <widget class="QPushButton" name="remove_preset_button">
     <property name="geometry">
      <rect>
       <x>10</x>
