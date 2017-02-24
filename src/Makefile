@@ -63,6 +63,8 @@ utils.o: utils.c utils.h
 .PHONY: clean
 clean:
 	$(RM) libgnuitar.so $(objfiles) $(tests)
+	$(MAKE) -C gnuitar-builtins clean
+	$(MAKE) -C gnuitar-sh clean
 
 .PHONY: doc
 doc:
