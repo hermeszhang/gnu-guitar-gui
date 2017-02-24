@@ -22,7 +22,7 @@ extern "C" {
 
 struct GnuitarPackageEffect {
     /** The name of the effect */
-    char * name;
+    const char * name;
     /** The method to create the effect */
     int (*init)(struct GnuitarEffect *);
 } gnuitar_package_effect_t;
@@ -61,6 +61,8 @@ struct GnuitarPackage {
 int gnuitar_package_open(struct GnuitarPackage *package, const char *path);
 
 void gnuitar_package_done(struct GnuitarPackage *package);
+
+int gnuitar_package_add_effect(struct GnuitarPackage *package, const struct GnuitarPackageEffect *package_effect);
 
 int gnuitar_package_find_effect(const struct GnuitarPackage *package, const char *name, size_t *index);
 

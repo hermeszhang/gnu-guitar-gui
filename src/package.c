@@ -72,6 +72,25 @@ gnuitar_package_done(struct GnuitarPackage *package)
 }
 
 int
+gnuitar_package_add_effect(struct GnuitarPackage *package, const struct GnuitarPackageEffect *package_effect)
+{
+    struct GnuitarPackageEffect *tmp;
+    size_t tmp_size;
+
+    tmp_size = sizeof(*tmp) * (package->effects_count + 1);
+
+    tmp = realloc(package->effects, tmp_size);
+    if (tmp == NULL)
+        return ENOMEM;
+
+    package->effects = tmp;
+    package->effects[package->effects_count] = *package_effect;
+    package->effects_count++;
+
+    return 0;
+}
+
+int
 gnuitar_package_create_effect(struct GnuitarPackage *package, const char *name, struct GnuitarEffect *effect)
 {
     int err;
@@ -84,8 +103,6 @@ gnuitar_package_create_effect(struct GnuitarPackage *package, const char *name, 
     err = package->effects[index].init(effect);
     if (err != 0)
         return err;
-
-    effect->init(effect);
 
     return 0;
 }
