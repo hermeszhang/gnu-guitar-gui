@@ -1,7 +1,14 @@
 CC = gcc
 CFLAGS = -Wall -Wextra -Werror -Wfatal-errors
 
+ifdef gnuitar_release
+CFLAGS += -O3
+else
+CFLAGS += -g
+endif
+
 objfiles += chain.o
+objfiles += conversion.o
 objfiles += effect.o
 objfiles += map.o
 objfiles += package.o
@@ -21,9 +28,8 @@ endif
 
 ifdef gnuitar_with_alsa
 CFLAGS += -DGNUITAR_WITH_ALSA
-endif
-
 objfiles += track-alsa.o
+endif
 
 .PHONY: all
 all: libgnuitar.a $(tests)
