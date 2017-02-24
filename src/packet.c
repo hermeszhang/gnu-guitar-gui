@@ -54,6 +54,7 @@ gnutiar_packet_get_length(const struct GnuitarPacket *packet)
  * If there is data in the packet, it is discarded.
  * The packet is not automatically resized to fit all of the samples.
  * Use @ref gnuitar_packet_reserve to do this.
+ * @param packet An initialized packet.
  * @param src An array of signed, 32-bit samples.
  * @param src_size The number of samples that can fit in @p src.
  * @returns The number of samples from @p src that were read from @p src.
@@ -76,11 +77,11 @@ gnuitar_packet_import_s32le(struct GnuitarPacket *packet, const void *src, size_
 
 /** Writes the audio samples in the packet on to an array.
  * The audio samples are encoded as signed, integer values (little endian).
- * @param packet An initialized packet
+ * @param packet An initialized packet.
  * @param dst A destination array
  * @param dst_size The number of samples that can fit into the destionation
  *  array.
- * @returns The number of samples from @p packet that were written to @dst.
+ * @returns The number of samples from @p packet that were written to @p dst.
  * @ingroup libgnuitar-packet
  */
 
