@@ -2,9 +2,9 @@ CC = gcc
 CFLAGS = -Wall -Wextra -Werror -Wfatal-errors
 
 ifdef gnuitar_release
-CFLAGS += -O3
+CFLAGS += -fPIC -O3
 else
-CFLAGS += -g
+CFLAGS += -fPIC -g
 endif
 
 objfiles += chain.o
@@ -28,24 +28,25 @@ endif
 
 ifdef gnuitar_with_alsa
 CFLAGS += -DGNUITAR_WITH_ALSA
+LDLIBS += -lasound
 objfiles += track-alsa.o
 endif
 
 .PHONY: all
-all: libgnuitar.a $(tests)
+all: libgnuitar.so $(tests)
 
-libgnuitar.a: $(objfiles)
-	$(AR) $(ARFLAGS) $@ $(objfiles)
+libgnuitar.so: $(objfiles)
+	$(CC) -shared $(objfiles) -o $@
 
 chain.o: chain.c chain.h effect.h
 
 effect.o: effect.c effect.h packet.h
 
-pipe-test: pipe-test.c libgnuitar.a
+pipe-test: pipe-test.c libgnuitar.so
 
 map.o: map.c map.h
 
-map-test: map-test.c libgnuitar.a
+map-test: map-test.c libgnuitar.so
 
 packet.o: packet.c packet.h
 
@@ -61,7 +62,7 @@ utils.o: utils.c utils.h
 
 .PHONY: clean
 clean:
-	$(RM) libgnuitar.a $(objfiles) $(tests)
+	$(RM) libgnuitar.so $(objfiles) $(tests)
 
 .PHONY: doc
 doc:
