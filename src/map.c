@@ -222,7 +222,7 @@ gnuitar_map_find(const struct GnuitarMap *map, const char *name)
 /** Sets the value of an entry.
  * If the entry does not exist, this function fails.
  * The entry must exist so that the type is known.
- * @param amp An initialized map.
+ * @param map An initialized map.
  * @param name The name of the entry.
  * @param data The data to set the entry to.
  * @returns On success, zero.
