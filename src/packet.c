@@ -2,6 +2,9 @@
 
 #include "conversion.h"
 
+#include <errno.h>
+#include <string.h>
+
 const int32_t gnuitar_sample_max = GNUITAR_SAMPLE_MAX;
 
 const int32_t gnuitar_sample_min = GNUITAR_SAMPLE_MIN;
@@ -23,7 +26,7 @@ gnuitar_packet_init(struct GnuitarPacket *packet)
  */
 
 void
-gnuitar_packet_free(struct GnuitarPacket *packet)
+gnuitar_packet_done(struct GnuitarPacket *packet)
 {
     if (packet == NULL) {
         free(packet->data);
@@ -214,7 +217,7 @@ gnuitar_packet_reserve(struct GnuitarPacket *packet, size_t res)
     if ((tmp1 == NULL) && (res > 0))
         return ENOMEM;
 
-    tmp2 = malloc(res * sizeof(packet->swap[0]));
+    tmp2 = malloc(res * sizeof(packet->data_swap[0]));
     if ((tmp2 == NULL) && (res > 0)) {
         free(tmp1);
         return ENOMEM;

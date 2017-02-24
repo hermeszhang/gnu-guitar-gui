@@ -67,7 +67,7 @@ struct GnuitarPacket {
 
 void gnuitar_packet_init(struct GnuitarPacket *packet);
 
-void gnuitar_packet_free(struct GnuitarPacket *packet);
+void gnuitar_packet_done(struct GnuitarPacket *packet);
 
 size_t gnuitar_packet_get_length(const struct GnuitarPacket *packet);
 
