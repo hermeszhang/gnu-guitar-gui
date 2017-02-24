@@ -17,7 +17,7 @@
  * To close the package, see @ref gnuitar_package_done.
  * @param package An unitialized package.
  * @param path The path of the library.
- *  If this parameter is NULL, the builtin package is opened.
+ *  This parameter may not be NULL.
  * @returns On success, zero.
  *  Otherwise, the error number is returned.
  * @ingroup gnuitar-package
@@ -26,6 +26,11 @@
 int
 gnuitar_package_open(struct GnuitarPackage *package, const char * path)
 {
+#ifdef _WIN32
+#else /* _WIN32 */
+    int (*package_init)(struct GnuitarPackage *package);
+    int err;
+#endif /* _WIN32 */
     package->handle = NULL;
     package->name = NULL;
     package->effects = NULL;
@@ -33,20 +38,24 @@ gnuitar_package_open(struct GnuitarPackage *package, const char * path)
     package->tracks = NULL;
     package->tracks_count = 0;
 
-    if ((path == NULL) || (path[0] == 0)) {
-#ifdef _WIN32
-        path = "gnuitar-builtins.dll";
-#else /* _WIN32 */
-        path = "libgnuitar-builtins.so";
-#endif /* _WIN32 */
-    }
+    if (path == NULL)
+        return EFAULT;
 
 #ifdef _WIN32
     package->handle = LoadLibrary(path);
 #else /* _WIN32 */
     package->handle = dlopen(path, RTLD_LAZY);
-    if (package->handle == NULL) {
-        return errno;
+    if (package->handle == NULL)
+        return ENOENT;
+    package_init = dlsym(package->handle, "gnuitar_package_entry");
+    if (package_init == NULL) {
+        dlclose(package->handle);
+        return ENOENT;
+    }
+    err = package_init(package);
+    if (err != 0) {
+        dlclose(package->handle);
+        return err;
     }
 #endif /* _WIN32 */
 
