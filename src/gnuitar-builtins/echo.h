@@ -20,26 +20,37 @@
  * $Id$
  */
 
-#ifndef _ECHO_H_
-#define _ECHO_H_ 1
+#ifndef GNUITAR_BUILTIN_ECHO_H
+#define GNUITAR_BUILTIN_ECHO_H
 
-#include "effect.h"
-#include "backbuf.h"
+#include "../gnuitar.h"
 
-#define MAX_ECHO_COUNT  4
-#define MAX_ECHO_LENGTH 500 /* ms */
+#ifdef __cplusplus
+extern "C" {
+#endif /* __cplusplus */
 
-effect_t *   echo_create(void);
-
-struct echo_params {
-    Backbuf_t *history[MAX_CHANNELS][MAX_ECHO_COUNT];
-    double primes[MAX_ECHO_COUNT];
-    double size_factor[MAX_ECHO_COUNT];
-    double decay_factor[MAX_ECHO_COUNT];
-    double echo_size, echo_decay;
-    unsigned int echoes;
-    short multichannel;
+struct GnuitarEcho {
+    /** Sample history of the echo */
+    struct GnuitarPacket history;
+    /** The number of echos to make */
+    size_t echo_count;
+    /** The number of milliseconds between echos */
+    size_t echo_delay;
 };
 
-#endif
+int gnuitar_echo_init(struct GnuitarEffect *effect);
+
+void gnuitar_echo_done(struct GnuitarEffect *effect);
+
+int gnuitar_echo_process(struct GnuitarEffect *effect, struct GnuitarPacket *packet);
+
+int gnuitar_echo_get_map(const struct GnuitarEffect *effect, struct GnuitarMap *map);
+
+int gnuitar_echo_set_map(struct GnuitarEffect *effect, const struct GnuitarMap *map);
+
+#ifdef __cplusplus
+} /* extern "C" { */
+#endif /* __cplusplus */
+
+#endif /* GNUITAR_BUITLTIN_ECHO_H */
 

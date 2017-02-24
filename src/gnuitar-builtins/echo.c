@@ -111,381 +111,85 @@
  */
 
 #include "echo.h"
-#include "gui.h"
-#include <math.h>
-#include <assert.h>
-#include <stdlib.h>
-#ifndef _WIN32
-#    include <unistd.h>
-#else
-#    include <io.h>
-#endif
 
-#define ECHO_FIRST_PRIME                    20
-#define ECHO_NEXT_PRIME_DISTANCE_FACTOR	    1.6
-#define ECHO_CROSSMIX_ATTN                  10.0
+#include <errno.h>
 
-static void
-update_echo_decay(GtkAdjustment *adj, struct echo_params *params)
+int
+gnuitar_echo_init(struct GnuitarEffect *effect)
 {
-    params->echo_decay = adj->value;
+    struct GnuitarEcho *echo;
+
+    echo = malloc(sizeof(*echo));
+    if (echo == NULL)
+        return ENOMEM;
+    gnuitar_packet_init(&echo->history);
+    echo->echo_delay = 250;
+    echo->echo_count = 2;
+
+    effect->params = echo;
+    effect->done = gnuitar_echo_done;
+    effect->get_map = gnuitar_echo_get_map;
+    effect->set_map = gnuitar_echo_set_map;
+    effect->process = gnuitar_echo_process;
+
+    return 0;
 }
 
-static void
-update_echo_count(GtkAdjustment *adj, struct echo_params *params)
+void
+gnuitar_echo_done(struct GnuitarEffect *effect)
 {
-    params->echoes = adj->value;
-}
+    struct GnuitarEcho *echo;
 
-static void
-update_echo_size(GtkAdjustment *adj, struct echo_params *params)
-{
-    params->echo_size = adj->value;
-}
-
-static void
-toggle_echo_multichannel(void *bullshit, struct echo_params *params)
-{
-    (void) bullshit;
-    params->multichannel = !params->multichannel;
-}
-
-static int
-is_prime(int n)
-{
-    int             i;
-
-    for (i = 2; i < n; i++)
-	if (n % i == 0)
-	    return 0;
-
-    return 1;
-}
-
-static void
-echo_init(gnuitar_effect_t *p)
-{
-    gnuitar_format_t format;
-
-    struct echo_params *params;
-
-    GtkWidget      *decay;
-    GtkWidget      *decay_label;
-    GtkObject      *adj_decay;
-
-    GtkWidget      *count;
-    GtkWidget      *count_label;
-    GtkObject      *adj_count;
-
-    GtkWidget      *size;
-    GtkWidget      *size_label;
-    GtkObject      *adj_size;
-
-    GtkWidget      *button, *mcbutton;
-    GtkWidget      *parmTable;
-
-    params = p->params;
-
-    if (gnuitar_audio_driver_get_format(audio_driver, &format) != 0) {
-        gnuitar_format_defaults(&format);
-    }
-
-    /*
-     * GUI Init
-     */
-    p->control = gtk_window_new(GTK_WINDOW_DIALOG);
-
-    gtk_signal_connect(GTK_OBJECT(p->control), "delete_event",
-		       GTK_SIGNAL_FUNC(delete_event), p);
-
-    parmTable = gtk_table_new(2, 8, FALSE);
-
-    adj_decay = gtk_adjustment_new(params->echo_decay,
-				   1.0, 80.0, 1.0, 10.0, 0.0);
-    decay_label = gtk_label_new("Decay\n%");
-    gtk_table_attach(GTK_TABLE(parmTable), decay_label, 0, 1, 0, 1,
-		     __GTKATTACHOPTIONS(GTK_FILL | GTK_EXPAND |
-					GTK_SHRINK),
-		     __GTKATTACHOPTIONS(GTK_SHRINK), 0, 0);
-
-
-    gtk_signal_connect(GTK_OBJECT(adj_decay), "value_changed",
-		       GTK_SIGNAL_FUNC(update_echo_decay), params);
-
-    decay = gtk_vscale_new(GTK_ADJUSTMENT(adj_decay));
-    gtk_widget_set_size_request(GTK_WIDGET(decay),0,100);
-
-    gtk_table_attach(GTK_TABLE(parmTable), decay, 0, 1, 1, 2,
-		     __GTKATTACHOPTIONS(GTK_FILL | GTK_EXPAND |
-					GTK_SHRINK),
-		     __GTKATTACHOPTIONS(GTK_FILL | GTK_EXPAND |
-					GTK_SHRINK), 0, 0);
-
-
-    adj_count = gtk_adjustment_new(params->echoes,
-				   1.0, MAX_ECHO_COUNT, 1.0, 1.0, 0.0);
-    count_label = gtk_label_new("Voices\n#");
-    gtk_table_attach(GTK_TABLE(parmTable), count_label, 1, 2, 0, 1,
-		     __GTKATTACHOPTIONS(GTK_FILL | GTK_EXPAND |
-					GTK_SHRINK),
-		     __GTKATTACHOPTIONS(GTK_SHRINK), 0, 0);
-
-
-    gtk_signal_connect(GTK_OBJECT(adj_count), "value_changed",
-		       GTK_SIGNAL_FUNC(update_echo_count), params);
-
-    count = gtk_vscale_new(GTK_ADJUSTMENT(adj_count));
-    gtk_scale_set_digits(GTK_SCALE(count), 0);
-
-    gtk_table_attach(GTK_TABLE(parmTable), count, 1, 2, 1, 2,
-		     __GTKATTACHOPTIONS
-		     (GTK_FILL | GTK_EXPAND | GTK_SHRINK),
-		     __GTKATTACHOPTIONS
-		     (GTK_FILL | GTK_EXPAND | GTK_SHRINK), 0, 0);
-
-    adj_size = gtk_adjustment_new(params->echo_size, 1.0,
-                                  MAX_ECHO_LENGTH, 1.0, 1.0, 0.0);
-    size_label = gtk_label_new("Delay\nms");
-    gtk_table_attach(GTK_TABLE(parmTable), size_label, 2, 3, 0, 1,
-		     __GTKATTACHOPTIONS(GTK_FILL | GTK_EXPAND |
-					GTK_SHRINK),
-		     __GTKATTACHOPTIONS(GTK_SHRINK), 0, 0);
-
-
-    gtk_signal_connect(GTK_OBJECT(adj_size), "value_changed",
-		       GTK_SIGNAL_FUNC(update_echo_size), params);
-
-    size = gtk_vscale_new(GTK_ADJUSTMENT(adj_size));
-
-    gtk_table_attach(GTK_TABLE(parmTable), size, 2, 3, 1, 2,
-		     __GTKATTACHOPTIONS
-		     (GTK_FILL | GTK_EXPAND | GTK_SHRINK),
-		     __GTKATTACHOPTIONS
-		     (GTK_FILL | GTK_EXPAND | GTK_SHRINK), 0, 0);
-
-    if (format.output_channels > 1 && format.input_channels == 1) {
-        mcbutton = gtk_check_button_new_with_label("Multichannel");
-        if (params->multichannel)
-            gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(mcbutton), TRUE);
-        gtk_signal_connect(GTK_OBJECT(mcbutton), "toggled",
-                           GTK_SIGNAL_FUNC(toggle_echo_multichannel), params);
-
-        gtk_table_attach(GTK_TABLE(parmTable), mcbutton, 1, 3, 2, 3,
-                         __GTKATTACHOPTIONS(GTK_SHRINK),
-                         __GTKATTACHOPTIONS(GTK_SHRINK), 0, 0);
-    }
-    
-    button = gtk_check_button_new_with_label("On");
-    if (p->toggle == 1)
-	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(button), TRUE);
-    gtk_signal_connect(GTK_OBJECT(button), "toggled",
-		       GTK_SIGNAL_FUNC(toggle_effect), p);
-
-    gtk_table_attach(GTK_TABLE(parmTable), button, 0, 1, 2, 3,
-		     __GTKATTACHOPTIONS(GTK_SHRINK),
-		     __GTKATTACHOPTIONS(GTK_SHRINK), 0, 0);
-
-    gtk_window_set_title(GTK_WINDOW(p->control), (gchar *) ("Echo"));
-    gtk_container_add(GTK_CONTAINER(p->control), parmTable);
-
-    gtk_widget_show_all(p->control);
-
-}
-    
-static void
-echo_filter_mono(effect_t *p, gnuitar_packet_t *db)
-{
-    unsigned int        i, count, curr_channel = 0;
-    gnuitar_sample_t    *s, tmp;
-    double              in, out, echo_samples, echo_decay;
-    struct echo_params  *params;
-    int                 delay_lookup[MAX_ECHO_COUNT];
-    float               decay_lookup[MAX_ECHO_COUNT];
-
-    s = db->data;
-    count = db->len;
-
-    params = p->params;
-
-    echo_samples = params->echo_size / 1000.0 * db->rate;
-    echo_decay = params->echo_decay / 100.0;
-    
-    for (i = 0; i < params->echoes; i += 1) {
-        delay_lookup[i] = echo_samples * params->size_factor[i];
-        decay_lookup[i] = pow(echo_decay, params->decay_factor[i]);
-    }
-    while (count) {
-        /* mix current input into the various echo buffers at their
-         * expected delays */
-        in = *s;
-        out = in;
-        for (i = 0; i < params->echoes; i += 1) {
-            tmp = params->history[curr_channel][i]->get(params->history[curr_channel][i], delay_lookup[i]) * decay_lookup[i];
-            out += tmp;
-            if (params->echoes > 1) {
-                if (i > 1)
-                    tmp += params->history[0][i-1]->get(params->history[0][i-1], delay_lookup[i-1]) * decay_lookup[i-1] / ECHO_CROSSMIX_ATTN;
-                else
-                    tmp += params->history[0][params->echoes-1]->get(params->history[0][params->echoes-1], delay_lookup[params->echoes-1]) * decay_lookup[params->echoes-1] / ECHO_CROSSMIX_ATTN;
-            }
-            params->history[curr_channel][i]->add(params->history[curr_channel][i], in + tmp);
-        }
-        *s = out;
-
-        curr_channel = (curr_channel + 1) % db->channels; 
-        s++;
-        count--;
+    echo = effect->params;
+    if (echo != NULL) {
+        gnuitar_packet_done(&echo->history);
+	free(echo);
+	effect->params = NULL;
     }
 }
 
-static void
-echo_filter_mc(effect_t *p, gnuitar_packet_t *db)
+int
+gnuitar_echo_process(struct GnuitarEffect *effect, struct GnuitarPacket *packet)
 {
-    unsigned int i, count, curr_channel = 0;
-    gnuitar_sample_t          *ins, *outs, tmp;
-    double              in, out, echo_samples, echo_decay;
-    struct echo_params  *params;
-    int                 delay_lookup[MAX_ECHO_COUNT];
-    float               decay_lookup[MAX_ECHO_COUNT];
-
-    assert(db->channels == 1);
-    ins = db->data;
-    outs = db->data_swap;
-    db->data = outs;
-    db->data_swap = ins;
-    
-    count = db->len;
-    
-    params = p->params;
-    echo_samples = params->echo_size / 1000.0 * db->rate;
-    echo_decay = params->echo_decay / 100.0;
-    
-    for (i = 0; i < params->echoes; i += 1) {
-	delay_lookup[i]   = echo_samples * params->size_factor[i];
-	decay_lookup[i]   = pow(echo_decay, params->decay_factor[i]);
-    }
-    
-    while (count) {
-        /* echo buffers are equally divided with all output channels.
-	 * otherwise the algorithm is the same. */
-        in = *ins++;
-        for (curr_channel = 0; curr_channel < db->channels; curr_channel += 1) {
-            out = in;
-            
-	    /* this for loop distributes channels equally between voices */
-            for (i = curr_channel; i < params->echoes; i += db->channels) {
-                tmp = params->history[0][i]->get(params->history[0][i], delay_lookup[i]) * decay_lookup[i];
-                out += tmp;
-	
-                /* do some cross-mixing */        
-                if (params->echoes > 1) {
-                    if (i > 1)
-                        tmp += params->history[0][i-1]->get(params->history[0][i-1], delay_lookup[i-1]) * decay_lookup[i-1] / ECHO_CROSSMIX_ATTN;
-                    else
-                        tmp += params->history[0][params->echoes-1]->get(params->history[0][params->echoes-1], delay_lookup[params->echoes-1]) * decay_lookup[params->echoes-1] / ECHO_CROSSMIX_ATTN;
-                }
-                params->history[0][i]->add(params->history[0][i], in + tmp);
-            }
-
-            *outs++ = out;
-        }
-        
-        count--;
-    }
+    (void) effect;
+    (void) packet;
+    return 0;
 }
 
-static void
-echo_filter(effect_t *p, gnuitar_packet_t *db)
+int
+gnuitar_echo_get_map(const struct GnuitarEffect *effect, struct GnuitarMap *map)
 {
-    struct echo_params *params = p->params;
-    if (params->multichannel && db->channels == 1) {
-        echo_filter_mc(p, db);
-    } else {
-        echo_filter_mono(p, db);
-    }
+    int err;
+    const struct GnuitarEcho *echo;
+
+    echo = effect->params;
+    if (echo == NULL)
+        return EFAULT;
+
+    err = gnuitar_map_define(map, "Delay", GNUITAR_MAP_TYPE_SIZE);
+    if (err != 0)
+        return err;
+
+    err = gnuitar_map_set(map, "Delay", &echo->echo_delay);
+    if (err != 0)
+        return err;
+
+    err = gnuitar_map_define(map, "Echo Count", GNUITAR_MAP_TYPE_SIZE);
+    if (err != 0)
+        return err;
+
+    err = gnuitar_map_set(map, "Echo Count", &echo->echo_count);
+    if (err != 0)
+        return err;
+
+    return 0;
 }
 
-static void
-echo_done(gnuitar_effect_t *p)
+int
+gnuitar_echo_set_map(struct GnuitarEffect *effect, const struct GnuitarMap *map)
 {
-    struct echo_params *params;
-    int             i, j;
-
-    params = p->params;
-    for (i = 0; i < MAX_ECHO_COUNT; i += 1) {
-        for (j = 0; j < MAX_CHANNELS; j += 1) {
-            del_Backbuf(params->history[j][i]);
-        }
-    }
-
-    gtk_widget_destroy(p->control);
-    free(p);
+    (void) effect;
+    (void) map;
+    return 0;
 }
 
-static void
-echo_save(gnuitar_effect_t *p, SAVE_ARGS)
-{
-    struct echo_params *params = p->params;
-
-    SAVE_DOUBLE("echo_size", params->echo_size);
-    SAVE_DOUBLE("echo_decay", params->echo_decay);
-    SAVE_INT("echoes", params->echoes);
-    SAVE_INT("multichannel", params->multichannel);
-}
-
-static void
-echo_load(gnuitar_effect_t *p, LOAD_ARGS)
-{
-    struct echo_params *params = p->params;
-
-    LOAD_DOUBLE("echo_size", params->echo_size);
-    LOAD_DOUBLE("echo_decay", params->echo_decay);
-    LOAD_INT("echoes", params->echoes);
-    LOAD_INT("multichannel", params->multichannel);
-}
-
-effect_t *
-echo_create()
-{
-    effect_t       *p;
-    struct echo_params *params;
-    int             i, j, k;
-
-    p = calloc(1, sizeof(effect_t));
-    p->params = calloc(1, sizeof(*params));
-    p->proc_init = echo_init;
-    p->proc_filter = echo_filter;
-    p->proc_save = echo_save;
-    p->proc_load = echo_load;
-    p->toggle = 0;
-    p->proc_done = echo_done;
-
-    params = p->params;
-    params->multichannel = 0;
-    params->echo_size = 200;
-    params->echo_decay = 30.0;
-    params->echoes = MAX_ECHO_COUNT;
-
-    /* find some primes to base echo times on */
-    k = ECHO_FIRST_PRIME;
-    for (i = 0; i < MAX_ECHO_COUNT; i += 1) {
-	while (! is_prime(k))
-	    k += 1;
-        params->primes[i] = k;
-        k *= ECHO_NEXT_PRIME_DISTANCE_FACTOR;
-    }
-    /* scale primes such that largest value is 1.0 in both */
-    for (i = 0; i < MAX_ECHO_COUNT; i += 1) {
-        params->size_factor[i] = params->primes[i] / params->primes[0];
-        params->decay_factor[i] = params->primes[i] / params->primes[0];
-    }
-    /* build history buffers, one per channel per echo */
-    /* with 20 voices, 0.5 s max buffer, 48 kHz sample rate
-     * and 4 bytes per sample we need approx. 1 MB */
-    for (i = 0; i < MAX_ECHO_COUNT; i += 1) {
-        for (j = 0; j < MAX_CHANNELS; j += 1) {
-            params->history[j][i] = new_Backbuf(MAX_ECHO_LENGTH / 1000.0 * MAX_SAMPLE_RATE * params->size_factor[i]);
-        }
-    }
-    return p;
-}
