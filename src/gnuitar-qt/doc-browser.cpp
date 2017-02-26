@@ -4,7 +4,7 @@ namespace Gnuitar {
 
 namespace Qt {
 
-DocBrowser::DocBrowser(QWidget * parent) : QTextBrowser(parent)
+DocBrowser::DocBrowser(QWidget *parent) : QTextBrowser(parent)
 {
 
 }

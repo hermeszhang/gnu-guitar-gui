@@ -11,7 +11,7 @@ main(int argc, char *argv[])
 
     QString docs_path;
     const char * docs_path_env = std::getenv("GNUITAR_DOCS_PATH");
-    if (docs_path_env != nullptr) {
+    if (docs_path_env != 0) {
         docs_path = docs_path_env;
     } else {
         docs_path = ".";

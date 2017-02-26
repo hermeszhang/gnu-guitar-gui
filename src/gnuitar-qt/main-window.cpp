@@ -29,7 +29,7 @@
 
 namespace Gnuitar {
 
-MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow), doc_browser(nullptr)
+MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow), doc_browser(0)
 {
     ui->setupUi(this);
 
@@ -43,7 +43,7 @@ MainWindow::~MainWindow(void)
     gnuitar_track_done(&track);
     gnuitar_package_done(&package);
     delete ui;
-    if (doc_browser != nullptr)
+    if (doc_browser != 0)
         delete doc_browser;
 }
 
@@ -53,7 +53,7 @@ MainWindow::open_documentation(void)
     if (doc_browser)
         return;
     doc_browser = new Gnuitar::Qt::DocBrowser();
-    if (doc_browser == nullptr)
+    if (doc_browser == 0)
         return;
 
 
@@ -61,7 +61,7 @@ MainWindow::open_documentation(void)
     docs_search_paths << GNUITAR_DOCS_PATH;
 
     const char * docs_path_env = std::getenv("GNUITAR_DOCS_PATH");
-    if (docs_path_env != nullptr)
+    if (docs_path_env != 0)
         docs_search_paths << docs_path_env;
 
     doc_browser->setSearchPaths(docs_search_paths);

@@ -10,7 +10,7 @@ namespace Qt {
 class DocBrowser : public QTextBrowser {
     Q_OBJECT
 public:
-    DocBrowser(QWidget *parent = nullptr);
+    DocBrowser(QWidget *parent = 0);
     ~DocBrowser(void);
 }; /* class DocBrowser */
 
