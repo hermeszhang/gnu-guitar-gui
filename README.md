@@ -11,7 +11,20 @@ Gnuitar is a real-time sound effects software that allows you to use your comput
 
 It was originally written by Max Rudensky.
 
-Now it's being refactored and a number of things are being changed, the most significant being the change from Gtk interface to a Qt interface.
+Now it's being refactored and a number of things are being added and changed.
+
+Here's a progress table.
+
+|                         Change | Status      |
+|--------------------------------|-------------|
+|       Moving from Gtk+2 to Qt5 | In Progress |
+|  Audio API and Effects Plugins | In Progress |
+|       Package / Plugin Manager | Not Started |
+| Client and Server Architecture | Not Started |
+|        <sup>1</sup>ALSA Driver | Not Started |
+|     <sup>1</sup>Windows Driver | Not Started |
+
+<sup>1</sup>The ALSA and Windows drivers allow Gnuitar to act as a virtual audio device, so that audio from Gnuitar may be read from other audio recording software.
 
 This program was inspired by two earlier works:
  - [Ele]([1] http://www-personal.umich.edu/~mslutsky/elepage/index.html) by Morris Slutsky
