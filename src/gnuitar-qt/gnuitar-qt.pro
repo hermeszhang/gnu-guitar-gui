@@ -6,9 +6,12 @@ TARGET = gnuitar-qt
 
 TEMPLATE = app
 
-SOURCES += "main.cpp" "main-window.cpp"
+SOURCES += "main.cpp"
+SOURCES += "main-window.cpp"
+SOURCES += "doc-browser.cpp"
 
 HEADERS += "main-window.h"
+HEADERS += "doc-browser.h"
 
 FORMS += "main-window.ui"
 
