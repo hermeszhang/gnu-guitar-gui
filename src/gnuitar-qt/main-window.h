@@ -5,6 +5,8 @@
 
 #include "../gnuitar.h"
 
+#include "doc-browser.h"
+
 namespace Ui {
 
 class MainWindow;
@@ -19,11 +21,22 @@ class MainWindow : public QMainWindow
 public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow(void);
+protected:
+    void open_documentation(void);
+    void populate_known_effects(void);
+    void open_package(const std::string& path);
 private slots:
-    void on_startButton_clicked(void);
+    void on_quit_triggered(void);
+    void on_open_package_triggered(void);
+    void on_start_button_clicked(void);
+    void on_report_an_issue_triggered(void);
+    void on_view_documentation_triggered(void);
 private:
     Ui::MainWindow *ui;
+    Gnuitar::Qt::DocBrowser *doc_browser;
     GnuitarTrack track;
+    GnuitarPackage package;
+    bool package_open;
 }; /* class MainWindow */
 
 } /* namespace Gnuitar */
