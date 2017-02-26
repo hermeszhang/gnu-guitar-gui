@@ -17,6 +17,7 @@ Here's a progress table.
 
 |                         Change | Status      |
 |--------------------------------|-------------|
+|         A text based interface | In progress |
 |       Moving from Gtk+2 to Qt5 | In Progress |
 |  Audio API and Effects Plugins | In Progress |
 |       Package / Plugin Manager | Not Started |
