@@ -13,6 +13,8 @@ SET(SOURCES
     effect.c
     map.c
     map.h
+    package.h
+    package.c
     packet.h
     packet.c
     pipe.h
