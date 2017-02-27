@@ -20,22 +20,27 @@
  * $Id$
  */
 
-#ifndef _VIBRATO_H_
-#define _VIBRATO_H_ 1
+#ifndef GNUITAR_VIBRATO_H
+#define GNUITAR_VIBRATO_H
 
-#include "effect.h"
+#include "../effect.h"
+
 #include "biquad.h"
 
 #define MAX_VIBRATO_BUFSIZE 16384
 
-effect_t *   vibrato_create(void);
-
-struct vibrato_params {
-    Hilbert_t       hilbert;
-    float           vibrato_amplitude, vibrato_base,
-       		    vibrato_speed,
-                    vibrato_phase,
-                    phase;
+struct GnuitarVibrato {
+    struct GnuitarHilbert hilbert;
+    double vibrato_amplitude;
+    double vibrato_base;
+    double vibrato_speed;
+    double vibrato_phase;
+    double phase;
 };
 
-#endif
+int gnuitar_vibrato_init(struct GnuitarEffect *effect);
+
+void gnuitar_vibrato_done(struct GnuitarEffect *effect);
+
+#endif /* GNUITAR_VIBRATO_H */
+

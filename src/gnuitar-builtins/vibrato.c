@@ -163,160 +163,14 @@
  */
 
 #include "vibrato.h"
+
+#include <errno.h>
 #include <math.h>
 #include <stdlib.h>
-#ifndef _WIN32
-#    include <unistd.h>
-#else
-#    include <io.h>
-#    include "utils.h"
-#endif
-#include "gui.h"
 
-static void
-update_vibrato_speed(GtkAdjustment * adj, struct vibrato_params *params)
+static int
+vibrato_process(struct GnuitarEffect *effect, struct GnuitarPacket *packet)
 {
-    params->vibrato_speed = adj->value;
-}
-
-static void
-update_vibrato_ampl(GtkAdjustment * adj, struct vibrato_params *params)
-{
-    params->vibrato_amplitude = adj->value;
-}
-
-static void
-update_vibrato_base(GtkAdjustment * adj, struct vibrato_params *params)
-{
-    params->vibrato_base = adj->value;
-}
-
-static void
-vibrato_init(gnuitar_effect_t *p)
-{
-    struct vibrato_params *pvibrato;
-
-    GtkWidget      *speed;
-    GtkWidget      *speed_label;
-    GtkObject      *adj_speed;
-
-    GtkWidget      *ampl;
-    GtkWidget      *ampl_label;
-    GtkObject      *adj_ampl;
-
-    GtkWidget      *button;
-    GtkWidget      *parmTable;
-
-    pvibrato = (struct vibrato_params *) p->params;
-
-    /*
-     * GUI Init
-     */
-    p->control = gtk_window_new(GTK_WINDOW_DIALOG);
-
-    gtk_signal_connect(GTK_OBJECT(p->control), "delete_event",
-		       GTK_SIGNAL_FUNC(delete_event), p);
-
-    parmTable = gtk_table_new(2, 8, FALSE);
-
-    adj_speed =
-	gtk_adjustment_new(pvibrato->vibrato_speed, 50.0, 3000.0, 1.0, 1.0, 0.0);
-    speed_label = gtk_label_new("Period\nms");
-    gtk_table_attach(GTK_TABLE(parmTable), speed_label, 0, 1, 0, 1,
-		     __GTKATTACHOPTIONS(GTK_FILL | GTK_EXPAND |
-					GTK_SHRINK),
-		     __GTKATTACHOPTIONS(GTK_FILL | GTK_EXPAND |
-					GTK_SHRINK), 0, 0);
-
-    gtk_signal_connect(GTK_OBJECT(adj_speed), "value_changed",
-		       GTK_SIGNAL_FUNC(update_vibrato_speed), pvibrato);
-
-    speed = gtk_vscale_new(GTK_ADJUSTMENT(adj_speed));
-    gtk_widget_set_size_request(GTK_WIDGET(speed),0,100);
-
-    gtk_table_attach(GTK_TABLE(parmTable), speed, 0, 1, 1, 2,
-		     __GTKATTACHOPTIONS
-		     (GTK_FILL | GTK_EXPAND | GTK_SHRINK),
-		     __GTKATTACHOPTIONS
-		     (GTK_FILL | GTK_EXPAND | GTK_SHRINK), 0, 0);
-
-    adj_ampl =
-	gtk_adjustment_new(pvibrato->vibrato_amplitude,
-			   0.0, 50.0, 1.0, 1.0, 0.0);
-    ampl_label = gtk_label_new("Depth\n(Hz)");
-    gtk_table_attach(GTK_TABLE(parmTable), ampl_label, 2, 3, 0, 1,
-		     __GTKATTACHOPTIONS(GTK_FILL | GTK_EXPAND |
-					GTK_SHRINK),
-		     __GTKATTACHOPTIONS(GTK_FILL | GTK_EXPAND |
-					GTK_SHRINK), 0, 0);
-
-    gtk_signal_connect(GTK_OBJECT(adj_ampl), "value_changed",
-		       GTK_SIGNAL_FUNC(update_vibrato_ampl), pvibrato);
-
-    ampl = gtk_vscale_new(GTK_ADJUSTMENT(adj_ampl));
-
-    gtk_table_attach(GTK_TABLE(parmTable), ampl, 2, 3, 1, 2,
-		     __GTKATTACHOPTIONS
-		     (GTK_FILL | GTK_EXPAND | GTK_SHRINK),
-		     __GTKATTACHOPTIONS
-		     (GTK_FILL | GTK_EXPAND | GTK_SHRINK), 0, 0);
-
-    adj_ampl =
-	gtk_adjustment_new(pvibrato->vibrato_base,
-			   -50.0, 50.0, 1.0, 1.0, 0.0);
-    ampl_label = gtk_label_new("Base\n(Hz)");
-    gtk_table_attach(GTK_TABLE(parmTable), ampl_label, 3, 4, 0, 1,
-		     __GTKATTACHOPTIONS(GTK_FILL | GTK_EXPAND |
-					GTK_SHRINK),
-		     __GTKATTACHOPTIONS(GTK_FILL | GTK_EXPAND |
-					GTK_SHRINK), 0, 0);
-
-
-    gtk_signal_connect(GTK_OBJECT(adj_ampl), "value_changed",
-		       GTK_SIGNAL_FUNC(update_vibrato_base), pvibrato);
-
-    ampl = gtk_vscale_new(GTK_ADJUSTMENT(adj_ampl));
-
-    gtk_table_attach(GTK_TABLE(parmTable), ampl, 3, 4, 1, 2,
-		     __GTKATTACHOPTIONS
-		     (GTK_FILL | GTK_EXPAND | GTK_SHRINK),
-		     __GTKATTACHOPTIONS
-		     (GTK_FILL | GTK_EXPAND | GTK_SHRINK), 0, 0);
-
-    button = gtk_check_button_new_with_label("On");
-    gtk_signal_connect(GTK_OBJECT(button), "toggled",
-		       GTK_SIGNAL_FUNC(toggle_effect), p);
-
-    gtk_table_attach(GTK_TABLE(parmTable), button, 0, 1, 2, 3,
-		     __GTKATTACHOPTIONS
-		     (GTK_FILL | GTK_EXPAND | GTK_SHRINK),
-		     __GTKATTACHOPTIONS
-		     (GTK_FILL | GTK_EXPAND | GTK_SHRINK), 0, 0);
-    if (p->toggle == 1) {
-	p->toggle = 0;
-	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(button), TRUE);
-    }
-
-    gtk_window_set_title(GTK_WINDOW(p->control), (gchar *) ("Tremolo bar"));
-    gtk_container_add(GTK_CONTAINER(p->control), parmTable);
-
-    gtk_widget_show_all(p->control);
-
-}
-
-static void
-vibrato_filter(gnuitar_effect_t *p, gnuitar_packet_t *db)
-{
-    gnuitar_sample_t     *s;
-    int             count;
-    int		    curr_channel = 0;
-    struct vibrato_params *vp;
-
-    s = db->data;
-    count = db->len;
-
-    vp = p->params;
-
     /* the vibrato effect is based on hilbert transform that allows us to reconstruct
      * shifted frequency spectra. However, the shifting effect does not preserve
      * frequency relationships because it implements f' = f - f_mod. On the other
@@ -326,82 +180,79 @@ vibrato_filter(gnuitar_effect_t *p, gnuitar_packet_t *db)
      * The f_mod is the speed of modulation, stored in variables speed. The speed
      * itself is modulated by the period and depth parameters. */
     
-    while (count) {
-        gnuitar_sample_t x0, x1;
+    size_t i;
+    double sample;
+    size_t count;
+    size_t curr_channel;
+    struct GnuitarVibrato *vibrato;
+
+    vibrato = effect->params;
+
+    i = 0;
+    count = gnuitar_packet_get_length(packet);
+    curr_channel = 0;
+
+    for (i = 0; i < count; i++){
+
+        double x0, x1;
         float sinval, cosval;
-        hilbert_transform(*s, &x0, &x1, &vp->hilbert, curr_channel);
+
+        sample = gnuitar_packet_get_df(packet, i);
+
+        gnuitar_hilbert_transform(sample, &x0, &x1, &vibrato->hilbert, curr_channel);
         
-        sinval = sin_lookup(vp->phase);
-        cosval = cos_lookup(vp->phase);
-        if (vp->vibrato_base > 0)
-            *s = cosval * x0 + sinval * x1;
+        sinval = sin(vibrato->phase);
+        cosval = cos(vibrato->phase);
+
+        if (vibrato->vibrato_base > 0)
+            sample = cosval * x0 + sinval * x1;
         else
-            *s = cosval * x0 - sinval * x1;
+            sample = cosval * x0 - sinval * x1;
         
-        curr_channel = (curr_channel + 1) % db->channels;
+        curr_channel = (curr_channel + 1) % packet->channels;
         if (curr_channel == 0) {
-            vp->vibrato_phase += 1000.0 / vp->vibrato_speed / db->rate;
-            if (vp->vibrato_phase >= 1.0)
-                vp->vibrato_phase -= 1.0;
-            vp->phase += (fabs(vp->vibrato_base) + (vp->vibrato_amplitude + sin_lookup(vp->vibrato_phase) * vp->vibrato_amplitude) / 2) / db->rate;
-            if (vp->phase >= 1.0)
-                vp->phase -= 1.0;
+            vibrato->vibrato_phase += 1000.0 / vibrato->vibrato_speed / packet->rate;
+            if (vibrato->vibrato_phase >= 1.0)
+                vibrato->vibrato_phase -= 1.0;
+            vibrato->phase += (fabs(vibrato->vibrato_base) + (vibrato->vibrato_amplitude + sin(vibrato->vibrato_phase) *
+	    vibrato->vibrato_amplitude) / 2) / packet->rate;
+            if (vibrato->phase >= 1.0)
+                vibrato->phase -= 1.0;
         }
 
-        s++;
-        count--;
+	gnuitar_packet_set_df(packet, i, sample);
     }
+
+    return 0;
 }
 
 static void
-vibrato_done(gnuitar_effect_t *p)
+vibrato_done(struct GnuitarEffect *effect)
 {
-    gnuitar_free(p->params);
-    gtk_widget_destroy(p->control);
-    free(p);
+    gnuitar_free(effect->params);
 }
 
-static void
-vibrato_save(gnuitar_effect_t *p, SAVE_ARGS)
+int
+gnuitar_vibrato_init(struct GnuitarEffect *effect)
 {
-    struct vibrato_params *params = p->params;
+    struct GnuitarVibrato *vibrato;
 
-    SAVE_DOUBLE("vibrato_speed", params->vibrato_speed);
-    SAVE_DOUBLE("vibrato_amplitude", params->vibrato_amplitude);
-    SAVE_DOUBLE("vibrato_base", params->vibrato_base);
+    vibrato = gnuitar_memalign(1, sizeof(struct GnuitarVibrato));
+    if (vibrato == NULL)
+        return ENOMEM;
+    gnuitar_hilbert_init(&vibrato->hilbert);
+    vibrato->vibrato_base = 0;
+    vibrato->vibrato_amplitude = 10;
+    vibrato->vibrato_speed = 200;
+    vibrato->vibrato_phase = 0;
+
+    effect->params = vibrato;
+    effect->done = vibrato_done;
+    effect->process = vibrato_process;
+    effect->get_map = NULL;
+    effect->set_map = NULL;
+    effect->toggle = 0;
+
+    return 0;
 }
 
-static void
-vibrato_load(gnuitar_effect_t *p, LOAD_ARGS)
-{
-    struct vibrato_params *params = p->params;
-
-    LOAD_DOUBLE("vibrato_speed", params->vibrato_speed);
-    LOAD_DOUBLE("vibrato_amplitude", params->vibrato_amplitude);
-    LOAD_DOUBLE("vibrato_base", params->vibrato_base);
-}
-
-effect_t *
-vibrato_create()
-{
-    effect_t       *p;
-    struct vibrato_params *pvibrato;
-
-    p = calloc(1, sizeof(effect_t));
-    p->params = gnuitar_memalign(1, sizeof(struct vibrato_params));
-    p->proc_init = vibrato_init;
-    p->proc_filter = vibrato_filter;
-    p->toggle = 0;
-    p->proc_done = vibrato_done;
-    p->proc_load = vibrato_load;
-    p->proc_save = vibrato_save;
-
-    pvibrato = p->params;
-    hilbert_init(&pvibrato->hilbert);
-    pvibrato->vibrato_base = 0;
-    pvibrato->vibrato_amplitude = 10;
-    pvibrato->vibrato_speed = 200;
-    pvibrato->vibrato_phase = 0;
-
-    return p;
-}
