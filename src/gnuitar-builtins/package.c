@@ -1,9 +1,11 @@
 #include "../gnuitar.h"
 
 #include "echo.h"
+#include "vibrato.h"
 
 const struct GnuitarPackageEffect builtin_effects[] = {
-    { "Echo", gnuitar_echo_init }
+    { "Echo", gnuitar_echo_init },
+    { "Vibrato", gnuitar_vibrato_init }
 };
 
 int
