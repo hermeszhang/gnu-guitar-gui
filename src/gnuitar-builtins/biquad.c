@@ -119,9 +119,9 @@
  * - remove separate chebyshev.c, move the code into biquad.c
  * - fix the copy in .h to agree with DoBiquad's implementation
  * - rename functions:
- *   * DoBiquad       -> do_biquad
- *   * SetEqBiquad    -> set_peq_biquad
- *   * CalcChebyshev2 -> set_chebyshev2_biquad
+ *   * DoBiquad       -> do
+ *   * SetEqBiquad    -> set_peq
+ *   * CalcChebyshev2 -> set_chebyshev2
  * - this change is followed by fixups in effects distort2 & eqbank
  *
  * Revision 1.6  2005/08/07 12:42:05  alankila
@@ -153,7 +153,7 @@
 
 /* peaking band equalizer */
 void
-set_peq_biquad(const double Fs, const double Fc, const double BW, const double G, Biquad_t *f)
+gnuitar_biquad_set_peq(const double Fs, const double Fc, const double BW, const double G, struct GnuitarBiquad *f)
 {
     double          k, om, alpha, a0, BWoct;
     
@@ -172,7 +172,7 @@ set_peq_biquad(const double Fs, const double Fc, const double BW, const double G
 
 /* low pass filter */
 void
-set_lpf_biquad(const double Fs, const double Fc, const double BW, Biquad_t *f)
+gnuitar_biquad_set_lpf(const double Fs, const double Fc, const double BW, struct GnuitarBiquad *f)
 {
     double om, alpha, a0;
     
@@ -189,7 +189,7 @@ set_lpf_biquad(const double Fs, const double Fc, const double BW, Biquad_t *f)
 
 /* band pass filter */
 void
-set_bpf_biquad(const double Fs, const double Fc, const double BW, Biquad_t *f)
+gnuitar_biquad_set_bpf(const double Fs, const double Fc, const double BW, struct GnuitarBiquad *f)
 {
     double om, alpha, a0;
     
@@ -206,7 +206,7 @@ set_bpf_biquad(const double Fs, const double Fc, const double BW, Biquad_t *f)
 
 /* 2nd order allpass filter, delay can vary from 0 to 1 */
 void
-set_phaser_biquad(const double a, Biquad_t *f)
+gnuitar_biquad_set_phaser(const double a, struct GnuitarBiquad *f)
 {
     f->b0 = a * a;
     f->b[0] = a;
@@ -217,7 +217,7 @@ set_phaser_biquad(const double a, Biquad_t *f)
 
 /* A 2nd order allpass, delay can vary from 0 to 1 */
 void
-set_2nd_allpass_biquad(const double a, Biquad_t *f)
+gnuitar_biquad_set_2nd_allpass(const double a, struct GnuitarBiquad *f)
 {
     f->b0 = a * a;
     f->b[0] = 0;
@@ -227,7 +227,7 @@ set_2nd_allpass_biquad(const double a, Biquad_t *f)
 }
 
 void
-set_rc_lowpass_biquad(const double sample_rate, const double freq, Biquad_t *f)
+gnuitar_biquad_set_rc_lowpass(const double sample_rate, const double freq, struct GnuitarBiquad *f)
 {
     double rc = 1 / (2 * M_PI * freq);
     double ts = 1.0 / sample_rate;
@@ -240,7 +240,7 @@ set_rc_lowpass_biquad(const double sample_rate, const double freq, Biquad_t *f)
 }
 
 void
-set_rc_highpass_biquad(const double sample_rate, const double freq, Biquad_t *f)
+gnuitar_biquad_set_rc_highpass(const double sample_rate, const double freq, struct GnuitarBiquad *f)
 {
     double rc = 1 / (2 * M_PI * freq);
     double ts = 1.0 / sample_rate;
@@ -253,7 +253,7 @@ set_rc_highpass_biquad(const double sample_rate, const double freq, Biquad_t *f)
 }
 
 void
-set_chebyshev1_biquad(const double Fs, const double Fc, const double ripple, const int lowpass, Biquad_t *f)
+gnuitar_biquad_set_chebyshev1(const double Fs, const double Fc, const double ripple, const int lowpass, struct GnuitarBiquad *f)
 {
     double          x, y, z, c, v, t, r, om, m, x0, y1p, y2, k, d, tt, tt2, a0;
     
@@ -299,7 +299,7 @@ set_chebyshev1_biquad(const double Fs, const double Fc, const double ripple, con
 }
 
 void
-set_lsh_biquad(const double Fs, const double Fc, const double G, Biquad_t *f)
+gnuitar_biquad_set_lsh(const double Fs, const double Fc, const double G, struct GnuitarBiquad *f)
 {
     double b0, b1, b2, a0, a1, a2, omega, cs, sn, beta, A;
 
@@ -324,7 +324,7 @@ set_lsh_biquad(const double Fs, const double Fc, const double G, Biquad_t *f)
 }
 
 void
-set_hsh_biquad(const double Fs, const double Fc, const double G, Biquad_t *f)
+gnuitar_biquad_set_hsh(const double Fs, const double Fc, const double G, struct GnuitarBiquad *f)
 {
     double b0, b1, b2, a0, a1, a2, omega, cs, sn, beta, A;
 
@@ -350,10 +350,10 @@ set_hsh_biquad(const double Fs, const double Fc, const double G, Biquad_t *f)
 
 /* input is input, output is x0 and x1 with 90° phase separation between them */
 void
-hilbert_transform(const gnuitar_sample_t input, gnuitar_sample_t *x0, gnuitar_sample_t *x1, Hilbert_t *h, const int curr_channel)
+gnuitar_hilbert_transform(const double input, double *x0, double *x1, struct GnuitarHilbert *h, const int curr_channel)
 {
     int i;
-    gnuitar_sample_t x0i, x1i;
+    double x0i, x1i;
 
     x0i = h->x0_tmp[curr_channel];
     h->x0_tmp[curr_channel] = input;
@@ -378,17 +378,17 @@ hilbert_transform(const gnuitar_sample_t input, gnuitar_sample_t *x0, gnuitar_sa
  * is shifted by 90 degrees over 99 % of the frequency band.
  */
 void
-hilbert_init(Hilbert_t *h)
+gnuitar_hilbert_init(struct GnuitarHilbert *h)
 {
-    set_2nd_allpass_biquad(0.6923877778065, &h->a1[0]);
-    set_2nd_allpass_biquad(0.9360654322959, &h->a1[1]);
-    set_2nd_allpass_biquad(0.9882295226860, &h->a1[2]);
-    set_2nd_allpass_biquad(0.9987488452737, &h->a1[3]);
+    gnuitar_biquad_set_2nd_allpass(0.6923877778065, &h->a1[0]);
+    gnuitar_biquad_set_2nd_allpass(0.9360654322959, &h->a1[1]);
+    gnuitar_biquad_set_2nd_allpass(0.9882295226860, &h->a1[2]);
+    gnuitar_biquad_set_2nd_allpass(0.9987488452737, &h->a1[3]);
 
-    set_2nd_allpass_biquad(0.4021921162426, &h->a2[0]);
-    set_2nd_allpass_biquad(0.8561710882420, &h->a2[1]);
-    set_2nd_allpass_biquad(0.9722909545651, &h->a2[2]);
-    set_2nd_allpass_biquad(0.9952884791278, &h->a2[3]);
+    gnuitar_biquad_set_2nd_allpass(0.4021921162426, &h->a2[0]);
+    gnuitar_biquad_set_2nd_allpass(0.8561710882420, &h->a2[1]);
+    gnuitar_biquad_set_2nd_allpass(0.9722909545651, &h->a2[2]);
+    gnuitar_biquad_set_2nd_allpass(0.9952884791278, &h->a2[3]);
 }
 
 /* Obtains two interpolated samples in out1 and out2. You need to imagine that the
@@ -406,7 +406,7 @@ hilbert_init(Hilbert_t *h)
  * out2 is "delayed" by 3.5 samples.
  */
 void
-fir_interpolate_2x(gnuitar_sample_t *history, const gnuitar_sample_t in, gnuitar_sample_t *out1, gnuitar_sample_t *out2)
+fir_interpolate_2x(double *history, const double in, double *out1, double *out2)
 {
     *out1 = history[2];
     *out2 = 0.6147129043790 * (history[2] + history[3])
@@ -433,10 +433,10 @@ fir_interpolate_2x(gnuitar_sample_t *history, const gnuitar_sample_t in, gnuitar
  * It would also be possible to calculate decimator by reusing the interpolator code
  * and ignoring out1, but this is more efficient. The decimator also delays input by
  * 1.5 samples in output rate. */
-gnuitar_sample_t
-fir_decimate_2x(gnuitar_sample_t *history, const gnuitar_sample_t in1, const gnuitar_sample_t in2)
+double
+fir_decimate_2x(double *history, const double in1, const double in2)
 {
-    gnuitar_sample_t out;
+    double out;
     
     out = 0.6147129043790 * (history[1] + history[2])
         - 0.1534261286990 * (history[0] + history[3])
