@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>733</width>
-    <height>527</height>
+    <width>857</width>
+    <height>618</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,7 +17,7 @@
    <widget class="QPushButton" name="start_button">
     <property name="geometry">
      <rect>
-      <x>10</x>
+      <x>30</x>
       <y>150</y>
       <width>131</width>
       <height>91</height>
@@ -27,30 +27,10 @@
      <string>Start</string>
     </property>
    </widget>
-   <widget class="QListView" name="current_effects">
-    <property name="geometry">
-     <rect>
-      <x>350</x>
-      <y>30</y>
-      <width>161</width>
-      <height>311</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="QListView" name="known_effects">
-    <property name="geometry">
-     <rect>
-      <x>540</x>
-      <y>30</y>
-      <width>171</width>
-      <height>311</height>
-     </rect>
-    </property>
-   </widget>
    <widget class="QPushButton" name="record_button">
     <property name="geometry">
      <rect>
-      <x>10</x>
+      <x>30</x>
       <y>250</y>
       <width>131</width>
       <height>91</height>
@@ -60,188 +40,59 @@
      <string>Record</string>
     </property>
    </widget>
-   <widget class="QLabel" name="label">
+   <widget class="QWidget" name="gridLayoutWidget">
     <property name="geometry">
      <rect>
-      <x>350</x>
-      <y>0</y>
-      <width>161</width>
-      <height>20</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Current Effects</string>
-    </property>
-    <property name="alignment">
-     <set>Qt::AlignCenter</set>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label_2">
-    <property name="geometry">
-     <rect>
-      <x>540</x>
-      <y>0</y>
-      <width>171</width>
-      <height>21</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Known Effects</string>
-    </property>
-    <property name="alignment">
-     <set>Qt::AlignCenter</set>
-    </property>
-   </widget>
-   <widget class="QProgressBar" name="input_volume">
-    <property name="geometry">
-     <rect>
-      <x>350</x>
-      <y>430</y>
-      <width>161</width>
-      <height>23</height>
-     </rect>
-    </property>
-    <property name="autoFillBackground">
-     <bool>false</bool>
-    </property>
-    <property name="value">
-     <number>24</number>
-    </property>
-    <property name="invertedAppearance">
-     <bool>false</bool>
-    </property>
-    <property name="format">
-     <string>%p</string>
-    </property>
-   </widget>
-   <widget class="QListView" name="listView">
-    <property name="geometry">
-     <rect>
-      <x>150</x>
+      <x>170</x>
       <y>30</y>
-      <width>161</width>
-      <height>311</height>
+      <width>641</width>
+      <height>501</height>
      </rect>
     </property>
-   </widget>
-   <widget class="QLabel" name="label_3">
-    <property name="geometry">
-     <rect>
-      <x>150</x>
-      <y>0</y>
-      <width>161</width>
-      <height>20</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Presets</string>
-    </property>
-    <property name="scaledContents">
-     <bool>false</bool>
-    </property>
-    <property name="alignment">
-     <set>Qt::AlignCenter</set>
-    </property>
-   </widget>
-   <widget class="QSlider" name="horizontalSlider">
-    <property name="geometry">
-     <rect>
-      <x>350</x>
-      <y>390</y>
-      <width>161</width>
-      <height>29</height>
-     </rect>
-    </property>
-    <property name="orientation">
-     <enum>Qt::Horizontal</enum>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label_4">
-    <property name="geometry">
-     <rect>
-      <x>380</x>
-      <y>350</y>
-      <width>121</width>
-      <height>41</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Input Volume</string>
-    </property>
-   </widget>
-   <widget class="QProgressBar" name="InputVolume_2">
-    <property name="geometry">
-     <rect>
-      <x>540</x>
-      <y>430</y>
-      <width>161</width>
-      <height>23</height>
-     </rect>
-    </property>
-    <property name="autoFillBackground">
-     <bool>false</bool>
-    </property>
-    <property name="value">
-     <number>24</number>
-    </property>
-    <property name="invertedAppearance">
-     <bool>false</bool>
-    </property>
-    <property name="format">
-     <string>%p</string>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label_5">
-    <property name="geometry">
-     <rect>
-      <x>570</x>
-      <y>350</y>
-      <width>121</width>
-      <height>41</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Output Volume</string>
-    </property>
-   </widget>
-   <widget class="QSlider" name="horizontalSlider_2">
-    <property name="geometry">
-     <rect>
-      <x>540</x>
-      <y>390</y>
-      <width>161</width>
-      <height>29</height>
-     </rect>
-    </property>
-    <property name="orientation">
-     <enum>Qt::Horizontal</enum>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="add_preset_button">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>30</y>
-      <width>131</width>
-      <height>27</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Add Preset</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="remove_preset_button">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>70</y>
-      <width>131</width>
-      <height>27</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Remove Preset</string>
-    </property>
+    <layout class="QGridLayout" name="gridLayout">
+     <item row="1" column="0">
+      <widget class="QListView" name="current_effects"/>
+     </item>
+     <item row="1" column="1">
+      <widget class="QListView" name="listView"/>
+     </item>
+     <item row="1" column="2">
+      <widget class="QListView" name="known_effects"/>
+     </item>
+     <item row="0" column="0">
+      <widget class="QLabel" name="label_3">
+       <property name="text">
+        <string>Presets</string>
+       </property>
+       <property name="scaledContents">
+        <bool>false</bool>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <widget class="QLabel" name="label">
+       <property name="text">
+        <string>Current Effects</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="2">
+      <widget class="QLabel" name="label_2">
+       <property name="text">
+        <string>Known Effects</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </widget>
   </widget>
   <widget class="QToolBar" name="main_toolbar">
@@ -258,7 +109,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>733</width>
+     <width>857</width>
      <height>25</height>
     </rect>
    </property>
@@ -337,4 +188,6 @@
   </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
+ <resources/>
+ <connections/>
 </ui>
