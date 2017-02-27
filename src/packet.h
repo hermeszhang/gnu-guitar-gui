@@ -77,7 +77,11 @@ size_t gnuitar_packet_export_s32le(const struct GnuitarPacket *packet, void * ou
 
 void gnuitar_packet_set_si(struct GnuitarPacket *packet, size_t index, int32_t n);
 
+void gnuitar_packet_set_df(struct GnuitarPacket *packet, size_t index, double n);
+
 int32_t gnuitar_packet_get_si(const struct GnuitarPacket *packet, size_t index);
+
+double gnuitar_packet_get_df(const struct GnuitarPacket *packet, size_t index);
 
 void gnuitar_packet_mul_si(struct GnuitarPacket *packet, int32_t n);
 

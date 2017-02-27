@@ -116,6 +116,17 @@ gnuitar_packet_set_si(struct GnuitarPacket *packet, size_t index, int32_t n)
     }
 }
 
+void
+gnuitar_packet_set_df(struct GnuitarPacket *packet, size_t index, double n)
+{
+    if (n > 1.0)
+        n = 1.0;
+    else if (n < -1.0)
+        n = -1.0;
+    if (index < packet->len)
+        packet->data[index] = GNUITAR_SAMPLE_MAX * n;
+}
+
 /** Gets the value of a sample within a packet.
  * @param packet An initialized packet.
  * @param index The index of the packet.
@@ -131,6 +142,17 @@ gnuitar_packet_get_si(const struct GnuitarPacket *packet, size_t index)
         return packet->data[index];
     }
     return 0;
+}
+
+double
+gnuitar_packet_get_df(const struct GnuitarPacket *packet, size_t index)
+{
+    double sample = 0.0;
+    if (index < packet->len) {
+        sample = packet->data[index];
+	sample /= GNUITAR_SAMPLE_MAX;
+    }
+    return sample;
 }
 
 /** Multiplies the samples in the packet by a signed integer.
