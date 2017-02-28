@@ -100,7 +100,7 @@ gnuitar_package_add_effect(struct GnuitarPackage *package, const struct GnuitarP
 }
 
 int
-gnuitar_package_create_effect(struct GnuitarPackage *package, const char *name, struct GnuitarEffect *effect)
+gnuitar_package_init_effect(struct GnuitarPackage *package, const char *name, struct GnuitarEffect *effect)
 {
     int err;
     size_t index;
