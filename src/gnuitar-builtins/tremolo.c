@@ -137,10 +137,17 @@ gnuitar_tremolo_init(struct GnuitarEffect *effect)
     effect->params = tremolo;
     effect->done = gnuitar_tremolo_done;
     effect->process = gnuitar_tremolo_process;
-    effect->get_map = NULL;
-    effect->set_map = NULL;
+    effect->get_map = gnuitar_tremolo_get_map;
+    effect->set_map = gnuitar_tremolo_set_map;
 
     return 0;
+}
+
+void
+gnuitar_tremolo_done(struct GnuitarEffect *effect)
+{
+    free(effect->params);
+    effect->params = NULL;
 }
 
 int
@@ -177,10 +184,27 @@ gnuitar_tremolo_process(struct GnuitarEffect *effect, struct GnuitarPacket *pack
     return 0;
 }
 
-void
-gnuitar_tremolo_done(struct GnuitarEffect *effect)
+int
+gnuitar_tremolo_get_map(const struct GnuitarEffect *effect, struct GnuitarMap *map)
 {
-    free(effect->params);
-    effect->params = NULL;
+    int err;
+    (void) effect;
+
+    err = gnuitar_map_define(map, "Amplitude", GNUITAR_MAP_TYPE_DOUBLE);
+    if (err != 0)
+        return err;
+
+    err = gnuitar_map_define(map, "Speed", GNUITAR_MAP_TYPE_DOUBLE);
+    if (err != 0)
+        return err;
+
+    return 0;
+}
+
+int
+gnuitar_tremolo_set_map(struct GnuitarEffect *effect, const struct GnuitarMap *map){
+    (void) effect;
+    (void) map;
+    return 0;
 }
 

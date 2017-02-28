@@ -37,5 +37,9 @@ void gnuitar_tremolo_done(struct GnuitarEffect *effect);
 
 int gnuitar_tremolo_process(struct GnuitarEffect *effect, struct GnuitarPacket *packet);
 
+int gnuitar_tremolo_get_map(const struct GnuitarEffect *effect, struct GnuitarMap *map);
+
+int gnuitar_tremolo_set_map(struct GnuitarEffect *effect, const struct GnuitarMap *map);
+
 #endif /* GNUITAR_BUILTIN_TREMOLO */
 
