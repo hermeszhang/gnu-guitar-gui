@@ -20,18 +20,22 @@
  * $Id$
  */
 
-#ifndef GNUITAR_TREMOLO_H
-#define GNUITAR_TREMOLO_H
+#ifndef GNUITAR_BUILTIN_TREMOLO_H
+#define GNUITAR_BUILTIN_TREMOLO_H
 
-#include "effect.h"
+#include "../effect.h"
 
-gnuitar_effect_t * gnuitar_tremolo_create(void);
+struct GnuitarTremolo {
+    double amplitude;
+    double speed;
+    double phase;
+};
 
-typedef struct gnuitar_tremolo {
-    float tremolo_amplitude;
-    float tremolo_speed;
-    float tremolo_phase;
-} gnuitar_tremolo_t;
+int gnuitar_tremolo_init(struct GnuitarEffect *effect);
 
-#endif /* GNUITAR_TREMOLO */
+void gnuitar_tremolo_done(struct GnuitarEffect *effect);
+
+int gnuitar_tremolo_process(struct GnuitarEffect *effect, struct GnuitarPacket *packet);
+
+#endif /* GNUITAR_BUILTIN_TREMOLO */
 

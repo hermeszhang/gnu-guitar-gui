@@ -4,6 +4,7 @@ CFLAGS = -Wall -Wextra -Werror -Wfatal-errors -fPIC
 objfiles += biquad.o
 objfiles += package.o
 objfiles += echo.o
+objfiles += tremolo.o
 objfiles += vibrato.o
 
 tests += echo-test
@@ -25,11 +26,15 @@ LDLIBS += -lgnuitar -lasound
 LDFLAGS += -L..
 endif
 
+effect_headers += ../effect.h
+effect_headers += ../packet.h
+effect_headers += ../map.h
+
 .PHONY: all
 all: libgnuitar-builtins.so $(tests)
 
 libgnuitar-builtins.so: $(objfiles)
-	$(CC) -shared $(objfiles) -o $@
+	$(CC) -shared $(objfiles) ../libgnuitar.so -o $@
 
 biquad.o: biquad.c biquad.h
 
@@ -38,11 +43,13 @@ package.o: package.c ../gnuitar.h ../package.h ../effect.h ../track.h
 package-test: package-test.c ../libgnuitar.so libgnuitar-builtins.so
 	$(CC) $(CFLAGS) package-test.c ../libgnuitar.so -lasound -o $@
 
-echo.o: echo.c echo.h ../gnuitar.h ../packet.h
+echo.o: echo.c echo.h $(effect_headers)
 
 echo-test: echo-test.c echo.o ../libgnuitar.so
 
-vibrato.o: vibrato.c vibrato.h ../effect.h ../packet.h biquad.h
+vibrato.o: vibrato.c vibrato.h biquad.h $(effect_headers)
+
+tremolo.o: tremolo.c tremolo.h $(effect_headers)
 
 .PHONY: clean
 clean:
