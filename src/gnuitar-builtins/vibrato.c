@@ -196,7 +196,6 @@ vibrato_process(struct GnuitarEffect *effect, struct GnuitarPacket *packet)
 
         double x0, x1;
         float sinval, cosval;
-
         sample = gnuitar_packet_get_df(packet, i);
 
         gnuitar_hilbert_transform(sample, &x0, &x1, &vibrato->hilbert, curr_channel);
@@ -251,7 +250,6 @@ gnuitar_vibrato_init(struct GnuitarEffect *effect)
     effect->process = vibrato_process;
     effect->get_map = NULL;
     effect->set_map = NULL;
-    effect->toggle = 0;
 
     return 0;
 }
