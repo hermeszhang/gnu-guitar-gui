@@ -17,7 +17,6 @@ gnuitar_effect_init(struct GnuitarEffect *effect)
     effect->process = NULL;
     effect->get_map = NULL;
     effect->set_map = NULL;
-    effect->toggle = 0;
 }
 
 /** Releases resources allocated by effect structure.
@@ -46,9 +45,8 @@ gnuitar_effect_done(struct GnuitarEffect *effect)
 int
 gnuitar_effect_process(struct GnuitarEffect *effect, struct GnuitarPacket *packet)
 {
-    if (effect->toggle)
+    if (effect->process)
         return effect->process(effect, packet);
-
     return EFAULT;
 }
 

@@ -46,8 +46,6 @@ struct GnuitarEffect {
     int (*get_map) (const struct GnuitarEffect *, struct GnuitarMap *);
     /** Sets the parameter map of the effect */
     int (*set_map) (struct GnuitarEffect *, const struct GnuitarMap *);
-    /** Toggles the effect on and off */
-    short toggle;
 };
 
 void gnuitar_effect_init(struct GnuitarEffect *effect);
@@ -104,23 +102,6 @@ int gnuitar_effect_set_map(struct GnuitarEffect *effect, const struct GnuitarMap
 	gnuitar_printf("warning: couldn't read '%s', '%s'\n", group, name); \
 	*error = NULL; \
     }
-
-/* tabularised sin() */
-#define SIN_LOOKUP_SIZE         65536
-extern float sin_lookup_table[SIN_LOOKUP_SIZE+1];
-
-static inline float
-sin_lookup(float pos) {
-    return sin_lookup_table[(int) (pos * (float) SIN_LOOKUP_SIZE)];
-}
-
-static inline float
-cos_lookup(float pos) {
-    if (pos >= 0.75f)
-        return sin_lookup(pos - 0.75f);
-    else
-        return sin_lookup(pos + 0.25f);
-}
 
 /* FreeBSD's malloc is aligned by 16 */
 #if defined(__SSE__) && !defined(__FreeBSD__)
