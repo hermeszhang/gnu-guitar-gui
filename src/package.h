@@ -66,6 +66,8 @@ struct GnuitarPackage {
 
 int gnuitar_package_open(struct GnuitarPackage *package, const char *path);
 
+void gnuitar_package_init(struct GnuitarPackage *package);
+
 void gnuitar_package_done(struct GnuitarPackage *package);
 
 int gnuitar_package_add_effect(struct GnuitarPackage *package, const struct GnuitarPackageEffect *package_effect);

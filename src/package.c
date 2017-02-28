@@ -31,12 +31,7 @@ gnuitar_package_open(struct GnuitarPackage *package, const char * path)
     int (*package_init)(struct GnuitarPackage *package);
     int err;
 #endif /* _WIN32 */
-    package->handle = NULL;
-    package->name = NULL;
-    package->effects = NULL;
-    package->effects_count = 0;
-    package->tracks = NULL;
-    package->tracks_count = 0;
+    gnuitar_package_init(package);
 
     if (path == NULL)
         return EFAULT;
@@ -62,6 +57,17 @@ gnuitar_package_open(struct GnuitarPackage *package, const char * path)
     return 0;
 }
 
+void
+gnuitar_package_init(struct GnuitarPackage *package)
+{
+    package->handle = NULL;
+    package->name = NULL;
+    package->effects = NULL;
+    package->effects_count = 0;
+    package->tracks = NULL;
+    package->tracks_count = 0;
+}
+
 /** Closes a package.
  * @param package A package created by @ref gnuitar_package_open
  * @ingroup gnuitar-package
@@ -77,7 +83,11 @@ gnuitar_package_done(struct GnuitarPackage *package)
         dlclose(package->handle);
 #endif /* _WIN32 */
     }
+    free(package->effects);
+    free(package->tracks);
     free(package->name);
+
+    gnuitar_package_init(package);
 }
 
 int
