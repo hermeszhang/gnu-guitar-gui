@@ -45,7 +45,7 @@ gnuitar_packet_done(struct GnuitarPacket *packet)
  */
 
 size_t
-gnutiar_packet_get_length(const struct GnuitarPacket *packet)
+gnuitar_packet_get_length(const struct GnuitarPacket *packet)
 {
     return packet->len;
 }
