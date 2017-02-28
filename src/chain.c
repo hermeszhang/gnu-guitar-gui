@@ -521,10 +521,7 @@ void
 gnuitar_chain_process(struct GnuitarChain *chain, struct GnuitarPacket *packet)
 {
     unsigned int i;
-
     for (i = 0; i < chain->n_effects; i++) {
-        if (!chain->effects[i].toggle)
-            continue;
         gnuitar_effect_process(&chain->effects[i], packet);
     }
 }
