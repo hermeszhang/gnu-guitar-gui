@@ -82,6 +82,7 @@ done(void *data)
         if (alsa_track->output_name != NULL)
             free(alsa_track->output_name);
     }
+    free(data);
 }
 
 static int
