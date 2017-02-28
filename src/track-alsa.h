@@ -68,29 +68,30 @@
 #include <alsa/asoundlib.h>
 #include <pthread.h>
 
+struct GnuitarPcmConfig {
+    /** The sample type */
+    snd_pcm_format_t format;
+    /** The number of channels in a frame */
+    unsigned int channels;
+    /** The number of frames per second */
+    unsigned int rate;
+    /** The number of frames in a period */
+    unsigned int period_size;
+    /** The number of periods in a buffer */
+    unsigned int periods;
+};
+
 struct GnuitarAlsaTrack {
     /** The name of the input PCM */
     char * input_name;
     /** The input PCM */
     snd_pcm_t * input_pcm;
-    /** The number of channels from the input */
-    unsigned int input_channels;
-    /** The number of bits per sample from the input */
-    unsigned int input_bits;
     /** The name of the output PCM */
     char * output_name;
     /** The output PCM */
     snd_pcm_t * output_pcm;
-    /** The number of channels from the output */
-    unsigned int output_channels;
-    /** The number of bits per sample from the output */
-    unsigned int output_bits;
-    /** The number of periods to use */
-    unsigned int period_size;
-    /** The number of frames in a period */
-    unsigned int periods;
-    /** The number of frames per second */
-    unsigned long int rate;
+    /** The configuration of the PCMs */
+    struct GnuitarPcmConfig pcm_config;
     /** The thread that runs the audio threw the pump */
     pthread_t thread;
     /** A flag to decide whether or not to keep to the thread running */

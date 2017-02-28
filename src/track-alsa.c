@@ -19,13 +19,7 @@ static int get_map(const struct GnuitarTrack *track, struct GnuitarMap *map);
 
 static void * alsa_audio_thread(void *data);
 
-static int alsa_configure_audio(snd_pcm_t *device,
-                                unsigned int *periods,
-                                unsigned int *period_size,
-                                int channels,
-                                unsigned long int *rate,
-                                unsigned int *bits,
-                                int adapting);
+static int alsa_configure_audio(snd_pcm_t *device, struct GnuitarPcmConfig *pcm_config);
 
 int
 gnuitar_alsa_track_init(struct GnuitarTrack *track)
@@ -58,17 +52,15 @@ create(void)
 
     alsa_track->input_name = gnuitar_strdup("default");
     alsa_track->input_pcm = NULL;
-    alsa_track->input_channels = 2;
-    alsa_track->input_bits = 32;
 
     alsa_track->output_name = gnuitar_strdup("default");
     alsa_track->output_pcm = NULL;
-    alsa_track->output_channels = 2;
-    alsa_track->output_bits = 32;
 
-    alsa_track->period_size = 128;
-    alsa_track->periods = 4;
-    alsa_track->rate = 48000;
+    alsa_track->pcm_config.format = SND_PCM_FORMAT_S32;
+    alsa_track->pcm_config.channels = 2;
+    alsa_track->pcm_config.rate = 48000;
+    alsa_track->pcm_config.periods = 2;
+    alsa_track->pcm_config.period_size = 512;
 
     alsa_track->keep_thread_running = 0;
 
@@ -101,44 +93,26 @@ start(struct GnuitarTrack *track)
     if (alsa_track == NULL)
         return -1;
 
-    if (snd_pcm_open(&alsa_track->input_pcm,
-                     alsa_track->input_name,
-                     SND_PCM_STREAM_CAPTURE,
-                     0 /* mode flags */) != 0) {
+    if (snd_pcm_open(&alsa_track->input_pcm, alsa_track->input_name, SND_PCM_STREAM_CAPTURE, 0 /* mode flags */) != 0) {
         return -2;
     }
 
-    if (alsa_configure_audio(alsa_track->input_pcm,
-                             &alsa_track->periods,
-                             &alsa_track->period_size,
-                             alsa_track->input_channels,
-                             &alsa_track->rate,
-                             &alsa_track->input_bits,
-                             1 /* 1 means values may be changed */) != 0) {
+    if (alsa_configure_audio(alsa_track->input_pcm, &alsa_track->pcm_config) != 0){
         return -3;
     }
 
-    if (snd_pcm_open(&alsa_track->output_pcm,
-                     alsa_track->output_name,
-                     SND_PCM_STREAM_PLAYBACK,
-                     0 /* mode flags */) != 0) {
-        return -2;
+    if (snd_pcm_open(&alsa_track->output_pcm, alsa_track->output_name, SND_PCM_STREAM_PLAYBACK, 0 /* mode flags */) != 0) {
+        return -4;
     }
 
-    if (alsa_configure_audio(alsa_track->output_pcm,
-                             &alsa_track->periods,
-                             &alsa_track->period_size,
-                             alsa_track->output_channels,
-                             &alsa_track->rate,
-                             &alsa_track->output_bits,
-                             1 /* 1 means values may be changed */) != 0) {
-        return -3;
+    if (alsa_configure_audio(alsa_track->output_pcm, &alsa_track->pcm_config) != 0){
+        return -5;
     }
 
     alsa_track->keep_thread_running = 1;
 
     if (pthread_create(&alsa_track->thread, NULL, alsa_audio_thread, track)) {
-        return -4;
+        return -6;
     }
 
     return 0;
@@ -198,7 +172,7 @@ alsa_audio_thread(void *data)
     int inframes, outframes;
     struct GnuitarPacket db;
     unsigned int restarting = 0;
-    unsigned int data_size = 0;
+    ssize_t data_size;
 
     struct GnuitarTrack *track;
     struct GnuitarAlsaTrack *alsa_track;
@@ -222,9 +196,9 @@ alsa_audio_thread(void *data)
     if (output_pcm == NULL)
         return NULL;
 
-    data_size = (alsa_track->output_channels
-               * alsa_track->period_size
-               * alsa_track->output_bits) / 8;
+    data_size = snd_pcm_frames_to_bytes(alsa_track->input_pcm, alsa_track->pcm_config.period_size);
+    if (data_size < 0)
+        return NULL;
 
     db.data = malloc(data_size);
     if (db.data == NULL)
@@ -236,10 +210,9 @@ alsa_audio_thread(void *data)
         return NULL;
     }
 
-    db.len = alsa_track->output_channels
-           * alsa_track->period_size;
-    db.channels = alsa_track->output_channels;
-    db.rate = alsa_track->rate;
+    db.len = alsa_track->pcm_config.period_size * alsa_track->pcm_config.channels;
+    db.channels = alsa_track->pcm_config.channels;
+    db.rate = alsa_track->pcm_config.rate;
 
     /* frame counts are always the same to both read and write */
     while (alsa_track->keep_thread_running) {
@@ -254,18 +227,15 @@ alsa_audio_thread(void *data)
             snd_pcm_prepare(output_pcm);
             /* prefill audio area */
             memset(db.data, 0, data_size);
-            for (i = 0; i < alsa_track->periods; i += 1)
+            for (i = 0; i < alsa_track->pcm_config.periods; i++)
                 if (snd_pcm_avail_update(output_pcm) > 0)
                     snd_pcm_writei(output_pcm, db.data, db.len / db.channels);
         }
-
         while ((inframes = snd_pcm_readi(input_pcm, db.data, db.len / db.channels)) < 0) {
-            //gnuitar_printf( "Input buffer overrun\n");
             restarting = 1;
             snd_pcm_prepare(input_pcm);
         }
         db.len = inframes * db.channels;
-
         gnuitar_mutex_lock(&track->chain_mutex);
         gnuitar_chain_process(&track->chain, &db);
         gnuitar_mutex_unlock(&track->chain_mutex);
@@ -284,13 +254,11 @@ alsa_audio_thread(void *data)
  * parameters on the two devices, which may not even be same physical
  * hardware. The return code from this function is an error code. */
 static int
-alsa_configure_audio(snd_pcm_t *device, unsigned int *fragments, unsigned int *frames, int channels, unsigned long int *rate, unsigned int *bits, int adapting)
+alsa_configure_audio(snd_pcm_t *device, struct GnuitarPcmConfig *pcm_config)
 {
     snd_pcm_hw_params_t *hw_params;
-    int                 err;
-    unsigned int        tmp;
-    snd_pcm_uframes_t   alsa_frames;
-    
+    int err;
+
     if ((err = snd_pcm_hw_params_malloc(&hw_params)) < 0)
 	return 1;
     
@@ -304,14 +272,11 @@ alsa_configure_audio(snd_pcm_t *device, unsigned int *fragments, unsigned int *f
 	return 1;
     }
 
-    /* XXX we should support floating-point sample format */
-    if ((err = snd_pcm_hw_params_set_format(device, hw_params, SND_PCM_FORMAT_S32)) < 0) {
+    if ((err = snd_pcm_hw_params_set_format(device, hw_params, pcm_config->format)) < 0) {
         return 1;
-    } else {
-        *bits = 32;
     }
 
-    if ((err = snd_pcm_hw_params_set_channels(device, hw_params, channels)) < 0) {
+    if ((err = snd_pcm_hw_params_set_channels(device, hw_params, pcm_config->channels)) < 0) {
         snd_pcm_hw_params_free(hw_params);
         return 1;
     }
@@ -324,60 +289,23 @@ alsa_configure_audio(snd_pcm_t *device, unsigned int *fragments, unsigned int *f
     }
 #endif
 
-    if (adapting) {
-        /* Adapting path: choose values for the tunables:
-         * sampling rate, fragment size, number of fragments. */
-        tmp = *rate;
-        if ((err = snd_pcm_hw_params_set_rate_near(device, hw_params, &tmp, 0)) < 0) {
-            snd_pcm_hw_params_free(hw_params);
-            return 1;
-        }
-        if (tmp != *rate) {
-            *rate = tmp;
-        }
-
-        /* tell alsa how many periods we would like to have */
-        if ((err = snd_pcm_hw_params_set_periods(device, hw_params, *fragments, 0)) < 0) {
-            /* If it doesn't work, well, no matter. Next time *fragments will have
-             * another value which hopefully works. And set_buffer_time_near() may
-             * still work. The message to take home is: ALSA is difficult to program. */
-        }
-
-        /* let the sound track pick period size as appropriate. */
-        tmp = (float) (*frames * *fragments) / (*rate) * 1E6;
-
-        if ((err = snd_pcm_hw_params_set_buffer_time_near(device, hw_params, &tmp, NULL)) < 0) {
-            snd_pcm_hw_params_free(hw_params);
-            return 1;
-        }
-        /* obtain the frames and fragments chosen by ALSA */
-        if ((err = snd_pcm_hw_params_get_period_size(hw_params, &alsa_frames, NULL)) < 0) {
-            snd_pcm_hw_params_free(hw_params);
-            return 1;
-        }
-        *frames = alsa_frames;
-        if ((err = snd_pcm_hw_params_get_periods(hw_params, fragments, NULL)) < 0) {
-            snd_pcm_hw_params_free(hw_params);
-            return 1;
-        }
-    } else {
-        /* use the fixed values given before */
-        tmp = *rate;
-        if ((err = snd_pcm_hw_params_set_rate(device, hw_params, tmp, 0)) < 0) {
-            snd_pcm_hw_params_free(hw_params);
-            return 1;
-        }
-        if ((err = snd_pcm_hw_params_set_period_size(device, hw_params, *frames, 0)) < 0) {
-            snd_pcm_hw_params_free(hw_params);
-            return 1;
-        }
-        
-        if ((err = snd_pcm_hw_params_set_periods(device, hw_params, *fragments, 0)) < 0) {
-            snd_pcm_hw_params_free(hw_params);
-            return 1;
-        }        
+    if ((err = snd_pcm_hw_params_set_rate_near(device, hw_params, &pcm_config->rate, 0)) < 0) {
+        snd_pcm_hw_params_free(hw_params);
+        return 1;
     }
 
+    /* tell alsa how many periods we would like to have */
+    if ((err = snd_pcm_hw_params_set_periods(device, hw_params, pcm_config->periods, 0)) < 0) {
+        /* If it doesn't work, well, no matter. Next time *fragments will have
+         * another value which hopefully works. And set_buffer_time_near() may
+         * still work. The message to take home is: ALSA is difficult to program. */
+    }
+
+    if ((err = snd_pcm_hw_params_set_period_size(device, hw_params, pcm_config->period_size, 0)) < 0) {
+        snd_pcm_hw_params_free(hw_params);
+        return 1;
+    }
+        
     if ((err = snd_pcm_hw_params(device, hw_params)) < 0) {
         snd_pcm_hw_params_free(hw_params);
         return 1;
