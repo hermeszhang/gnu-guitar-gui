@@ -12,12 +12,23 @@ ifdef gnuitar_with_alsa
 LDLIBS += -lasound
 endif
 
+objfiles += gnuitar-sh.o
+objfiles += string.o
+objfiles += shell.o
+
 .PHONY: all
 all: gnuitar-sh
 
-gnuitar-sh: gnuitar-sh.c ../libgnuitar.so
+gnuitar-sh: $(objfiles) ../libgnuitar.so
+
+gnuitar-sh.o: gnuitar-sh.c shell.h ../libgnuitar.so
+
+shell.o: shell.c shell.h string.h
+
+string.o: string.c string.h
 
 .PHONY: clean
 clean:
 	$(RM) gnuitar-sh
+	$(RM) $(objfiles)
 
