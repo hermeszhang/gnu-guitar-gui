@@ -6,6 +6,56 @@
 #define GNUITAR_PROMPT "gnuitar-sh: "
 #endif
 
+static void
+gnuitar_shell_prompt_map_entry(struct GnuitarShell *shell, struct GnuitarMap *map, const char *entry_name)
+{
+    struct GnuitarMapEntry *map_entry;
+    struct GnuitarString map_value;
+
+    union {
+        double a1;
+    } variant;
+
+    map_entry = gnuitar_map_find(map, entry_name);
+    if (map_entry == NULL)
+        return;
+
+    fprintf(shell->output, "%s: ", entry_name);
+
+    gnuitar_string_init(&map_value);
+
+    if (gnuitar_shell_readline(shell, &map_value) != 0) {
+        gnuitar_string_done(&map_value);
+        return;
+    }
+
+    if (map_entry->type == GNUITAR_MAP_TYPE_DOUBLE) {
+        if (sscanf(map_value.buf, "%lf", &variant.a1) == 1) {
+            gnuitar_map_set(map, entry_name, &variant.a1);
+        }
+    } else {
+
+    }
+
+    gnuitar_string_done(&map_value);
+}
+
+static void
+gnuitar_shell_prompt_map(struct GnuitarShell *shell, struct GnuitarMap *map)
+{
+    size_t i;
+    size_t count;
+    const char *entry_name;
+
+    count = gnuitar_map_get_count(map);
+    for (i = 0; i < count; i++){
+        entry_name = gnuitar_map_get_name(map, i);
+        if (entry_name == NULL)
+            continue;
+        gnuitar_shell_prompt_map_entry(shell, map, entry_name);
+    }
+}
+
 void
 gnuitar_shell_init(struct GnuitarShell *shell)
 {
@@ -28,6 +78,7 @@ gnuitar_shell_add_effect(struct GnuitarShell *shell)
 {
     struct GnuitarString effect_name;
     struct GnuitarEffect effect;
+    struct GnuitarMap effect_map;
 
     gnuitar_string_init(&effect_name);
 
@@ -47,6 +98,19 @@ gnuitar_shell_add_effect(struct GnuitarShell *shell)
 
     gnuitar_string_done(&effect_name);
 
+    gnuitar_map_init(&effect_map);
+
+    if (gnuitar_effect_get_map(&effect, &effect_map) == 0){
+        gnuitar_shell_prompt_map(shell, &effect_map);
+        if (gnuitar_effect_set_map(&effect, &effect_map) != 0){
+            fprintf(shell->error, "set effect map\n");
+            gnuitar_map_done(&effect_map);
+            return -3;
+        }
+    }
+
+    gnuitar_map_done(&effect_map);
+
     if (gnuitar_track_add_effect(&shell->track, &effect) != 0) {
         fprintf(shell->error, "failed to add effect to effects chain\n");
         gnuitar_effect_done(&effect);
@@ -60,9 +124,9 @@ void
 gnuitar_shell_help(struct GnuitarShell *shell)
 {
     fprintf(shell->output, "commands:\n");
+    fprintf(shell->output, " add-effect\n");
     fprintf(shell->output, " help\n");
     fprintf(shell->output, " list-effects\n");
-    fprintf(shell->output, " add-effect\n");
     fprintf(shell->output, " open-package\n");
     fprintf(shell->output, " quit\n");
     fprintf(shell->output, " exit (same as quit)\n");
@@ -112,6 +176,10 @@ gnuitar_shell_loop(struct GnuitarShell *shell)
             gnuitar_shell_list_effects(shell);
         } else if (gnuitar_string_cmp_literal(&cmd, "open-package") == 0) {
             gnuitar_shell_open_package(shell);
+        } else if (gnuitar_string_cmp_literal(&cmd, "start") == 0) {
+            gnuitar_shell_start(shell);
+        } else if (gnuitar_string_cmp_literal(&cmd, "stop") == 0) {
+            gnuitar_shell_stop(shell);
         } else if ((gnuitar_string_cmp_literal(&cmd, "quit") == 0)
                 || (gnuitar_string_cmp_literal(&cmd, "exit") == 0)) {
             gnuitar_string_done(&cmd);
@@ -176,5 +244,17 @@ gnuitar_shell_readline(struct GnuitarShell *shell, struct GnuitarString *string)
     }
 
     return 0;
+}
+
+int
+gnuitar_shell_start(struct GnuitarShell *shell)
+{
+    return gnuitar_track_start(&shell->track);
+}
+
+int
+gnuitar_shell_stop(struct GnuitarShell *shell)
+{
+    return gnuitar_track_stop(&shell->track);
 }
 

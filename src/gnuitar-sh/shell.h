@@ -28,6 +28,8 @@ int gnuitar_shell_loop(struct GnuitarShell *shell);
 
 int gnuitar_shell_add_effect(struct GnuitarShell *shell);
 
+int gnuitar_shell_edit_effect(struct GnuitarShell *shell);
+
 void gnuitar_shell_help(struct GnuitarShell *shell);
 
 void gnuitar_shell_list_effects(struct GnuitarShell *shell);
@@ -35,6 +37,10 @@ void gnuitar_shell_list_effects(struct GnuitarShell *shell);
 int gnuitar_shell_open_package(struct GnuitarShell *shell);
 
 int gnuitar_shell_readline(struct GnuitarShell *shell, struct GnuitarString *line);
+
+int gnuitar_shell_start(struct GnuitarShell *shell);
+
+int gnuitar_shell_stop(struct GnuitarShell *shell);
 
 #endif /* GNUITAR_SHELL */
 
