@@ -62,44 +62,42 @@
 
 #ifndef _WIN32
 
-inline void gnuitar_mutex_init(struct GnuitarMutex *m) {
+void gnuitar_mutex_init(struct GnuitarMutex *m) {
     pthread_mutex_init(&m->handle, NULL);
 }
 
-inline void gnuitar_mutex_done(struct GnuitarMutex *m) {
+void gnuitar_mutex_done(struct GnuitarMutex *m) {
     pthread_mutex_destroy(&m->handle);
 }
 
-inline int gnuitar_mutex_lock(struct GnuitarMutex *m) {
+int gnuitar_mutex_lock(struct GnuitarMutex *m) {
     return pthread_mutex_lock(&m->handle);
 }
 
-inline int gnuitar_mutex_unlock(struct GnuitarMutex *m) {
+int gnuitar_mutex_unlock(struct GnuitarMutex *m) {
     return pthread_mutex_unlock(&m->handle);
 }
 
 #else /* _WIN32 */
 
-inline void gnuitar_mutex_init(struct GnuitarMutex *m) {
-    *m = CreateMutex(NULL, FALSE, NULL);
+void gnuitar_mutex_init(struct GnuitarMutex *m) {
+    m->handle = CreateMutex(NULL, FALSE, NULL);
 }
 
-inline void gnuitar_mutex_done(struct GnuitarMutex *m) {
-    if (m) {
-        CloseHandle(m);
-    }
+void gnuitar_mutex_done(struct GnuitarMutex *m) {
+    CloseHandle(m->handle);
 }
 
-inline void gnuitar_mutex_lock(struct GnuitarMutex *m) {
-    if (m) {
-        WaitForSingleObject(m, INFINITE);
-    }
+int gnuitar_mutex_lock(struct GnuitarMutex *m) {
+    if (WaitForSingleObject(m, INFINITE) == WAIT_FAILED)
+        return 1;
+    return 0;
 }
 
-inline void gnuitar_mutex_unlock(struct GnuitarMutex *m) {
-    if (m) {
-        ReleaseMutex(m);
-    }
+int gnuitar_mutex_unlock(struct GnuitarMutex *m) {
+    if (ReleaseMutex(m) == FALSE)
+        return 1;
+    return 0;
 }
 
 #endif /* _WIN32 */
