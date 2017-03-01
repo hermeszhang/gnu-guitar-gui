@@ -23,49 +23,19 @@
 #ifndef GNUITAR_UTILS_H
 #define GNUITAR_UTILS_H
 
-#include <math.h>
-
 #ifdef _WIN32
-
-#ifndef M_PI
-#define M_PI 3.1415926535897932384626433832795
-#endif
-
-#ifndef  R_OK
-#define  R_OK 04
-#endif
-
-#ifndef  X_OK
-#define  X_OK 01
-#endif
-
-#ifndef  F_OK
-#define  F_OK 00
-#endif
-
-#define FILESEP "\\"
-
-#ifndef isnan
-#define isnan _isnan
-#endif
-
 #include <windows.h>
-
-struct GnuitarMutex {
-    HANDLE handle;
-};
-
 #else /* _WIN32 */
-
-#define FILESEP "/"
-
 #include <pthread.h>
+#endif /* _WIN32 */
 
 struct GnuitarMutex {
+#ifdef _WIN32
+    HANDLE handle;
+#else /* _WIN32 */
     pthread_mutex_t handle;
-};
-
 #endif /* _WIN32 */
+};
 
 void gnuitar_mutex_init(struct GnuitarMutex *mutex);
 
