@@ -146,10 +146,6 @@
  */
 
 #include "biquad.h"
-#include <math.h>
-#ifdef _WIN32
-#   include "utils.h"
-#endif
 
 /* peaking band equalizer */
 void
@@ -253,7 +249,7 @@ gnuitar_biquad_set_rc_highpass(const double sample_rate, const double freq, stru
 }
 
 void
-gnuitar_biquad_set_chebyshev1(const double Fs, const double Fc, const double ripple, const int lowpass, struct GnuitarBiquad *f)
+gnuitar_biquad_set_chebyshev1(double Fs, double Fc, double ripple, int lowpass, struct GnuitarBiquad *f)
 {
     double          x, y, z, c, v, t, r, om, m, x0, y1p, y2, k, d, tt, tt2, a0;
     
