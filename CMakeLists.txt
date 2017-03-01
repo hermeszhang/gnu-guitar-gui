@@ -6,6 +6,9 @@ SET (GNUITAR_VERSION_MAJOR 0)
 SET (GNUITAR_VERSION_MINOR 4)
 SET (GNUITAR_VERSION_PATCH 0)
 
+OPTION (GNUITAR_QT "Build the Qt interface of Gnuitar" ON)
+OPTION (GNUITAR_SH "Build the shell interface of Gnuitar" ON)
+
 ADD_SUBDIRECTORY(src)
 
 SET (CPACK_PACKAGE_DESCRIPTION_SUMMARY "A cross-platform, real-time guitar effects processor")
