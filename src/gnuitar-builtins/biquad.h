@@ -205,6 +205,12 @@
 #include <pmmintrin.h>
 #endif
 
+#include <math.h>
+
+#ifndef M_PI
+#define M_PI 3.1415926535
+#endif /* M_PI */
+
 struct GnuitarBiquad {
 #ifdef __SSE__
     union {
@@ -241,8 +247,7 @@ void gnuitar_biquad_set_rc_lowpass(const double Fs, const double Fc, struct Gnui
 void gnuitar_biquad_set_rc_highpass(const double Fs, const double Fc, struct GnuitarBiquad *f);
 void gnuitar_biquad_set_lsh(const double Fs, const double Fc, const double G, struct GnuitarBiquad *f);
 void gnuitar_biquad_set_hsh(const double Fs, const double Fc, const double G, struct GnuitarBiquad *f);
-void gnuitar_biquad_set_chebyshev1(double Fs, double Fc, double ripple,
-			       int lowpass, struct GnuitarBiquad *f);
+void gnuitar_biquad_set_chebyshev1(double Fs, double Fc, double ripple, int lowpass, struct GnuitarBiquad *f);
 
 void gnuitar_hilbert_transform(const double in, double *x0, double *x1, struct GnuitarHilbert *h, const int curr_channel);
 void gnuitar_hilbert_init(struct GnuitarHilbert *h);
@@ -360,7 +365,7 @@ convolve_aligned (const float *a, const float *b, const int len)
 }
 
 
-#else
+#else /* __SSE__ */
 
 /* Denormals are small numbers that force FPU into slow mode.
  * Denormals tend to occur in all low-pass filters, but a DC
@@ -370,7 +375,9 @@ convolve_aligned (const float *a, const float *b, const int len)
 #define DENORMAL_BIAS   1E-5f
 
 static inline float
+#ifdef __GNUC__
 __attribute__ ((nonnull(1, 2)))
+#endif /* __GNUC__ */
 convolve(const double *a, const double *b, const int len)
 {
     int i;
@@ -382,21 +389,25 @@ convolve(const double *a, const double *b, const int len)
 }
 
 static inline float
+#ifdef __GNUC__
 __attribute__ ((nonnull(1, 2)))
+#endif /* __GNUC__ */
 convolve_aligned(const double *a, const double *b, const int len)
 {
     return convolve(a, b, len);
 }
 
 static inline float
+#ifdef __GNUC__
 __attribute__ ((nonnull(2)))
+#endif /* __GNUC__ */
 do_biquad(const float x, struct GnuitarBiquad *f, const int c)
 {
     float *mem = f->mem[c], y;
     y = x * f->b0 + mem[0] * f->b[0] + mem[1] * f->b[1]
         + mem[2] * f->b[2] + mem[3] * f->b[3] + DENORMAL_BIAS;
     if (isnan(y))
-	y=0;
+        y=0;
     mem[1] = mem[0];
     mem[0] = x;
     mem[3] = mem[2];
