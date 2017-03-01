@@ -23,12 +23,10 @@
 
 #include "utils.h"
 #include "track.h"
-#include "track-alsa.h"
 
-#include "audio-oss.h"
-#include "audio-jack.h"
-#include "audio-winmm.h"
-#include "audio-dsound.h"
+#ifdef GNUITAR_WITH_ALSA
+#include "track-alsa.h"
+#endif /* GNUITAR_WITH_ALSA */
 
 /** Initializes a track, using a specified API.
  * @param track An unitialized track.
@@ -146,57 +144,5 @@ gnuitar_track_get_map(const struct GnuitarTrack *track, struct GnuitarMap *map)
     gnuitar_map_init(map);
 
     return track->get_map(track, map);
-}
-
-#ifndef _WIN32
-float procbuf[MAX_BUFFER_SIZE * MAX_CHANNELS];
-float procbuf2[MAX_BUFFER_SIZE * MAX_CHANNELS];
-#else
-float procbuf[MAX_BUFFER_SIZE / sizeof(int16_t)];
-float procbuf2[MAX_BUFFER_SIZE / sizeof(int16_t)];
-#endif
-
-struct GnuitarTrack *audio_track = NULL;
-
-/* default settings */
-struct GnuitarMutex effectlist_lock;
-#ifdef _WIN32
-unsigned int overrun_threshold = 4;
-unsigned int nbuffers = MAX_BUFFERS;
-#endif
-
-/* from JACK -- blindingly fast */
-static inline unsigned int
-prng(void)
-{
-    static unsigned int seed = 22222;
-    seed = (seed * 96314165) + 907633515;
-    return seed;
-}
-
-/* This is triangular correlated noise with frequency spectrum that increases
- * 6 dB per octave, thus most noise occurs at high frequencies. The probability
- * distribution still looks like triangle. Idea and implementation borrowed from
- * JACK. */
-void
-triangular_dither(struct GnuitarPacket *db, int16_t *target)
-{
-    static int32_t correlated_noise[MAX_CHANNELS] = { 0, 0, 0, 0 };
-    uint_fast16_t i, current_channel = 0;
-    
-    for (i = 0; i < db->len; i += 1) {
-        int32_t tmp = db->data[i];
-        int32_t noise = (prng() & 0x1ff) - 256; /* -256 to 255 */
-        
-        tmp += noise - correlated_noise[current_channel];
-        correlated_noise[current_channel] = noise;
-        tmp >>= 8;
-        if (tmp > 32767)
-            tmp = 32767;
-        if (tmp < -32768)
-            tmp = -32768;
-        target[i] = tmp;
-        current_channel = (current_channel + 1) % db->channels;
-    }
 }
 
