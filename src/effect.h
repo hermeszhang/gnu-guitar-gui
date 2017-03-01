@@ -62,46 +62,9 @@ int gnuitar_effect_set_map(struct GnuitarEffect *effect, const struct GnuitarMap
 
 #ifdef __MINGW32__
 #include <malloc.h>
-#endif
-
-#include <string.h>
+#else /* __MINGW32__ */
 #include <stdlib.h>
-#include <stdio.h>
-
-#ifdef __GNUC__
-#define unlikely(x) __builtin_expect((x), 0)
-#else
-#warning "no unlikely"
-#define unlikely(x) !!(x)
-#endif
-
-#define CLIP_SAMPLE(sm) \
-    if (unlikely(sm > (typeof(sm)) MAX_SAMPLE)) \
-        sm = (typeof(sm)) MAX_SAMPLE; \
-    if (unlikely(sm < (typeof(sm)) -MAX_SAMPLE)) \
-        sm = (typeof(sm)) -MAX_SAMPLE;
-
-/* these macros are used to save my sanity */
-#define SAVE_ARGS \
-    GKeyFile *preset, gchar *group
-#define LOAD_ARGS \
-    GKeyFile *preset, gchar *group, GError **error
-#define SAVE_DOUBLE(name, param) \
-    g_key_file_set_double(preset, group, name, param);
-#define LOAD_DOUBLE(name, param) \
-    param = g_key_file_get_double(preset, group, name, error); \
-    if (*error != NULL) { \
-	gnuitar_printf("warning: couldn't read '%s', '%s'\n", group, name); \
-	*error = NULL; \
-    }
-#define SAVE_INT(name, param) \
-    g_key_file_set_integer(preset, group, name, param);
-#define LOAD_INT(name, param) \
-    param = g_key_file_get_integer(preset, group, name, error); \
-    if (*error != NULL) { \
-	gnuitar_printf("warning: couldn't read '%s', '%s'\n", group, name); \
-	*error = NULL; \
-    }
+#endif /* __MINGW32__ */
 
 /* FreeBSD's malloc is aligned by 16 */
 #if defined(__SSE__) && !defined(__FreeBSD__)
@@ -138,12 +101,7 @@ gnuitar_free(void *memory) {
 static inline void *
 gnuitar_memalign(unsigned int num, size_t bytes)
 {
-    void *mem = calloc(num, bytes);
-    if (mem == NULL) {
-        fprintf(stderr, "failed to allocate aligned memory.\n");
-        exit(1);
-    }
-    return mem;
+    return calloc(num, bytes);
 }
 
 static inline void
