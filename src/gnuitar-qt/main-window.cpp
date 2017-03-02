@@ -33,6 +33,9 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 {
     ui->setupUi(this);
 
+    rack = new Gnuitar::Qt::Rack(ui->central_widget);
+    rack->resize(640, 480);
+
     open_package(GNUITAR_BUILTINS_PACKAGE);
 
     gnuitar_track_init(&track, "ALSA");
@@ -76,20 +79,14 @@ MainWindow::populate_known_effects(void)
     if (!package_open)
         return;
 
-    QStringList effect_list;
-
     auto count = gnuitar_package_get_effect_count(&package);
     for (decltype(count) i = 0; i < count; i++) {
         auto effect_name = gnuitar_package_get_effect_name(&package, i);
         if (effect_name == NULL)
             continue;
-        effect_list << effect_name;
+        auto action = ui->menu_effects->addAction(effect_name);
+	connect(action, &QAction::triggered, this, [this, effect_name]{ add_effect(effect_name); });
     }
-
-    auto model = new QStringListModel(this);
-    model->setStringList(effect_list);
-
-    ui->known_effects->setModel(model);
 }
 
 void
@@ -101,6 +98,43 @@ MainWindow::open_package(const std::string& package_path)
         package_open = true;
 	populate_known_effects();
     }
+}
+
+void
+MainWindow::add_effect(const QString& effect_name)
+{
+    GnuitarEffect effect;
+
+    if (gnuitar_package_init_effect(&package, effect_name.toStdString().c_str(), &effect) != 0)
+        return;
+
+    if (gnuitar_track_add_effect(&track, &effect) != 0) {
+        gnuitar_effect_done(&effect);
+	return;
+    }
+
+    GnuitarMap effect_map;
+
+    gnuitar_map_init(&effect_map);
+
+    if (gnuitar_effect_get_map(&effect, &effect_map) != 0) {
+        gnuitar_map_done(&effect_map);
+        return;
+    }
+
+    auto effect_widget = new Gnuitar::Qt::Effect(effect_name, ui->central_widget);
+
+    auto parameter_count = gnuitar_map_get_count(&effect_map);
+    for (decltype(parameter_count) i = 0; i < parameter_count; i++) {
+        auto parameter_name = gnuitar_map_get_name(&effect_map, i);
+        if (parameter_name == NULL)
+            continue;
+        effect_widget->add_parameter(parameter_name);
+    }
+
+    gnuitar_map_done(&effect_map);
+
+    rack->add_effect(effect_widget);
 }
 
 void
@@ -117,14 +151,6 @@ MainWindow::on_open_package_triggered(void)
     std::string package_path_utf8 = package_path.toUtf8().constData();
 
     open_package(package_path_utf8);
-}
-
-void
-MainWindow::on_start_button_clicked(void)
-{
-    if (gnuitar_track_start(&track) != 0) {
-        /* error */
-    }
 }
 
 void

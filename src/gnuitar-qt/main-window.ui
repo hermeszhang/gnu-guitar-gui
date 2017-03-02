@@ -14,85 +14,16 @@
    <string>Gnuitar</string>
   </property>
   <widget class="QWidget" name="central_widget">
-   <widget class="QPushButton" name="start_button">
+   <widget class="QWidget" name="verticalLayoutWidget">
     <property name="geometry">
      <rect>
-      <x>30</x>
-      <y>150</y>
-      <width>131</width>
-      <height>91</height>
+      <x>-11</x>
+      <y>-1</y>
+      <width>871</width>
+      <height>561</height>
      </rect>
     </property>
-    <property name="text">
-     <string>Start</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="record_button">
-    <property name="geometry">
-     <rect>
-      <x>30</x>
-      <y>250</y>
-      <width>131</width>
-      <height>91</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Record</string>
-    </property>
-   </widget>
-   <widget class="QWidget" name="gridLayoutWidget">
-    <property name="geometry">
-     <rect>
-      <x>170</x>
-      <y>30</y>
-      <width>641</width>
-      <height>501</height>
-     </rect>
-    </property>
-    <layout class="QGridLayout" name="gridLayout">
-     <item row="1" column="0">
-      <widget class="QListView" name="current_effects"/>
-     </item>
-     <item row="1" column="1">
-      <widget class="QListView" name="listView"/>
-     </item>
-     <item row="1" column="2">
-      <widget class="QListView" name="known_effects"/>
-     </item>
-     <item row="0" column="0">
-      <widget class="QLabel" name="label_3">
-       <property name="text">
-        <string>Presets</string>
-       </property>
-       <property name="scaledContents">
-        <bool>false</bool>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignCenter</set>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="1">
-      <widget class="QLabel" name="label">
-       <property name="text">
-        <string>Current Effects</string>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignCenter</set>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="2">
-      <widget class="QLabel" name="label_2">
-       <property name="text">
-        <string>Known Effects</string>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignCenter</set>
-       </property>
-      </widget>
-     </item>
-    </layout>
+    <layout class="QVBoxLayout" name="verticalLayout"/>
    </widget>
   </widget>
   <widget class="QToolBar" name="main_toolbar">
@@ -139,6 +70,7 @@
      <string>Effects</string>
     </property>
    </widget>
+   <addaction name="add-effect/">
    <widget class="QMenu" name="menu_packages">
     <property name="title">
      <string>Packages</string>
