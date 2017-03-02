@@ -27,6 +27,10 @@
 #include "packet.h"
 #include "map.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif /* __cplusplus */
+
 /** @defgroup libgnuitar-effect Audio Effects
  * The API that's associated with audio effects.
  */
@@ -110,6 +114,10 @@ gnuitar_free(void *memory) {
 }
 
 #endif /* defined(__SSE__) && !defined(__FreeBSD__) */
+
+#ifdef __cplusplus
+} /* extern "C" */
+#endif /* __cplusplus */
 
 #endif /* GNUITAR_EFFECT_H */
 
