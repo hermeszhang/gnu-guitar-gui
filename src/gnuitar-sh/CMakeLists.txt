@@ -1,15 +1,17 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 
-IF (CMAKE_COMPILER_IS_GNUCC)
-    SET (CMAKE_C_FLAGS "-Wall -Wextra -Werror -Wfatal-errors")
-ENDIF (CMAKE_COMPILER_IS_GNUCC)
+IF (CMAKE_COMPILER_IS_GNUCXX)
+    SET (CMAKE_CXX_FLAGS "-Wall -Wextra -Werror -Wfatal-errors -std=c++14")
+ENDIF (CMAKE_COMPILER_IS_GNUCXX)
+
+IF (MSVC)
+    SET (CMAKE_CXX_FLAGS "/Wall")
+ENDIF (MSVC)
 
 ADD_EXECUTABLE(gnuitar-sh
-    gnuitar-sh.c
-    string.h
-    string.c
+    gnuitar-sh.cc
     shell.h
-    shell.c)
+    shell.cc)
 
 TARGET_LINK_LIBRARIES(gnuitar-sh gnuitar)
 

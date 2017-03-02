@@ -1,5 +1,5 @@
-CC = gcc
-CFLAGS = -Wall -Wextra -Werror -Wfatal-errors
+CXX = gcc
+CXXFLAGS = -Wall -Wextra -Werror -Wfatal-errors -std=c++14
 LDLIBS = -lpthread
 
 ifdef gnuitar_config
@@ -21,11 +21,9 @@ all: gnuitar-sh
 
 gnuitar-sh: $(objfiles) ../libgnuitar.so
 
-gnuitar-sh.o: gnuitar-sh.c shell.h ../libgnuitar.so
+gnuitar-sh.o: gnuitar-sh.cc shell.h ../libgnuitar.so
 
-shell.o: shell.c shell.h string.h
-
-string.o: string.c string.h
+shell.o: shell.cc shell.h ../libgnuitar.so
 
 .PHONY: clean
 clean:

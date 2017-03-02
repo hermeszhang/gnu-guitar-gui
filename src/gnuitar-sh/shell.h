@@ -1,13 +1,14 @@
 #ifndef GNUITAR_SHELL_H
 #define GNUITAR_SHELL_H
 
-#include <stdio.h>
+#include <cstdio>
+#include <string>
 
 #include "../gnuitar.h"
 
-#include "string.h"
+namespace Gnuitar {
 
-struct GnuitarShell {
+class Shell final {
     /** standard shell input */
     FILE *input;
     /** standard shell output */
@@ -18,29 +19,23 @@ struct GnuitarShell {
     struct GnuitarTrack track;
     /** the shell's package */
     struct GnuitarPackage package;
-};
+public:
+    Shell(void) noexcept;
+    ~Shell(void);
+    int loop(void) noexcept;
+    int add_effect(void) noexcept;
+    void help(void) noexcept;
+    void list_effects(void) noexcept;
+    int open_package(void) noexcept;
+    int readline(std::string& line) noexcept;
+    int start(void) noexcept;
+    int stop(void) noexcept;
+protected:
+    void prompt_map(struct GnuitarMap *map) noexcept;
+    void prompt_map_entry(struct GnuitarMap *map, const char *name) noexcept;
+}; /* class Shell */
 
-void gnuitar_shell_init(struct GnuitarShell *shell);
+} /* namespace Gnuitar */
 
-void gnuitar_shell_done(struct GnuitarShell *shell);
-
-int gnuitar_shell_loop(struct GnuitarShell *shell);
-
-int gnuitar_shell_add_effect(struct GnuitarShell *shell);
-
-int gnuitar_shell_edit_effect(struct GnuitarShell *shell);
-
-void gnuitar_shell_help(struct GnuitarShell *shell);
-
-void gnuitar_shell_list_effects(struct GnuitarShell *shell);
-
-int gnuitar_shell_open_package(struct GnuitarShell *shell);
-
-int gnuitar_shell_readline(struct GnuitarShell *shell, struct GnuitarString *line);
-
-int gnuitar_shell_start(struct GnuitarShell *shell);
-
-int gnuitar_shell_stop(struct GnuitarShell *shell);
-
-#endif /* GNUITAR_SHELL */
+#endif /* GNUITAR_SHELL_H */
 

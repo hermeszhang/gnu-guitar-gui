@@ -9,18 +9,10 @@
 int
 main(void)
 {
-    int err;
-    struct GnuitarShell shell;
-
-    gnuitar_shell_init(&shell);
-
-    err = gnuitar_shell_loop(&shell);
-
-    gnuitar_shell_done(&shell);
-
+    Gnuitar::Shell shell;
+    auto err = shell.loop();
     if (err != 0)
         return EXIT_FAILURE;
-
     return EXIT_SUCCESS;
 }
 
