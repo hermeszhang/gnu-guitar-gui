@@ -1,4 +1,4 @@
-CXX = gcc
+CXX = g++
 CXXFLAGS = -Wall -Wextra -Werror -Wfatal-errors -std=c++14
 LDLIBS = -lpthread
 
@@ -13,13 +13,13 @@ LDLIBS += -lasound
 endif
 
 objfiles += gnuitar-sh.o
-objfiles += string.o
 objfiles += shell.o
 
 .PHONY: all
 all: gnuitar-sh
 
 gnuitar-sh: $(objfiles) ../libgnuitar.so
+	$(CXX) $(objfiles) ../libgnuitar.so -o $@ $(LDLIBS)
 
 gnuitar-sh.o: gnuitar-sh.cc shell.h ../libgnuitar.so
 
