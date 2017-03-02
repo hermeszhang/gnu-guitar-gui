@@ -6,9 +6,9 @@ TARGET = gnuitar-qt
 
 TEMPLATE = app
 
-SOURCES += "main.cpp"
-SOURCES += "main-window.cpp"
-SOURCES += "doc-browser.cpp"
+SOURCES += "gnuitar-qt.cc"
+SOURCES += "main-window.cc"
+SOURCES += "doc-browser.cc"
 SOURCES += "knob.cc"
 SOURCES += "rack.cc"
 
