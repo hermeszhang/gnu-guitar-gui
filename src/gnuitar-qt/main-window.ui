@@ -70,7 +70,6 @@
      <string>Effects</string>
     </property>
    </widget>
-   <addaction name="add-effect/">
    <widget class="QMenu" name="menu_packages">
     <property name="title">
      <string>Packages</string>
