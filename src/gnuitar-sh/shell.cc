@@ -6,6 +6,10 @@
 #define GNUITAR_PROMPT "gnuitar-sh: "
 #endif
 
+#ifdef _WIN32
+#include <windows.h>
+#endif /* _WIN32 */
+
 namespace Gnuitar {
 
 Shell::Shell(void) noexcept
@@ -227,7 +231,17 @@ Shell::prompt_map_entry(struct GnuitarMap *map, const char *entry_name) noexcept
 void
 Shell::log_error(const std::string& error)
 {
-    fprintf(this->error, "%s\n", error.c_str());
+#ifdef _WIN32
+    auto console_handle = GetStdHandle(STD_OUTPUT_HANDLE);
+    if (console_handle != NULL)
+        SetConsoleTextAttribute(console_handle, FOREGROUND_RED);
+#endif /* _WIN32 */
+    fprintf(this->error, "error");
+#ifdef _WIN32
+    if (console_handle != NULL)
+        SetConsoleTextAttribute(console_handle, FOREGROUND_RED | FOREGROUND_BLUE | FOREGROUND_GREEN);
+#endif /* _WIN32 */
+    fprintf(this->error, ": %s\n", error.c_str());
 }
 
 } /* namespace Gnuitar */
