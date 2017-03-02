@@ -9,9 +9,13 @@ TEMPLATE = app
 SOURCES += "main.cpp"
 SOURCES += "main-window.cpp"
 SOURCES += "doc-browser.cpp"
+SOURCES += "knob.cc"
+SOURCES += "rack.cc"
 
 HEADERS += "main-window.h"
 HEADERS += "doc-browser.h"
+HEADERS += "knob.h"
+HEADERS += "rack.h"
 
 FORMS += "main-window.ui"
 

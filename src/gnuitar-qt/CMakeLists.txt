@@ -18,8 +18,12 @@ ADD_EXECUTABLE(gnuitar-qt
     ${UI_HEADERS}
     doc-browser.h
     doc-browser.cpp
+    knob.h
+    knob.cc
     main-window.h
     main-window.cpp
+    rack.h
+    rack.cc
     main.cpp)
 TARGET_LINK_LIBRARIES(gnuitar-qt ${Qt5Core_QTMAIN_LIBRARIES})
 TARGET_LINK_LIBRARIES(gnuitar-qt gnuitar)
