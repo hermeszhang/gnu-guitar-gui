@@ -33,6 +33,8 @@ public:
 protected:
     void prompt_map(struct GnuitarMap *map) noexcept;
     void prompt_map_entry(struct GnuitarMap *map, const char *name) noexcept;
+    void log_error(const std::string& error);
+    void log_info(const std::string& info);
 }; /* class Shell */
 
 } /* namespace Gnuitar */

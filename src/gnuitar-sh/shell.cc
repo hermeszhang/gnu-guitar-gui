@@ -33,12 +33,12 @@ Shell::add_effect(void) noexcept
 
     std::string effect_name;
     if (readline(effect_name) != 0) {
-        fprintf(this->error, "failed to read effect name\n");
+        log_error("failed to read effect name");
         return -1;
     }
 
     if (gnuitar_package_init_effect(&this->package, effect_name.c_str(), &effect) != 0) {
-        fprintf(this->error, "failed to initialize effect\n");
+        log_error("failed to initialize effect");
         return -2;
     }
 
@@ -47,7 +47,7 @@ Shell::add_effect(void) noexcept
     if (gnuitar_effect_get_map(&effect, &effect_map) == 0){
         Shell::prompt_map(&effect_map);
         if (gnuitar_effect_set_map(&effect, &effect_map) != 0){
-            fprintf(this->error, "set effect map\n");
+            log_error("failed to set effect parameters");
             gnuitar_map_done(&effect_map);
             return -3;
         }
@@ -56,7 +56,7 @@ Shell::add_effect(void) noexcept
     gnuitar_map_done(&effect_map);
 
     if (gnuitar_track_add_effect(&this->track, &effect) != 0) {
-        fprintf(this->error, "failed to add effect to effects chain\n");
+        log_error("failed to add effect to effects chain");
         gnuitar_effect_done(&effect);
         return -3;
     }
@@ -122,7 +122,7 @@ Shell::loop(void) noexcept
         } else if ((cmd == "quit") || (cmd == "exit")) {
             break;
         } else {
-            fprintf(this->output, "unknown command: %s\n", cmd.c_str());
+            log_error("unknown command '" + cmd + "'");
         }
     }
 
@@ -136,7 +136,7 @@ Shell::open_package(void) noexcept
 
     std::string package_path;
     if (readline(package_path) != 0) {
-        fprintf(this->error, "failed to read package path\n");
+        log_error("failed to read package path");
         return -1;
     }
 
@@ -144,7 +144,7 @@ Shell::open_package(void) noexcept
     gnuitar_package_done(&this->package);
 
     if (gnuitar_package_open(&this->package, package_path.c_str()) != 0) {
-        fprintf(this->error, "failed to open package\n");
+        log_error("failed to open package");
         return -2;
     }
 
@@ -222,6 +222,12 @@ Shell::prompt_map_entry(struct GnuitarMap *map, const char *entry_name) noexcept
             gnuitar_map_set(map, entry_name, &variant.a1);
         }
     }
+}
+
+void
+Shell::log_error(const std::string& error)
+{
+    fprintf(this->error, "%s\n", error.c_str());
 }
 
 } /* namespace Gnuitar */
