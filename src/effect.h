@@ -70,6 +70,8 @@ int gnuitar_effect_set_map(struct GnuitarEffect *effect, const struct GnuitarMap
 #include <stdlib.h>
 #endif /* __MINGW32__ */
 
+#include <string.h>
+
 /* FreeBSD's malloc is aligned by 16 */
 #if defined(__SSE__) && !defined(__FreeBSD__)
 
