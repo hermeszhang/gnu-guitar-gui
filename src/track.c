@@ -21,7 +21,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "utils.h"
 #include "track.h"
 
 #ifdef GNUITAR_WITH_ALSA

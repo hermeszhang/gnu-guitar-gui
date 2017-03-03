@@ -58,7 +58,7 @@
  * Utility constants and functions.
  *
  */
-#include "utils.h"
+#include "mutex.h"
 
 #ifndef _WIN32
 

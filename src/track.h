@@ -4,7 +4,7 @@
 #include "packet.h"
 #include "chain.h"
 #include "map.h"
-#include "utils.h"
+#include "mutex.h"
 
 #ifdef __cplusplus
 extern "C" {

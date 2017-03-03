@@ -25,8 +25,8 @@ SET(SOURCES
     pipe.c
     track.h
     track.c
-    utils.h
-    utils.c)
+    mutex.h
+    mutex.c)
 
 FIND_PACKAGE(ALSA)
 IF (ALSA_FOUND)

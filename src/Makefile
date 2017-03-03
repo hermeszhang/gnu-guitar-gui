@@ -17,7 +17,7 @@ objfiles += package-manager.o
 objfiles += packet.o
 objfiles += pipe.o
 objfiles += track.o
-objfiles += utils.o
+objfiles += mutex.o
 
 tests += pipe-test
 tests += map-test
@@ -64,7 +64,7 @@ track.o: track.c track.h packet.h chain.h map.h
 
 track-alsa.o: track-alsa.c track-alsa.h track.h packet.h chain.h map.h
 
-utils.o: utils.c utils.h
+mutex.o: mutex.c mutex.h
 
 .PHONY: clean
 clean:
