@@ -31,10 +31,8 @@ struct GnuitarTrack {
     int (*start)(struct GnuitarTrack *track);
     /** Stops the audio stream */
     int (*stop)(struct GnuitarTrack *track);
-    /** The effects pump for the track */
+    /** The effects chain for the track */
     struct GnuitarChain chain;
-    /** The mutex for the pump */
-    struct GnuitarMutex chain_mutex;
 };
 
 int gnuitar_track_init(struct GnuitarTrack *track, const char *name);

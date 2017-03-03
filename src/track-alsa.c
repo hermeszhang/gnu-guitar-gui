@@ -24,8 +24,6 @@ static int alsa_configure_audio(snd_pcm_t *device, struct GnuitarPcmConfig *pcm_
 int
 gnuitar_alsa_track_init(struct GnuitarTrack *track)
 {
-    gnuitar_mutex_init(&track->chain_mutex);
-
     gnuitar_chain_init(&track->chain);
 
     track->done = done;
@@ -237,9 +235,9 @@ alsa_audio_thread(void *data)
             snd_pcm_prepare(input_pcm);
         }
         db.len = inframes * db.channels;
-        gnuitar_mutex_lock(&track->chain_mutex);
+        gnuitar_chain_lock(&track->chain);
         gnuitar_chain_process(&track->chain, &db);
-        gnuitar_mutex_unlock(&track->chain_mutex);
+        gnuitar_chain_unlock(&track->chain);
 
         /* write output */
         while ((outframes = snd_pcm_writei(output_pcm, db.data, db.len / db.channels)) < 0) {

@@ -39,7 +39,6 @@
 int
 gnuitar_track_init(struct GnuitarTrack *track, const char *api_name)
 {
-    gnuitar_mutex_init(&track->chain_mutex);
     gnuitar_chain_init(&track->chain);
 
     if (api_name == NULL)
@@ -76,7 +75,7 @@ gnuitar_track_add_effect(struct GnuitarTrack *track, struct GnuitarEffect *effec
 {
     int err;
 
-    err = gnuitar_mutex_lock(&track->chain_mutex);
+    err = gnuitar_chain_lock(&track->chain);
     if (err != 0)
         return err;
 
@@ -84,7 +83,7 @@ gnuitar_track_add_effect(struct GnuitarTrack *track, struct GnuitarEffect *effec
     if (err != 0)
         return err;
 
-    err = gnuitar_mutex_unlock(&track->chain_mutex);
+    err = gnuitar_chain_unlock(&track->chain);
     if (err != 0)
         return err;
 
@@ -97,7 +96,7 @@ gnuitar_track_erase_effect(struct GnuitarTrack *track, unsigned int index)
 
     int err;
 
-    err = gnuitar_mutex_lock(&track->chain_mutex);
+    err = gnuitar_chain_lock(&track->chain);
     if (err != 0)
         return err;
 
@@ -105,7 +104,7 @@ gnuitar_track_erase_effect(struct GnuitarTrack *track, unsigned int index)
     if (err != 0)
         return err;
 
-    err = gnuitar_mutex_unlock(&track->chain_mutex);
+    err = gnuitar_chain_unlock(&track->chain);
     if (err != 0)
         return err;
 

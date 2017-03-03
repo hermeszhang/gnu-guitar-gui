@@ -403,6 +403,7 @@ gnuitar_chain_init(struct GnuitarChain *chain)
 {
     chain->effects = NULL;
     chain->n_effects = 0;
+    gnuitar_mutex_init(&chain->mutex);
 }
 
 /** Releases resources allocated by a chain.
@@ -423,6 +424,8 @@ gnuitar_chain_done(struct GnuitarChain *chain)
 
     chain->effects = NULL;
     chain->n_effects = 0;
+
+    gnuitar_mutex_done(&chain->mutex);
 }
 
 int
