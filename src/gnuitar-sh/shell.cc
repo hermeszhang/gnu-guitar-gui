@@ -19,12 +19,18 @@ Shell::Shell(void) noexcept
     this->error = stderr;
     gnuitar_track_init(&this->track, "ALSA");
     gnuitar_package_init(&this->package);
+
+    gnuitar_package_manager_init(&package_manager);
+    auto packages_dir = std::getenv("GNUITAR_PACKAGES_PATH");
+    if (packages_dir != NULL)
+        gnuitar_package_manager_set_packages_dir(&package_manager, packages_dir);
 }
 
 Shell::~Shell(void)
 {
     gnuitar_track_done(&this->track);
     gnuitar_package_done(&this->package);
+    gnuitar_package_manager_done(&package_manager);
 }
 
 int
@@ -75,6 +81,7 @@ Shell::help(void) noexcept
     fprintf(this->output, " add-effect\n");
     fprintf(this->output, " help\n");
     fprintf(this->output, " list-effects\n");
+    fprintf(this->output, " list-packages\n");
     fprintf(this->output, " open-package\n");
     fprintf(this->output, " quit\n");
     fprintf(this->output, " exit (same as quit)\n");
@@ -98,6 +105,26 @@ Shell::list_effects(void) noexcept
     }
 }
 
+void
+Shell::list_packages(void) noexcept
+{
+
+    fprintf(this->output, "known packages:\n");
+
+    gnuitar_package_manager_refresh_packages(&package_manager);
+
+    auto count = gnuitar_package_manager_get_count(&package_manager);
+    for (decltype(count) i = 0; i < count; i++){
+        auto package = gnuitar_package_manager_get(&package_manager, i);
+        if (package == NULL)
+            continue;
+        auto name = gnuitar_package_get_name(package);
+        if (name == NULL)
+            continue;
+        fprintf(this->output, " %s\n", name);
+    }
+}
+
 int
 Shell::loop(void) noexcept
 {
@@ -112,17 +139,19 @@ Shell::loop(void) noexcept
         }
 
         if (cmd == "add-effect") {
-            Shell::add_effect();
+            add_effect();
         } else if (cmd == "help") {
-            Shell::help();
+            help();
         } else if (cmd == "list-effects") {
-            Shell::list_effects();
+            list_effects();
+        } else if (cmd == "list-packages") {
+            list_packages();
         } else if (cmd == "open-package") {
-            Shell::open_package();
+            open_package();
         } else if (cmd == "start") {
-            Shell::start();
+            start();
         } else if (cmd == "stop") {
-            Shell::stop();
+            stop();
         } else if ((cmd == "quit") || (cmd == "exit")) {
             break;
         } else {

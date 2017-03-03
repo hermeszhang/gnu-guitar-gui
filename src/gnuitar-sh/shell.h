@@ -19,6 +19,8 @@ class Shell final {
     struct GnuitarTrack track;
     /** the shell's package */
     struct GnuitarPackage package;
+    /** the shell's package manager */
+    struct GnuitarPackageManager package_manager;
 public:
     Shell(void) noexcept;
     ~Shell(void);
@@ -26,6 +28,7 @@ public:
     int add_effect(void) noexcept;
     void help(void) noexcept;
     void list_effects(void) noexcept;
+    void list_packages(void) noexcept;
     int open_package(void) noexcept;
     int readline(std::string& line) noexcept;
     int start(void) noexcept;
