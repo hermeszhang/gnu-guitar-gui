@@ -425,6 +425,18 @@ gnuitar_chain_done(struct GnuitarChain *chain)
     chain->n_effects = 0;
 }
 
+int
+gnuitar_chain_lock(struct GnuitarChain *chain)
+{
+    return gnuitar_mutex_lock(&chain->mutex);
+}
+
+int
+gnuitar_chain_unlock(struct GnuitarChain *chain)
+{
+    return gnuitar_mutex_unlock(&chain->mutex);
+}
+
 /** Adds an effect to the chain.
  * The effect is added to the end of the chain.
  * @param chain An initialized chain.

@@ -2,6 +2,7 @@
 #define GNUITAR_CHAIN_H
 
 #include "effect.h"
+#include "mutex.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -20,11 +21,17 @@ struct GnuitarChain {
     struct GnuitarEffect *effects;
     /** number of effects in the chain */
     size_t n_effects;
+    /** the chain lock */
+    struct GnuitarMutex mutex;
 };
 
 void gnuitar_chain_init(struct GnuitarChain *chain);
 
 void gnuitar_chain_done(struct GnuitarChain *chain);
+
+int gnuitar_chain_lock(struct GnuitarChain *chain);
+
+int gnuitar_chain_unlock(struct GnuitarChain *chain);
 
 int gnuitar_chain_add_effect(struct GnuitarChain *chain, struct GnuitarEffect *effect);
 
