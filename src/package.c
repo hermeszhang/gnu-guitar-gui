@@ -24,7 +24,7 @@
  */
 
 int
-gnuitar_package_open(struct GnuitarPackage *package, const char * path)
+gnuitar_package_open(struct GnuitarPackage *package, const char *path)
 {
 #ifdef _WIN32
 #else /* _WIN32 */
@@ -64,8 +64,8 @@ gnuitar_package_init(struct GnuitarPackage *package)
     package->name = NULL;
     package->effects = NULL;
     package->effects_count = 0;
-    package->tracks = NULL;
-    package->tracks_count = 0;
+    package->drivers = NULL;
+    package->drivers_count = 0;
 }
 
 /** Closes a package.
@@ -84,7 +84,7 @@ gnuitar_package_done(struct GnuitarPackage *package)
 #endif /* _WIN32 */
     }
     free(package->effects);
-    free(package->tracks);
+    free(package->drivers);
     free(package->name);
 
     gnuitar_package_init(package);
@@ -165,7 +165,7 @@ gnuitar_package_find_effect(const struct GnuitarPackage *package, const char *na
 size_t
 gnuitar_package_get_effect_count(const struct GnuitarPackage *package)
 {
-	return package->effects_count;
+    return package->effects_count;
 }
 
 /** Gets the name of an effect.
