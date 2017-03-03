@@ -16,8 +16,8 @@ addons:
     - llvm-toolchain-precise-3.6
     packages:
     - libasound2-dev
-    - gcc-5
-    - g++-5
+    - gcc-6
+    - g++-6
     - clang-3.6
 script:
 - bash travis-ci/build.bash
