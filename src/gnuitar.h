@@ -8,6 +8,7 @@
 
 #include "chain.h"
 #include "effect.h"
+#include "env.h"
 #include "package.h"
 #include "package-manager.h"
 #include "packet.h"

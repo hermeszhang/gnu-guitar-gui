@@ -10,6 +10,7 @@ endif
 objfiles += chain.o
 objfiles += conversion.o
 objfiles += effect.o
+objfiles += env.o
 objfiles += map.o
 objfiles += package.o
 objfiles += package-manager.o
@@ -42,6 +43,8 @@ libgnuitar.so: $(objfiles)
 chain.o: chain.c chain.h effect.h
 
 effect.o: effect.c effect.h packet.h
+
+env.o: env.c env.h
 
 pipe-test: pipe-test.c libgnuitar.so
 
