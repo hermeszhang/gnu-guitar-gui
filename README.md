@@ -20,7 +20,7 @@ Here's a progress table.
 |         A text based interface | In progress |
 |       Moving from Gtk+2 to Qt5 | In Progress |
 |  Audio API and Effects Plugins | In Progress |
-|       Package / Plugin Manager | Not Started |
+|       Package / Plugin Manager | In Progress |
 | Client and Server Architecture | Not Started |
 |        <sup>1</sup>ALSA Driver | Not Started |
 |     <sup>1</sup>Windows Driver | Not Started |
