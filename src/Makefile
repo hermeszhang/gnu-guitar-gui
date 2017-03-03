@@ -9,6 +9,7 @@ endif
 
 objfiles += chain.o
 objfiles += conversion.o
+objfiles += driver.o
 objfiles += effect.o
 objfiles += env.o
 objfiles += map.o
@@ -41,6 +42,8 @@ libgnuitar.so: $(objfiles)
 	$(CC) -shared $(objfiles) -o $@
 
 chain.o: chain.c chain.h effect.h
+
+driver.o: driver.c driver.h
 
 effect.o: effect.c effect.h packet.h
 
