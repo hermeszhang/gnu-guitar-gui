@@ -13,6 +13,8 @@ SET(SOURCES
     chain.c
     conversion.h
     conversion.c
+    driver.h
+    driver.c
     effect.h
     effect.c
     map.c

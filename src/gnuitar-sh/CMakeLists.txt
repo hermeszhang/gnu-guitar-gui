@@ -1,11 +1,9 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 
-IF (CMAKE_COMPILER_IS_GNUCXX)
-    SET (CMAKE_CXX_FLAGS "-Wall -Wextra -Werror -Wfatal-errors -std=c++14")
-ENDIF (CMAKE_COMPILER_IS_GNUCXX)
-
 IF (MSVC)
     SET (CMAKE_CXX_FLAGS "/Wall")
+ELSE (MSVC)
+    SET (CMAKE_CXX_FLAGS "-Wall -Wextra -Werror -Wfatal-errors -std=c++14")
 ENDIF (MSVC)
 
 ADD_EXECUTABLE(gnuitar-sh
