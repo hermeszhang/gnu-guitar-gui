@@ -12,6 +12,7 @@ objfiles += conversion.o
 objfiles += effect.o
 objfiles += map.o
 objfiles += package.o
+objfiles += package-manager.o
 objfiles += packet.o
 objfiles += pipe.o
 objfiles += track.o
@@ -51,6 +52,8 @@ map-test: map-test.c libgnuitar.so
 packet.o: packet.c packet.h
 
 package.o: package.c package.h
+
+package-manager.o: package-manager.c package-manager.h package.h
 
 pipe.o: pipe.c pipe.h
 
