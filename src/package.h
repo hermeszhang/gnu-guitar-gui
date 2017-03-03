@@ -78,9 +78,13 @@ size_t gnuitar_package_get_effect_count(const struct GnuitarPackage *package);
 
 const char * gnuitar_package_get_effect_name(const struct GnuitarPackage *package, size_t index);
 
+const char * gnuitar_package_get_name(const struct GnuitarPackage *package);
+
 int gnuitar_package_init_effect(struct GnuitarPackage *package, const char *name, struct GnuitarEffect *effect);
 
 int gnuitar_package_init_track(struct GnuitarPackage *package, const char *name, struct GnuitarTrack *track);
+
+int gnuitar_package_set_name(struct GnuitarPackage *package, const char *name);
 
 int gnuitar_package_entry(struct GnuitarPackage *package);
 

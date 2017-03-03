@@ -185,3 +185,26 @@ gnuitar_package_get_effect_name(const struct GnuitarPackage *package, size_t ind
     return package->effects[index].name;
 }
 
+const char *
+gnuitar_package_get_name(const struct GnuitarPackage *package)
+{
+    return package->name;
+}
+
+int
+gnuitar_package_set_name(struct GnuitarPackage *package, const char *name)
+{
+    char *tmp;
+
+    tmp = gnuitar_strdup(name);
+    if (tmp == NULL)
+        return ENOMEM;
+
+    if (package->name != NULL)
+        free(package->name);
+
+    package->name = tmp;
+
+    return 0;
+}
+
