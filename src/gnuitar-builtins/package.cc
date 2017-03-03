@@ -1,5 +1,7 @@
 #include "../gnuitar.h"
 
+#include "../package.inl"
+
 #include "echo.h"
 #include "tremolo.h"
 #include "vibrato.h"
@@ -11,21 +13,19 @@ const struct GnuitarPackageEffect builtin_effects[] = {
 };
 
 int
-gnuitar_package_entry(struct GnuitarPackage *package)
+gnuitar_package_entry(struct GnuitarPackage *package_ptr)
 {
-    size_t i;
-    size_t builtin_effects_count;
-    int err;
+    Gnuitar::Package package(package_ptr);
 
-    err = gnuitar_package_set_name(package, "Builtins");
+    auto err = package.set_name("Builtins");
     if (err != 0)
         return err;
 
-    builtin_effects_count = sizeof(builtin_effects);
+    auto builtin_effects_count = sizeof(builtin_effects);
     builtin_effects_count /= sizeof(builtin_effects[0]);
 
-    for (i = 0; i < builtin_effects_count; i++) {
-        err = gnuitar_package_add_effect(package, &builtin_effects[i]);
+    for (decltype(builtin_effects_count) i = 0; i < builtin_effects_count; i++) {
+        err = package.add_effect(&builtin_effects[i]);
         if (err != 0)
             return err;
     }

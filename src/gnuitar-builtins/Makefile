@@ -1,5 +1,6 @@
 CC = gcc
 CFLAGS = -Wall -Wextra -Werror -Wfatal-errors -fPIC
+CXXFLAGS = -Wall -Wextra -Werror -Wfatal-errors -fPIC
 
 objfiles += biquad.o
 objfiles += package.o
@@ -38,7 +39,7 @@ libgnuitar-builtins.so: $(objfiles)
 
 biquad.o: biquad.c biquad.h
 
-package.o: package.c ../gnuitar.h ../package.h ../effect.h ../track.h
+package.o: package.cc ../gnuitar.h ../package.h ../effect.h ../track.h
 
 package-test: package-test.c ../libgnuitar.so libgnuitar-builtins.so
 	$(CC) $(CFLAGS) package-test.c ../libgnuitar.so -lasound -o $@

@@ -11,7 +11,7 @@ ENDIF (MSVC)
 ADD_LIBRARY(gnuitar-builtins SHARED
     biquad.h
     biquad.c
-    package.c
+    package.cc
     tremolo.h
     tremolo.c
     vibrato.h
