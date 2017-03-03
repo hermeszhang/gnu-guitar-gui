@@ -17,6 +17,10 @@ gnuitar_package_entry(struct GnuitarPackage *package)
     size_t builtin_effects_count;
     int err;
 
+    err = gnuitar_package_set_name(package, "Builtins");
+    if (err != 0)
+        return err;
+
     builtin_effects_count = sizeof(builtin_effects);
     builtin_effects_count /= sizeof(builtin_effects[0]);
 
