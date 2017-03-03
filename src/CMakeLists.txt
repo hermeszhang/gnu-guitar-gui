@@ -21,6 +21,8 @@ SET(SOURCES
     map.h
     package.h
     package.c
+    package-manager.h
+    package-manager.c
     packet.h
     packet.c
     pipe.h
