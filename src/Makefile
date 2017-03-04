@@ -7,6 +7,8 @@ else
 CFLAGS += -fPIC -g
 endif
 
+LDLIBS += -ldl
+
 objfiles += chain.o
 objfiles += conversion.o
 objfiles += driver.o
@@ -22,18 +24,6 @@ objfiles += mutex.o
 
 tests += pipe-test
 tests += map-test
-
-ifdef gnuitar_config
-include $(gnuitar_config)
-else
-gnuitar_with_alsa = 1
-endif
-
-ifdef gnuitar_with_alsa
-CFLAGS += -DGNUITAR_WITH_ALSA
-LDLIBS += -lasound
-objfiles += track-alsa.o
-endif
 
 .PHONY: all
 all: libgnuitar.so $(tests)
@@ -64,8 +54,6 @@ package-manager.o: package-manager.c package-manager.h package.h
 pipe.o: pipe.c pipe.h
 
 track.o: track.c track.h packet.h chain.h map.h
-
-track-alsa.o: track-alsa.c track-alsa.h track.h packet.h chain.h map.h
 
 mutex.o: mutex.c mutex.h
 

@@ -27,33 +27,16 @@
 #include "track-alsa.h"
 #endif /* GNUITAR_WITH_ALSA */
 
-/** Initializes a track, using a specified API.
+/** Initializes a track
  * @param track An unitialized track.
- * @param api_name The name of the API to use.
- * @returns On success, zero.
- *  If @p api_name is an invalid name, EINVAL is returned.
- *  If @p api_name is NULL, EFAULT is returned.
  * @ingroup libgnuitar-track
  */
 
-int
-gnuitar_track_init(struct GnuitarTrack *track, const char *api_name)
+void
+gnuitar_track_init(struct GnuitarTrack *track)
 {
     gnuitar_chain_init(&track->chain);
-
-    if (api_name == NULL)
-        return EFAULT;
-
-#ifdef GNUITAR_WITH_ALSA
-    if (strcmp(api_name, "ALSA") == 0) {
-        return gnuitar_alsa_track_init(track);
-    }
-#endif /* GNUITAR_WITH_ALSA */
-    if (strcmp(api_name, "Null") == 0) {
-        /* TODO */
-	return EFAULT;
-    }
-    return EINVAL;
+    gnuitar_driver_init(&track->driver);
 }
 
 /** Releases memory allocated by the track.
@@ -64,9 +47,7 @@ gnuitar_track_init(struct GnuitarTrack *track, const char *api_name)
 void
 gnuitar_track_done(struct GnuitarTrack *track)
 {
-    if (track->done != NULL)
-        track->done(track->data);
-
+    gnuitar_driver_done(&track->driver);
     gnuitar_chain_done(&track->chain);
 }
 
@@ -111,36 +92,21 @@ gnuitar_track_erase_effect(struct GnuitarTrack *track, unsigned int index)
     return 0;
 }
 
+void
+gnuitar_track_set_driver(struct GnuitarTrack *track, struct GnuitarDriver *driver)
+{
+    track->driver = *driver;
+}
+
 int
 gnuitar_track_start(struct GnuitarTrack *track)
 {
-    if (track == NULL)
-        return -1;
-    if (track->start == NULL)
-        return -2;
-    if (track->start(track) != 0)
-        return -3;
-
-    return 0;
+    return gnuitar_driver_start(&track->driver, &track->chain);
 }
 
 int
 gnuitar_track_stop(struct GnuitarTrack *track)
 {
-    if (track->stop == NULL)
-        return EFAULT;
-
-    return track->stop(track);
-}
-
-int
-gnuitar_track_get_map(const struct GnuitarTrack *track, struct GnuitarMap *map)
-{
-    if (track->get_map == NULL)
-        return EFAULT;
-
-    gnuitar_map_init(map);
-
-    return track->get_map(track, map);
+    return gnuitar_driver_stop(&track->driver);
 }
 
