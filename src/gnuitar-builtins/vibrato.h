@@ -29,6 +29,10 @@
 
 #define MAX_VIBRATO_BUFSIZE 16384
 
+#ifdef __cplusplus
+extern "C" {
+#endif /* __cplusplus */
+
 struct GnuitarVibrato {
     struct GnuitarHilbert hilbert;
     double vibrato_amplitude;
@@ -41,6 +45,10 @@ struct GnuitarVibrato {
 int gnuitar_vibrato_init(struct GnuitarEffect *effect);
 
 void gnuitar_vibrato_done(struct GnuitarEffect *effect);
+
+#ifdef __cplusplus
+} /* extern "C" { */
+#endif /* __cplusplus */
 
 #endif /* GNUITAR_VIBRATO_H */
 

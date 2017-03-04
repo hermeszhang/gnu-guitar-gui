@@ -25,6 +25,10 @@
 
 #include "../effect.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif /* __cplusplus */
+
 struct GnuitarTremolo {
     double amplitude;
     double speed;
@@ -40,6 +44,10 @@ int gnuitar_tremolo_process(struct GnuitarEffect *effect, struct GnuitarPacket *
 int gnuitar_tremolo_get_map(const struct GnuitarEffect *effect, struct GnuitarMap *map);
 
 int gnuitar_tremolo_set_map(struct GnuitarEffect *effect, const struct GnuitarMap *map);
+
+#ifdef __cplusplus
+} /* extern "C" { */
+#endif /* __cplusplus */
 
 #endif /* GNUITAR_BUILTIN_TREMOLO */
 
