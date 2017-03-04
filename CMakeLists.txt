@@ -124,44 +124,13 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 2.4)
 PROJECT(GNUitar)
 
-# Get the GCC version -- this regex is pathetic.
-EXEC_PROGRAM(${CMAKE_C_COMPILER} ARGS --version OUTPUT_VARIABLE _gcc_version_info)
-STRING(REGEX REPLACE "^[a-z.]+ \\(GCC\\) ([0-9]+\\.[0-9]+).*" "\\1" _gcc_version "${_gcc_version_info}")
-
-# Check that we succeeded
-IF (NOT _gcc_version)
-    MESSAGE(FATAL_ERROR "*** error: I could not determine your GCC version.\n\nThe C compiler discovered by CMake was: ${CMAKE_C_COMPILER}.\nIts output for --version was:\n${_gcc_version_info}")
-ENDIF (NOT _gcc_version)
-
-MESSAGE("*** Detected GCC version: ${_gcc_version}\n")
-
-# Compute an integer representation of the GCC version number
-STRING(REGEX REPLACE "([0-9]+)\\.[0-9]+" "\\1" _gcc_version_major "${_gcc_version}")
-STRING(REGEX REPLACE "[0-9]+\\.([0-9]+)" "\\1" _gcc_version_minor "${_gcc_version}")
-MATH(EXPR _gcc_version "${_gcc_version_major} * 100 + ${_gcc_version_minor}")
-
-SET(OPT_FLAGS "-ffast-math")
-SET(WARNING_FLAGS "-Wall -Wbad-function-cast -Wcast-align -Wmissing-noreturn -Wredundant-decls -Winline -Wpointer-arith -Wmissing-prototypes")
+IF (CMAKE_COMPILER_IS_GNUCC)
 IF (_gcc_version GREATER 399) # cmake suckage for lacking >=
+    SET(OPT_FLAGS "-ffast-math")
+    SET(WARNING_FLAGS "-Wall -Wbad-function-cast -Wcast-align -Wmissing-noreturn -Wredundant-decls -Winline -Wpointer-arith -Wmissing-prototypes")
     SET(OPT_FLAGS "${OPT_FLAGS} -frename-registers -ftree-vectorize")
     SET(WARNING_FLAGS "${WARNING_FLAGS} -Wpointer-sign -Wunsafe-loop-optimizations -Wmissing-field-initializers")
-ENDIF (_gcc_version GREATER 399)
-
-# guess something rather conservative. We wamt SSE. hence we specify at least pentium3
-SET(ARCH_FLAGS "-march=pentium3")
-IF (UNIX) # IF (LINUX) ?
-    # read cpuinfo on linux to improve guess
-    FILE(READ "/proc/cpuinfo" _cpuinfo)
-    IF (_cpuinfo MATCHES "AuthenticAMD")
-        SET(ARCH_FLAGS "-march=athlon-xp")
-        IF (_cpuinfo MATCHES "Athlon\\(tm\\) 64")
-            SET(ARCH_FLAGS "-march=athlon64 -msse3")
-        ENDIF (_cpuinfo MATCHES "Athlon\\(tm\\) 64")
-    ENDIF (_cpuinfo MATCHES "AuthenticAMD")
-    IF (_cpuinfo MATCHES "GenuineIntel")
-        SET(ARCH_FLAGS "-march=pentium4 -mtune=prescott")
-    ENDIF (_cpuinfo MATCHES "GenuineIntel")
-ENDIF (UNIX)
+ENDIF (CMAKE_COMPILER_IS_GNUCC)
 
 # user serviceable parts begin
 SET(CMAKE_BUILD_TYPE RELEASE)
@@ -290,3 +259,13 @@ INSTALL(FILES AUTHORS NEWS README TODO FAQ COPYING ChangeLog
 INSTALL(FILES docs/devdocs.txt docs/faq.html docs/index.html docs/install.html
         docs/readme.html
         DESTINATION share/doc/gnuitar/docs)
+
+set (CPACK_DESCRIPTION_SUMMARY "A real-time audio effects program")
+set (CPACK_PACKAGE_VENDOR "Max Rudensky")
+set (CPACK_PACKAGE_VERSION_MAJOR 0)
+set (CPACK_PACKAGE_VERSION_MINOR 3)
+set (CPACK_PACKAGE_VERSION_PATCH 3)
+set (CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/COPYING")
+set (CPACK_PACKAGE_CONTACT "taylorcholberton@gmail.com")
+include (CPack)
+
