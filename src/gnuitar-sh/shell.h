@@ -5,6 +5,7 @@
 #include <string>
 
 #include "../gnuitar.h"
+#include "../package.inl"
 
 namespace Gnuitar {
 
@@ -17,8 +18,6 @@ class Shell final {
     FILE *error;
     /** the shell's track */
     struct GnuitarTrack track;
-    /** the shell's package */
-    struct GnuitarPackage package;
     /** the shell's package manager */
     struct GnuitarPackageManager package_manager;
 public:
@@ -27,10 +26,15 @@ public:
     int loop(void) noexcept;
     int add_effect(void) noexcept;
     void help(void) noexcept;
+    void list_drivers(void) noexcept;
+    void list_drivers(GnuitarPackage *package) noexcept;
     void list_effects(void) noexcept;
+    void list_effects(GnuitarPackage *package) noexcept;
     void list_packages(void) noexcept;
-    int open_package(void) noexcept;
     int readline(std::string& line) noexcept;
+    int prompt(const std::string& field_name, std::string& field) noexcept;
+    int set_driver(void) noexcept;
+    int set_driver(GnuitarPackage *package) noexcept;
     int start(void) noexcept;
     int stop(void) noexcept;
 protected:

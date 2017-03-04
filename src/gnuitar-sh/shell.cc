@@ -17,25 +17,26 @@ Shell::Shell(void) noexcept
     this->input = stdin;
     this->output = stdout;
     this->error = stderr;
-    gnuitar_track_init(&this->track, "ALSA");
-    gnuitar_package_init(&this->package);
+
+    gnuitar_track_init(&track);
 
     gnuitar_package_manager_init(&package_manager);
     auto packages_dir = std::getenv("GNUITAR_PACKAGES_PATH");
     if (packages_dir != NULL)
         gnuitar_package_manager_set_packages_dir(&package_manager, packages_dir);
+    gnuitar_package_manager_refresh_packages(&package_manager);
 }
 
 Shell::~Shell(void)
 {
     gnuitar_track_done(&this->track);
-    gnuitar_package_done(&this->package);
     gnuitar_package_manager_done(&package_manager);
 }
 
 int
 Shell::add_effect(void) noexcept
 {
+/*
     struct GnuitarEffect effect;
     struct GnuitarMap effect_map;
 
@@ -70,38 +71,76 @@ Shell::add_effect(void) noexcept
         gnuitar_effect_done(&effect);
         return -3;
     }
-
+*/
     return 0;
 }
 
 void
 Shell::help(void) noexcept
 {
-    fprintf(this->output, "commands:\n");
-    fprintf(this->output, " add-effect\n");
-    fprintf(this->output, " help\n");
-    fprintf(this->output, " list-effects\n");
-    fprintf(this->output, " list-packages\n");
-    fprintf(this->output, " open-package\n");
-    fprintf(this->output, " quit\n");
-    fprintf(this->output, " exit (same as quit)\n");
+    fprintf(output, "commands:\n");
+    fprintf(output, " add-effect\n");
+    fprintf(output, " help\n");
+    fprintf(output, " list-effects\n");
+    fprintf(output, " list-drivers\n");
+    fprintf(output, " list-packages\n");
+    fprintf(output, " quit\n");
+    fprintf(output, " exit (same as quit)\n");
+}
+
+void
+Shell::list_drivers(void) noexcept
+{
+    auto count = gnuitar_package_manager_get_count(&package_manager);
+    for (decltype(count) i = 0; i < count; i++) {
+        auto package = gnuitar_package_manager_get(&package_manager, i);
+        if (package == nullptr)
+            continue;
+        list_drivers(package);
+    }
+}
+
+void
+Shell::list_drivers(GnuitarPackage *package_ptr) noexcept
+{
+    Gnuitar::Package package(package_ptr);
+
+    auto package_name = package.get_name();
+    fprintf(output, "drivers from %s\n", package_name);
+
+    auto count = package.get_driver_count();
+    for (decltype(count) i = 0; i < count; i++) {
+        auto name = package.get_driver_name(i);
+        if (name == nullptr)
+            continue;
+        fprintf(output, " - %s\n", name);
+    }
 }
 
 void
 Shell::list_effects(void) noexcept
 {
-    size_t i;
-    size_t count;
-    const char *name;
-
-    fprintf(this->output, "known effects:\n");
-
-    count = gnuitar_package_get_effect_count(&this->package);
-    for (i = 0; i < count; i++) {
-        name = gnuitar_package_get_effect_name(&this->package, i);
-        if (name == NULL)
+    auto count = gnuitar_package_manager_get_count(&package_manager);
+    for (decltype(count) i = 0; i < count; i++) {
+        auto package = gnuitar_package_manager_get(&package_manager, i);
+        if (package == nullptr)
             continue;
-        fprintf(this->output, " %s\n", name);
+        list_effects(package);
+    }
+}
+
+void
+Shell::list_effects(GnuitarPackage *package_) noexcept
+{
+    Package package(package_);
+
+    fprintf(output, "effects from %s:\n", package.get_name());
+    auto count = package.get_effect_count();
+    for (decltype(count) i = 0; i < count; i++) {
+        auto name = package.get_effect_name(i);
+        if (name == nullptr)
+            continue;
+        fprintf(output, " - %s\n", name);
     }
 }
 
@@ -109,7 +148,7 @@ void
 Shell::list_packages(void) noexcept
 {
 
-    fprintf(this->output, "known packages:\n");
+    fprintf(output, "known packages:\n");
 
     gnuitar_package_manager_refresh_packages(&package_manager);
 
@@ -121,7 +160,7 @@ Shell::list_packages(void) noexcept
         auto name = gnuitar_package_get_name(package);
         if (name == NULL)
             continue;
-        fprintf(this->output, " %s\n", name);
+        fprintf(output, " - %s\n", name);
     }
 }
 
@@ -142,12 +181,14 @@ Shell::loop(void) noexcept
             add_effect();
         } else if (cmd == "help") {
             help();
+        } else if (cmd == "list-drivers") {
+            list_drivers();
         } else if (cmd == "list-effects") {
             list_effects();
         } else if (cmd == "list-packages") {
             list_packages();
-        } else if (cmd == "open-package") {
-            open_package();
+        } else if (cmd == "set-driver") {
+            set_driver();
         } else if (cmd == "start") {
             start();
         } else if (cmd == "stop") {
@@ -157,28 +198,6 @@ Shell::loop(void) noexcept
         } else {
             log_error("unknown command '" + cmd + "'");
         }
-    }
-
-    return 0;
-}
-
-int
-Shell::open_package(void) noexcept
-{
-    fprintf(this->output, "package path: ");
-
-    std::string package_path;
-    if (readline(package_path) != 0) {
-        log_error("failed to read package path");
-        return -1;
-    }
-
-    /* free the current package */
-    gnuitar_package_done(&this->package);
-
-    if (gnuitar_package_open(&this->package, package_path.c_str()) != 0) {
-        log_error("failed to open package");
-        return -2;
     }
 
     return 0;
@@ -203,15 +222,52 @@ Shell::readline(std::string& line) noexcept
 }
 
 int
+Shell::prompt(const std::string& field_name, std::string& field) noexcept
+{
+    fprintf(output, "%s: ", field_name.c_str());
+    return readline(field);
+}
+
+int
+Shell::set_driver(void) noexcept
+{
+    std::string package_name;
+    if (prompt("package name", package_name) != 0)
+        return -1;
+
+    auto package = gnuitar_package_manager_find(&package_manager, package_name.c_str());
+    if (package == NULL)
+        return -2;
+
+    return set_driver(package);
+}
+
+int Shell::set_driver(GnuitarPackage *package_ptr) noexcept
+{
+    std::string driver_name;
+    if (prompt("driver name", driver_name) != 0)
+        return -1;
+
+    GnuitarDriver driver;
+
+    Gnuitar::Package package(package_ptr);
+    package.init_driver(driver_name.c_str(), &driver);
+
+    gnuitar_track_set_driver(&track, &driver);
+
+    return 0;
+}
+
+int
 Shell::start(void) noexcept
 {
-    return gnuitar_track_start(&this->track);
+    return gnuitar_track_start(&track);
 }
 
 int
 Shell::stop(void) noexcept
 {
-    return gnuitar_track_stop(&this->track);
+    return gnuitar_track_stop(&track);
 }
 
 void
