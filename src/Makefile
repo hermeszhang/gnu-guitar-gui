@@ -4,7 +4,7 @@ CFLAGS = -Wall -Wextra -Werror -Wfatal-errors
 ifdef gnuitar_release
 CFLAGS += -fPIC -O3
 else
-CFLAGS += -fPIC -g
+CFLAGS += -fPIC -g -DGNUITAR_DEBUG
 endif
 
 LDLIBS += -ldl
