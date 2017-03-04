@@ -37,3 +37,19 @@ gnuitar_driver_stop(struct GnuitarDriver *driver)
     return EFAULT;
 }
 
+int
+gnuitar_driver_get_map(const struct GnuitarDriver *driver, struct GnuitarMap *map)
+{
+    if (driver->get_map != NULL)
+        return driver->get_map(driver->data, map);
+    return EFAULT;
+}
+
+int
+gnuitar_driver_set_map(struct GnuitarDriver *driver, const struct GnuitarMap *map)
+{
+    if (driver->set_map != NULL)
+        return driver->set_map(driver->data, map);
+    return EFAULT;
+}
+
