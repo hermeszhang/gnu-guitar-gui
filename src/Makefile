@@ -27,6 +27,8 @@ tests += map-test
 
 .PHONY: all
 all: libgnuitar.so $(tests)
+	$(MAKE) -C gnuitar-builtins
+	$(MAKE) -C gnuitar-sh
 
 libgnuitar.so: $(objfiles)
 	$(CC) -shared $(objfiles) -o $@
