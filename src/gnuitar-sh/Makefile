@@ -1,6 +1,6 @@
 CXX = g++
 CXXFLAGS = -Wall -Wextra -Werror -Wfatal-errors -std=c++14
-LDLIBS = -lpthread
+LDLIBS = -lpthread -ldl
 
 ifdef gnuitar_config
 include $(gnuitar_config)
