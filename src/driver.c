@@ -33,7 +33,7 @@ int
 gnuitar_driver_stop(struct GnuitarDriver *driver)
 {
     if (driver->stop != NULL)
-        return driver->stop(driver);
+        return driver->stop(driver->data);
     return EFAULT;
 }
 
