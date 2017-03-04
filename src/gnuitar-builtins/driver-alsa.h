@@ -60,13 +60,18 @@
  *
  */
 
-#ifndef GNUITAR_TRACK_ALSA_H
-#define GNUITAR_TRACK_ALSA_H
+#ifndef GNUITAR_DRIVER_ALSA_H
+#define GNUITAR_DRIVER_ALSA_H
 
-#include "track.h"
+#include "../driver.h"
 
 #include <alsa/asoundlib.h>
 #include <pthread.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif /* __cplusplus */
+
 
 struct GnuitarPcmConfig {
     /** The sample type */
@@ -81,7 +86,7 @@ struct GnuitarPcmConfig {
     unsigned int periods;
 };
 
-struct GnuitarAlsaTrack {
+struct GnuitarAlsaDriver {
     /** The name of the input PCM */
     char * input_name;
     /** The input PCM */
@@ -92,13 +97,19 @@ struct GnuitarAlsaTrack {
     snd_pcm_t * output_pcm;
     /** The configuration of the PCMs */
     struct GnuitarPcmConfig pcm_config;
+    /** The effects chain */
+    struct GnuitarChain *chain;
     /** The thread that runs the audio threw the pump */
     pthread_t thread;
     /** A flag to decide whether or not to keep to the thread running */
     unsigned int keep_thread_running;
 };
 
-int gnuitar_alsa_track_init(struct GnuitarTrack *track);
+int gnuitar_alsa_driver_init(struct GnuitarDriver *driver);
 
-#endif /* GNUITAR_TRACK_ALSA_H */
+#ifdef __cplusplus
+} /* extern "C" { */
+#endif /* __cplusplus */
+
+#endif /* GNUITAR_DRIVER_ALSA_H */
 
