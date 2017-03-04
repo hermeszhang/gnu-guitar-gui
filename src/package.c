@@ -110,6 +110,25 @@ gnuitar_package_add_effect(struct GnuitarPackage *package, const struct GnuitarP
 }
 
 int
+gnuitar_package_add_driver(struct GnuitarPackage *package, const struct GnuitarPackageDriver *package_driver)
+{
+    struct GnuitarPackageDriver *tmp;
+    size_t tmp_size;
+
+    tmp_size = sizeof(*tmp) * (package->drivers_count + 1);
+
+    tmp = realloc(package->drivers, tmp_size);
+    if (tmp == NULL)
+        return ENOMEM;
+
+    package->drivers = tmp;
+    package->drivers[package->drivers_count] = *package_driver;
+    package->drivers_count++;
+
+    return 0;
+}
+
+int
 gnuitar_package_init_effect(struct GnuitarPackage *package, const char *name, struct GnuitarEffect *effect)
 {
     int err;
@@ -156,6 +175,12 @@ gnuitar_package_find_effect(const struct GnuitarPackage *package, const char *na
     return 0;
 }
 
+size_t
+gnuitar_package_get_driver_count(const struct GnuitarPackage *package)
+{
+    return package->drivers_count;
+}
+
 /** Gets the number of effects in the package.
  * @param package A package created by @gnuitar_package_open
  * @returns The number of effects in the package.
@@ -166,6 +191,14 @@ size_t
 gnuitar_package_get_effect_count(const struct GnuitarPackage *package)
 {
     return package->effects_count;
+}
+
+const char *
+gnuitar_package_get_driver_name(const struct GnuitarPackage *package, size_t index)
+{
+    if (index >= package->drivers_count)
+        return NULL;
+    return package->drivers[index].name;
 }
 
 /** Gets the name of an effect.
@@ -179,9 +212,8 @@ gnuitar_package_get_effect_count(const struct GnuitarPackage *package)
 const char *
 gnuitar_package_get_effect_name(const struct GnuitarPackage *package, size_t index)
 {
-    if (index >= package->effects_count) {
+    if (index >= package->effects_count)
         return NULL;
-    }
     return package->effects[index].name;
 }
 

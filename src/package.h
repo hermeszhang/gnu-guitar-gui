@@ -72,9 +72,15 @@ void gnuitar_package_done(struct GnuitarPackage *package);
 
 int gnuitar_package_add_effect(struct GnuitarPackage *package, const struct GnuitarPackageEffect *package_effect);
 
+int gnuitar_package_add_driver(struct GnuitarPackage *package, const struct GnuitarPackageDriver *driver);
+
 int gnuitar_package_find_effect(const struct GnuitarPackage *package, const char *name, size_t *index);
 
+size_t gnuitar_package_get_driver_count(const struct GnuitarPackage *package);
+
 size_t gnuitar_package_get_effect_count(const struct GnuitarPackage *package);
+
+const char * gnuitar_package_get_driver_name(const struct GnuitarPackage *package, size_t index);
 
 const char * gnuitar_package_get_effect_name(const struct GnuitarPackage *package, size_t index);
 
