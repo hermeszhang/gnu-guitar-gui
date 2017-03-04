@@ -20,7 +20,7 @@ void gnuitar_package_manager_init(struct GnuitarPackageManager *manager);
 
 void gnuitar_package_manager_done(struct GnuitarPackageManager *manager);
 
-const struct GnuitarPackage * gnuitar_package_manager_get(const struct GnuitarPackageManager *manager, size_t index);
+struct GnuitarPackage * gnuitar_package_manager_get(const struct GnuitarPackageManager *manager, size_t index);
 
 size_t gnuitar_package_manager_get_count(const struct GnuitarPackageManager *manager);
 

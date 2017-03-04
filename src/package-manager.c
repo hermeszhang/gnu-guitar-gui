@@ -38,7 +38,7 @@ gnuitar_package_manager_done(struct GnuitarPackageManager *manager)
     }
 }
 
-const struct GnuitarPackage *
+struct GnuitarPackage *
 gnuitar_package_manager_get(const struct GnuitarPackageManager *manager, size_t index)
 {
     if (index >= manager->packages_count)
