@@ -4,6 +4,8 @@
 #include <stdlib.h>
 #include <assert.h>
 
+#include <dlfcn.h>
+
 int
 main(void)
 {
@@ -14,6 +16,8 @@ main(void)
     const char * effect_name;
 
     err = gnuitar_package_open(&package, "./" GNUITAR_BUILTINS_PACKAGE);
+    if (err != 0)
+        printf("dlerror: %s\n", dlerror());
     assert(err == 0);
 
     printf("builtin effects:\n");
