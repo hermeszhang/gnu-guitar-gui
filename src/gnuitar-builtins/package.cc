@@ -6,10 +6,20 @@
 #include "tremolo.h"
 #include "vibrato.h"
 
+#ifdef GNUITAR_WITH_ALSA
+#include "driver-alsa.h"
+#endif /* GNUITAR_WITH_ALSA */
+
 const struct GnuitarPackageEffect builtin_effects[] = {
     { "Echo", gnuitar_echo_init },
     { "Tremolo", gnuitar_tremolo_init },
     { "Vibrato", gnuitar_vibrato_init }
+};
+
+const struct GnuitarPackageDriver builtin_drivers[] = {
+#ifdef GNUITAR_WITH_ALSA
+    { "ALSA", gnuitar_alsa_driver_init }
+#endif /* GNUITAR_WITH_ALSA */
 };
 
 int
@@ -21,11 +31,18 @@ gnuitar_package_entry(struct GnuitarPackage *package_ptr)
     if (err != 0)
         return err;
 
-    auto builtin_effects_count = sizeof(builtin_effects);
-    builtin_effects_count /= sizeof(builtin_effects[0]);
-
-    for (decltype(builtin_effects_count) i = 0; i < builtin_effects_count; i++) {
+    auto count = sizeof(builtin_effects);
+    count /= sizeof(builtin_effects[0]);
+    for (decltype(count) i = 0; i < count; i++) {
         err = package.add_effect(&builtin_effects[i]);
+        if (err != 0)
+            return err;
+    }
+
+    count = sizeof(builtin_drivers);
+    count /= sizeof(builtin_drivers[0]);
+    for (decltype(count) i = 0; i < count; i++) {
+        err = package.add_driver(&builtin_drivers[i]);
         if (err != 0)
             return err;
     }
