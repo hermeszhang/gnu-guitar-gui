@@ -7,6 +7,10 @@
 #include <stdlib.h>
 #include <errno.h>
 
+#ifdef GNUITAR_DEBUG
+#include <stdio.h>
+#endif /* GNUITAR_DEBUG */
+
 #ifdef _MSC_VER
 #define gnuitar_strdup _strdup
 #else /* _MSC_VER */
@@ -40,8 +44,14 @@ gnuitar_package_open(struct GnuitarPackage *package, const char *path)
     package->handle = LoadLibrary(path);
 #else /* _WIN32 */
     package->handle = dlopen(path, RTLD_LAZY);
-    if (package->handle == NULL)
+    if (package->handle == NULL) {
+#ifdef GNUITAR_DEBUG
+        fprintf(stderr, "gnuitar-debug:\n");
+        fprintf(stderr, "  failed to load %s\n", path);
+        fprintf(stderr, "  %s\n", dlerror());
+#endif /* GNUITAR_DEBUG */
         return ENOENT;
+    }
     package_init = dlsym(package->handle, "gnuitar_package_entry");
     if (package_init == NULL) {
         dlclose(package->handle);
@@ -126,6 +136,20 @@ gnuitar_package_add_driver(struct GnuitarPackage *package, const struct GnuitarP
     package->drivers_count++;
 
     return 0;
+}
+
+int
+gnuitar_package_init_driver(struct GnuitarPackage *package, const char *name, struct GnuitarDriver *driver)
+{
+    size_t i;
+    for (i = 0; i < package->drivers_count; i++){
+        if (package->drivers[i].name == NULL)
+            continue;
+        else if (strcmp(package->drivers[i].name, name) != 0)
+            continue;
+        return package->drivers[i].init(driver);
+    }
+    return ENOENT;
 }
 
 int
