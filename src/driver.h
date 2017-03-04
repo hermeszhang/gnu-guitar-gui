@@ -4,6 +4,10 @@
 #include "chain.h"
 #include "map.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif /* __cplusplus */
+
 struct GnuitarDriver {
     void *data;
     void (*done)(void *data);
@@ -24,6 +28,10 @@ int gnuitar_driver_stop(struct GnuitarDriver *driver);
 int gnuitar_driver_get_map(const struct GnuitarDriver *driver, struct GnuitarMap *map);
 
 int gnuitar_driver_set_map(struct GnuitarDriver *driver, const struct GnuitarMap *map);
+
+#ifdef __cplusplus
+} /* extern "C" { */
+#endif /* __cplusplus */
 
 #endif /* GNUITAR_DRIVER_H */
 
