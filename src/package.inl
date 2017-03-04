@@ -10,27 +10,47 @@ namespace Gnuitar {
 class Package {
     GnuitarPackage *package;
 public:
-    Package(GnuitarPackage *package_) noexcept
+    inline Package(GnuitarPackage *package_) noexcept
     {
         package = package_;
     }
-    ~Package(void)
+    inline ~Package(void)
     {
 
     }
-    int add_effect(const struct GnuitarPackageEffect *effect) noexcept
+    inline int add_effect(const GnuitarPackageEffect *effect) noexcept
     {
         return gnuitar_package_add_effect(package, effect);
     }
-    const char * get_name(void) noexcept
+    inline int add_driver(const GnuitarPackageDriver *driver) noexcept
+    {
+        return gnuitar_package_add_driver(package, driver);
+    }
+    inline size_t get_effect_count(void) const noexcept
+    {
+        return gnuitar_package_get_effect_count(package);
+    }
+    inline size_t get_driver_count(void) const noexcept
+    {
+        return gnuitar_package_get_driver_count(package);
+    }
+    inline const char * get_driver_name(size_t index) const noexcept
+    {
+        return gnuitar_package_get_driver_name(package, index);
+    }
+    inline const char * get_effect_name(size_t index) const noexcept
+    {
+        return gnuitar_package_get_effect_name(package, index);
+    }
+    inline const char * get_name(void) noexcept
     {
         return gnuitar_package_get_name(package);
     }
-    int set_name(const char *name) noexcept
+    inline int set_name(const char *name) noexcept
     {
         return gnuitar_package_set_name(package, name);
     }
-    int set_name(const std::string& name) noexcept
+    inline int set_name(const std::string& name) noexcept
     {
         return set_name(name.c_str());
     }
