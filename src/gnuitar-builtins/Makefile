@@ -2,11 +2,25 @@ CC = gcc
 CFLAGS = -Wall -Wextra -Werror -Wfatal-errors -fPIC
 CXXFLAGS = -Wall -Wextra -Werror -Wfatal-errors -fPIC
 
+ifdef gnuitar_config
+include $(gnuitar_config)
+else
+gnuitar_with_alsa = 1
+endif
+
 objfiles += biquad.o
 objfiles += package.o
 objfiles += echo.o
 objfiles += tremolo.o
 objfiles += vibrato.o
+
+ifdef gnuitar_with_alsa
+objfiles += driver-alsa.o
+LDLIBS += -lasound
+CXXFLAGS += -DGNUITAR_WITH_ALSA
+endif
+
+LDLIBS += -ldl
 
 tests += echo-test
 tests += package-test
@@ -23,7 +37,7 @@ VALGRIND = valgrind --quiet --error-exitcode=1
 endif
 
 ifdef gnuitar_with_alsa
-LDLIBS += -lgnuitar -lasound
+LDLIBS += -lasound
 LDFLAGS += -L..
 endif
 
@@ -35,14 +49,16 @@ effect_headers += ../map.h
 all: libgnuitar-builtins.so $(tests)
 
 libgnuitar-builtins.so: $(objfiles)
-	$(CC) -shared $(objfiles) ../libgnuitar.so -o $@
+	$(CXX) -shared $(objfiles) ../libgnuitar.so -o $@
 
 biquad.o: biquad.c biquad.h
 
 package.o: package.cc ../gnuitar.h ../package.h ../effect.h ../track.h
 
-package-test: package-test.c ../libgnuitar.so libgnuitar-builtins.so
-	$(CC) $(CFLAGS) package-test.c ../libgnuitar.so -lasound -o $@
+package-test: package-test.o ../libgnuitar.so libgnuitar-builtins.so
+	$(CC) package-test.o ../libgnuitar.so $(LDFLAGS) $(LDLIBS) -o $@
+
+package-test.o: package-test.c
 
 echo.o: echo.c echo.h $(effect_headers)
 
