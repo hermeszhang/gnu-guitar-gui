@@ -627,8 +627,8 @@ alsa_init_sound(void)
     int             err;
     unsigned int    bs_try, fragments_try, tries;
 
-    if ((err = snd_pcm_open(&playback_handle, alsadevice_str, SND_PCM_STREAM_PLAYBACK, 0)) < 0) {
-	gnuitar_printf( "can't open output audio device %s: %s\n", alsadevice_str, snd_strerror(err));
+    if ((err = snd_pcm_open(&playback_handle, "default", SND_PCM_STREAM_PLAYBACK, 0)) < 0) {
+	gnuitar_printf( "can't open output audio device %s: %s\n", "default", snd_strerror(err));
 	return ERR_WAVEOUTOPEN;
     }
 
