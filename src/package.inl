@@ -46,6 +46,10 @@ public:
     {
         return gnuitar_package_get_name(package);
     }
+    inline int init_driver(const char *name, GnuitarDriver *driver) noexcept
+    {
+        return gnuitar_package_init_driver(package, name, driver);
+    }
     inline int set_name(const char *name) noexcept
     {
         return gnuitar_package_set_name(package, name);
