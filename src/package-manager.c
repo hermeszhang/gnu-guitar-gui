@@ -19,6 +19,23 @@
 
 #include <errno.h>
 
+static int
+pkgcmp(const void *name_ptr, const void *package_ptr)
+{
+    const char *name;
+    const struct GnuitarPackage *package;
+
+    name = (const char *)(name_ptr);
+    package = (const struct GnuitarPackage *)(package_ptr);
+
+    if (name == NULL)
+        return -1;
+    if (package->name == NULL)
+        return 1;
+
+    return strcmp(name, package->name);
+}
+
 void
 gnuitar_package_manager_init(struct GnuitarPackageManager *manager)
 {
@@ -36,6 +53,16 @@ gnuitar_package_manager_done(struct GnuitarPackageManager *manager)
     for (i = 0; i < manager->packages_count; i++){
         gnuitar_package_done(&manager->packages[i]);
     }
+}
+
+struct GnuitarPackage *
+gnuitar_package_manager_find(const struct GnuitarPackageManager *manager, const char *name)
+{
+    return bsearch(name,
+                   manager->packages,
+                   manager->packages_count,
+                   sizeof(manager->packages[0]),
+                   pkgcmp);
 }
 
 struct GnuitarPackage *
