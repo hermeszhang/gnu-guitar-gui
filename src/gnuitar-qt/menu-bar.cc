@@ -1,5 +1,11 @@
 #include "menu-bar.h"
 
+#include <QDesktopServices>
+
+#ifndef GNUITAR_ISSUES_LINK
+#define GNUITAR_ISSUES_LINK "https://github.com/gnuitar/gnuitar/issues/new"
+#endif /* GNUITAR_ISSUES_LINK */
+
 namespace Gnuitar {
 
 namespace Qt {
@@ -87,7 +93,7 @@ MenuBar::view_documentation_triggered(void)
 void
 MenuBar::report_an_issue_triggered(void)
 {
-
+    QDesktopServices::openUrl(QUrl(GNUITAR_ISSUES_LINK));
 }
 
 void
