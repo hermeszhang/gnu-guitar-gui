@@ -19,11 +19,8 @@ FIND_PACKAGE(Qt5Core REQUIRED)
 FIND_PACKAGE(Qt5Gui REQUIRED)
 FIND_PACKAGE(Qt5Widgets REQUIRED)
 
-QT5_WRAP_UI(UI_HEADERS main-window.ui)
-
 ADD_EXECUTABLE(gnuitar-qt
     gnuitar-qt.cc
-    ${UI_HEADERS}
     audio-panel.h
     audio-panel.cc
     button.h
@@ -37,7 +34,8 @@ ADD_EXECUTABLE(gnuitar-qt
     menu-bar.h
     menu-bar.cc
     rack.h
-    rack.cc)
+    rack.cc
+    resources.qrc)
 TARGET_LINK_LIBRARIES(gnuitar-qt ${Qt5Core_QTMAIN_LIBRARIES})
 TARGET_LINK_LIBRARIES(gnuitar-qt gnuitar)
 QT5_USE_MODULES(gnuitar-qt Widgets)
