@@ -56,7 +56,8 @@ ENDFUNCTION(ADD_GNUITAR_QT_TEST TEST_NAME)
 ADD_GNUITAR_QT_TEST(audio-panel-test
     audio-panel-test.cc
     audio-panel.cc
-    button.cc)
+    button.cc
+    resources.qrc)
 
 ADD_GNUITAR_QT_TEST(menu-bar-test
     menu-bar-test.cc

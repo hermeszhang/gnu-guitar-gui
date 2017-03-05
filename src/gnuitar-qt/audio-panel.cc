@@ -8,8 +8,8 @@ AudioPanel::AudioPanel(QWidget *parent) : QWidget(parent)
 {
     layout = new QHBoxLayout();
 
-    play_button = new Button("play.png");
-    stop_button = new Button("stop.png");
+    play_button = new Button(":/icons/play.png");
+    stop_button = new Button(":/icons/stop.png");
 
     connect(play_button, &Button::clicked, this, &AudioPanel::on_play_triggered);
     connect(stop_button, &Button::clicked, this, &AudioPanel::on_stop_triggered);
