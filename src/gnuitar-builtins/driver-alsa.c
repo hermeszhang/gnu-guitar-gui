@@ -145,15 +145,15 @@ get_map(const void *data, struct GnuitarMap *map)
 
     (void) data;
 
-    err = gnuitar_map_define(map, "Rate", GNUITAR_MAP_TYPE_UINT32);
+    err = gnuitar_map_define(map, "Rate", GNUITAR_MAP_TYPE_ULONG);
     if (err)
         return err;
 
-    err = gnuitar_map_define(map, "Periods", GNUITAR_MAP_TYPE_UINT32);
+    err = gnuitar_map_define(map, "Periods", GNUITAR_MAP_TYPE_ULONG);
     if (err)
         return err;
 
-    err = gnuitar_map_define(map, "Period Size", GNUITAR_MAP_TYPE_UINT32);
+    err = gnuitar_map_define(map, "Period Size", GNUITAR_MAP_TYPE_ULONG);
     if (err)
         return err;
 
