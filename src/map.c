@@ -1,5 +1,6 @@
 #include "map.h"
 
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdint.h>
@@ -249,6 +250,48 @@ gnuitar_map_set(struct GnuitarMap *map, const char *name, const void *data)
         return ENOMEM;
 
     memcpy(entry->data, data, entry_size);
+
+    return 0;
+}
+
+int
+gnuitar_map_set_as_string(struct GnuitarMap *map, const char *name, const char *data_str)
+{
+    int count = 0;
+    struct GnuitarMapEntry *entry;
+    const char *fmt = NULL;
+
+    entry = gnuitar_map_find(map, name);
+    if (entry == NULL)
+        return EINVAL;
+
+    /* TODO : support the rest of the types */
+    switch (entry->type) {
+    case GNUITAR_MAP_TYPE_FLOAT:
+        fmt = "%f";
+        break;
+    case GNUITAR_MAP_TYPE_DOUBLE:
+        fmt = "%lf";
+        break;
+    case GNUITAR_MAP_TYPE_INT:
+        fmt = "%d";
+        break;
+    case GNUITAR_MAP_TYPE_UINT:
+        fmt = "%u";
+        break;
+    case GNUITAR_MAP_TYPE_LONG:
+        fmt = "%ld";
+        break;
+    case GNUITAR_MAP_TYPE_ULONG:
+        fmt = "%lu";
+        break;
+    default:
+        return EINVAL;
+    }
+
+    count = sscanf(data_str, fmt, entry->data);
+    if (count == 0)
+        return EINVAL;
 
     return 0;
 }

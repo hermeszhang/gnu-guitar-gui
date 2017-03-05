@@ -112,6 +112,8 @@ struct GnuitarMapEntry * gnuitar_map_find(const struct GnuitarMap *map, const ch
 
 int gnuitar_map_set(struct GnuitarMap *map, const char *name, const void *data);
 
+int gnuitar_map_set_as_string(struct GnuitarMap *map, const char *name, const char *data_str);
+
 int gnuitar_map_get(struct GnuitarMap *map, const char *name, void *data);
 
 size_t gnuitar_map_get_count(const struct GnuitarMap *map);
