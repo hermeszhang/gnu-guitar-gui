@@ -5,6 +5,7 @@ CXXFLAGS = -Wall -Wextra -Werror -Wfatal-errors -fPIC
 ifdef gnuitar_config
 include $(gnuitar_config)
 else
+gnuitar_release = 0
 gnuitar_with_alsa = 1
 endif
 
@@ -18,6 +19,12 @@ ifdef gnuitar_with_alsa
 objfiles += driver-alsa.o
 LDLIBS += -lasound
 CXXFLAGS += -DGNUITAR_WITH_ALSA
+endif
+
+ifdef gnuitar_release
+CFLAGS += -O3
+else
+CFLAGS += -g -DGNUITAR_DEBUG
 endif
 
 LDLIBS += -ldl
