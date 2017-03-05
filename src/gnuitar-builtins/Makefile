@@ -56,7 +56,7 @@ effect_headers += ../map.h
 all: libgnuitar-builtins.so $(tests)
 
 libgnuitar-builtins.so: $(objfiles)
-	$(CXX) -shared $(objfiles) ../libgnuitar.so -o $@
+	$(CXX) -shared $(objfiles) ../libgnuitar.so $(LDLIBS) -o $@
 
 biquad.o: biquad.c biquad.h
 
