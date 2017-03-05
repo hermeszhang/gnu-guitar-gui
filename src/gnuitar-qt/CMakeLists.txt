@@ -33,22 +33,36 @@ ADD_EXECUTABLE(gnuitar-qt
     knob.cc
     main-window.h
     main-window.cc
+    menu-bar.h
+    menu-bar.cc
     rack.h
     rack.cc)
 TARGET_LINK_LIBRARIES(gnuitar-qt ${Qt5Core_QTMAIN_LIBRARIES})
 TARGET_LINK_LIBRARIES(gnuitar-qt gnuitar)
 QT5_USE_MODULES(gnuitar-qt Widgets)
 
-ADD_EXECUTABLE(audio-panel-test audio-panel-test.cc button.cc audio-panel.cc)
-TARGET_LINK_LIBRARIES(audio-panel-test ${Qt5Core_QTMAIN_LIBRARIES})
-QT5_USE_MODULES(audio-panel-test Widgets)
-
-ADD_EXECUTABLE(doc-browser-test doc-browser-test.cc doc-browser.cc)
-TARGET_LINK_LIBRARIES(doc-browser-test ${Qt5Core_QTMAIN_LIBRARIES})
-QT5_USE_MODULES(doc-browser-test Widgets)
-
 INSTALL(TARGETS gnuitar-qt
     RUNTIME DESTINATION bin
     ARCHIVE DESTINATION lib
     LIBRARY DESTINATION lib)
+
+FUNCTION(ADD_GNUITAR_QT_TEST TEST_NAME)
+    ADD_EXECUTABLE(${TEST_NAME} ${ARGN})
+    TARGET_LINK_LIBRARIES(${TEST_NAME} ${Qt5Core_QTMAIN_LIBRARIES})
+    QT5_USE_MODULES(${TEST_NAME} Widgets)
+ENDFUNCTION(ADD_GNUITAR_QT_TEST TEST_NAME)
+
+ADD_GNUITAR_QT_TEST(audio-panel-test
+    audio-panel-test.cc
+    audio-panel.cc
+    button.cc)
+
+ADD_GNUITAR_QT_TEST(menu-bar-test
+    menu-bar-test.cc
+    menu-bar.cc
+    doc-browser.cc)
+
+ADD_GNUITAR_QT_TEST(doc-browser-test
+    doc-browser-test.cc
+    doc-browser.cc)
 
