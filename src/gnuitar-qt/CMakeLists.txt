@@ -23,6 +23,10 @@ QT5_WRAP_UI(UI_HEADERS main-window.ui)
 ADD_EXECUTABLE(gnuitar-qt
     gnuitar-qt.cc
     ${UI_HEADERS}
+    audio-panel.h
+    audio-panel.cc
+    button.h
+    button.cc
     doc-browser.h
     doc-browser.cc
     knob.h
@@ -34,6 +38,10 @@ ADD_EXECUTABLE(gnuitar-qt
 TARGET_LINK_LIBRARIES(gnuitar-qt ${Qt5Core_QTMAIN_LIBRARIES})
 TARGET_LINK_LIBRARIES(gnuitar-qt gnuitar)
 QT5_USE_MODULES(gnuitar-qt Widgets)
+
+ADD_EXECUTABLE(audio-panel-test audio-panel-test.cc button.cc audio-panel.cc)
+TARGET_LINK_LIBRARIES(audio-panel-test ${Qt5Core_QTMAIN_LIBRARIES})
+QT5_USE_MODULES(audio-panel-test Widgets)
 
 ADD_EXECUTABLE(doc-browser-test doc-browser-test.cc doc-browser.cc)
 TARGET_LINK_LIBRARIES(doc-browser-test ${Qt5Core_QTMAIN_LIBRARIES})

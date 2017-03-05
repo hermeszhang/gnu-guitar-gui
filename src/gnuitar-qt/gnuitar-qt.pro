@@ -7,12 +7,16 @@ TARGET = gnuitar-qt
 TEMPLATE = app
 
 SOURCES += "gnuitar-qt.cc"
+SOURCES += "audio-panel.cc"
+SOURCES += "button.cc"
 SOURCES += "main-window.cc"
 SOURCES += "doc-browser.cc"
 SOURCES += "knob.cc"
 SOURCES += "rack.cc"
 
 HEADERS += "main-window.h"
+HEADERS += "audio-panel.h"
+HEADERS += "button.h"
 HEADERS += "doc-browser.h"
 HEADERS += "knob.h"
 HEADERS += "rack.h"

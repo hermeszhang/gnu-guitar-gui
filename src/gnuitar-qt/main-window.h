@@ -5,6 +5,7 @@
 
 #include "../gnuitar.h"
 
+#include "audio-panel.h"
 #include "doc-browser.h"
 #include "rack.h"
 
@@ -15,6 +16,8 @@ class MainWindow;
 } /* namespace Ui */
 
 namespace Gnuitar {
+
+namespace Qt {
 
 class MainWindow : public QMainWindow
 {
@@ -35,12 +38,19 @@ private slots:
     void on_report_an_issue_triggered(void);
     void on_view_documentation_triggered(void);
 private:
+
     Ui::MainWindow *ui;
-    Gnuitar::Qt::DocBrowser *doc_browser;
-    Gnuitar::Qt::Rack *rack;
+
+    AudioPanel *audio_panel;
+    DocBrowser *doc_browser;
+    Rack *rack;
+
     GnuitarTrack track;
     GnuitarPackageManager package_manager;
+
 }; /* class MainWindow */
+
+} /* namespace Qt */
 
 } /* namespace Gnuitar */
 

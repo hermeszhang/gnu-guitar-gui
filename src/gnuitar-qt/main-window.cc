@@ -29,12 +29,16 @@
 
 namespace Gnuitar {
 
+namespace Qt {
+
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow), doc_browser(0)
 {
     ui->setupUi(this);
 
-    rack = new Gnuitar::Qt::Rack(ui->central_widget);
+    rack = new Rack(ui->central_widget);
     rack->resize(640, 480);
+
+    audio_panel = new AudioPanel(ui->central_widget);
 
     gnuitar_track_init(&track);
 
@@ -217,6 +221,8 @@ MainWindow::on_view_documentation_triggered(void)
 {
     open_documentation();
 }
+
+} /* namespace Qt */
 
 } /* namespace Gnuitar */
 
