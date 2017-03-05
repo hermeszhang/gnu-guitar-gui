@@ -1,63 +1,27 @@
-CC = gcc
-CFLAGS = -Wall -Wextra -Werror -Wfatal-errors
+CXX = g++
+CXXFLAGS = -Wall -Wextra -Werror -Wfatal-errors -std=c++11
 
 ifdef gnuitar_release
-CFLAGS += -fPIC -O3
+CXXFLAGS += -O3
 else
-CFLAGS += -fPIC -g -DGNUITAR_DEBUG
+CXXFLAGS += -g -DGNUITAR_DEBUG
 endif
 
 LDLIBS += -ldl
 
-objfiles += chain.o
-objfiles += conversion.o
-objfiles += driver.o
-objfiles += effect.o
-objfiles += env.o
-objfiles += map.o
-objfiles += package.o
-objfiles += package-manager.o
-objfiles += packet.o
-objfiles += pipe.o
-objfiles += track.o
-objfiles += mutex.o
+objfiles += plugin.o
 
-tests += pipe-test
-tests += map-test
+tests += plugin-test
 
 .PHONY: all
-all: libgnuitar.so $(tests)
-	$(MAKE) -C gnuitar-builtins
-	$(MAKE) -C gnuitar-sh
+all: libgnuitar.a $(tests)
 
-libgnuitar.so: $(objfiles)
-	$(CC) -shared $(objfiles) -o $@
+libgnuitar.a: $(objfiles)
+	$(AR) $(ARFLAGS) $@ $(objfiles)
 
-chain.o: chain.c chain.h effect.h
+plugin.o: plugin.cc plugin.h
 
-driver.o: driver.c driver.h
-
-effect.o: effect.c effect.h packet.h
-
-env.o: env.c env.h
-
-pipe-test: pipe-test.c libgnuitar.so
-
-map.o: map.c map.h
-
-map-test: map-test.c libgnuitar.so
-
-packet.o: packet.c packet.h
-
-package.o: package.c package.h
-
-package-manager.o: package-manager.c package-manager.h package.h
-
-pipe.o: pipe.c pipe.h
-
-track.o: track.c track.h packet.h chain.h map.h
-
-mutex.o: mutex.c mutex.h
+plugin-test: plugin-test.cc libgnuitar.a
 
 .PHONY: clean
 clean:
