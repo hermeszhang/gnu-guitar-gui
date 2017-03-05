@@ -65,16 +65,10 @@
      <string>Presets</string>
     </property>
    </widget>
-   <widget class="QMenu" name="menu_effects">
-    <property name="title">
-     <string>Effects</string>
-    </property>
-   </widget>
    <widget class="QMenu" name="menu_packages">
     <property name="title">
      <string>Packages</string>
     </property>
-    <addaction name="open_package"/>
    </widget>
    <widget class="QMenu" name="menu_help">
     <property name="title">
@@ -83,17 +77,10 @@
     <addaction name="report_an_issue"/>
     <addaction name="view_documentation"/>
    </widget>
-   <widget class="QMenu" name="menuDrivers">
-    <property name="title">
-     <string>Drivers</string>
-    </property>
-   </widget>
    <addaction name="menu_file"/>
    <addaction name="menu_edit"/>
    <addaction name="menu_view"/>
    <addaction name="menu_presets"/>
-   <addaction name="menuDrivers"/>
-   <addaction name="menu_effects"/>
    <addaction name="menu_packages"/>
    <addaction name="menu_help"/>
   </widget>

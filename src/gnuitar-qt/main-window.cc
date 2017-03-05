@@ -36,15 +36,21 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     rack = new Gnuitar::Qt::Rack(ui->central_widget);
     rack->resize(640, 480);
 
-    open_package(GNUITAR_BUILTINS_PACKAGE);
+    gnuitar_track_init(&track);
 
-    gnuitar_track_init(&track, "ALSA");
+    gnuitar_package_manager_init(&package_manager);
+    auto packages_dir = std::getenv("GNUITAR_PACKAGES_PATH");
+    if (packages_dir != nullptr)
+        gnuitar_package_manager_set_packages_dir(&package_manager, packages_dir);
+    gnuitar_package_manager_refresh_packages(&package_manager);
+
+    populate_known_packages();
 }
 
 MainWindow::~MainWindow(void)
 {
     gnuitar_track_done(&track);
-    gnuitar_package_done(&package);
+    gnuitar_package_manager_done(&package_manager);
     delete ui;
     if (doc_browser != 0)
         delete doc_browser;
@@ -74,38 +80,68 @@ MainWindow::open_documentation(void)
 }
 
 void
-MainWindow::populate_known_effects(void)
+MainWindow::populate_known_packages(void)
 {
-    if (!package_open)
+    auto count = gnuitar_package_manager_get_count(&package_manager);
+    for (decltype(count) i = 0; i < count; i++) {
+        auto package = gnuitar_package_manager_get(&package_manager, i);
+        if (package == NULL)
+            continue;
+        auto package_name = gnuitar_package_get_name(package);
+        if (package_name == NULL)
+            continue;
+        auto package_menu = ui->menu_packages->addMenu(package_name);
+        populate_known_effects(package_menu, package);
+	populate_known_drivers(package_menu, package);
+    }
+}
+
+void
+MainWindow::populate_known_drivers(QMenu *menu, GnuitarPackage *package)
+{
+    auto package_name = gnuitar_package_get_name(package);
+    if (package_name == nullptr)
         return;
 
-    auto count = gnuitar_package_get_effect_count(&package);
+    auto count = gnuitar_package_get_driver_count(package);
     for (decltype(count) i = 0; i < count; i++) {
-        auto effect_name = gnuitar_package_get_effect_name(&package, i);
+        auto driver_name = gnuitar_package_get_driver_name(package, i);
+        if (driver_name == NULL)
+            continue;
+        QString action_name(driver_name);
+	action_name += " (Driver)";
+        auto action = menu->addAction(action_name);
+	connect(action, &QAction::triggered, this, [this, package_name, driver_name]{ set_driver(package_name, driver_name); });
+    }
+}
+
+void
+MainWindow::populate_known_effects(QMenu *menu, GnuitarPackage *package)
+{
+    auto package_name = gnuitar_package_get_name(package);
+    if (package_name == nullptr)
+        return;
+
+    auto count = gnuitar_package_get_effect_count(package);
+    for (decltype(count) i = 0; i < count; i++) {
+        auto effect_name = gnuitar_package_get_effect_name(package, i);
         if (effect_name == NULL)
             continue;
-        auto action = ui->menu_effects->addAction(effect_name);
-	connect(action, &QAction::triggered, this, [this, effect_name]{ add_effect(effect_name); });
+        auto action = menu->addAction(effect_name);
+	connect(action, &QAction::triggered, this, [this, package_name, effect_name]{ add_effect(package_name, effect_name); });
     }
 }
 
 void
-MainWindow::open_package(const std::string& package_path)
+MainWindow::add_effect(const char *package_name, const char* effect_name)
 {
-    if (gnuitar_package_open(&package, package_path.c_str()) != 0){
-        package_open = false;
-    } else {
-        package_open = true;
-	populate_known_effects();
-    }
-}
+    auto package = gnuitar_package_manager_find(&package_manager, package_name);
+    if (package == NULL)
+        return;
 
-void
-MainWindow::add_effect(const QString& effect_name)
-{
     GnuitarEffect effect;
 
-    if (gnuitar_package_init_effect(&package, effect_name.toStdString().c_str(), &effect) != 0)
+    if (gnuitar_package_init_effect(package, effect_name, &effect) != 0)
         return;
 
     if (gnuitar_track_add_effect(&track, &effect) != 0) {
@@ -138,19 +174,36 @@ MainWindow::add_effect(const QString& effect_name)
 }
 
 void
-MainWindow::on_quit_triggered(void)
+MainWindow::set_driver(const char *package_name, const char* driver_name)
 {
-    close();
+    auto package = gnuitar_package_manager_find(&package_manager, package_name);
+    if (package == NULL)
+        return;
+
+    GnuitarDriver driver;
+
+    if (gnuitar_package_init_driver(package, driver_name, &driver) != 0)
+        return;
+
+    gnuitar_track_set_driver(&track, &driver);
+
+    gnuitar_track_start(&track);
 }
 
 void
-MainWindow::on_open_package_triggered(void)
+MainWindow::on_actionFull_Screen_triggered(void)
 {
-    auto package_path = QFileDialog::getOpenFileName(this, tr("Open File"), ".", tr("Libraries (*.so)"));
+    auto window_state = windowState();
+    if (window_state == ::Qt::WindowFullScreen)
+        showNormal();
+    else
+        showFullScreen();
+}
 
-    std::string package_path_utf8 = package_path.toUtf8().constData();
-
-    open_package(package_path_utf8);
+void
+MainWindow::on_quit_triggered(void)
+{
+    close();
 }
 
 void

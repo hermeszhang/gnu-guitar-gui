@@ -24,12 +24,14 @@ public:
     ~MainWindow(void);
 protected:
     void open_documentation(void);
-    void populate_known_effects(void);
-    void open_package(const std::string& path);
+    void populate_known_packages(void);
+    void populate_known_drivers(QMenu *menu, GnuitarPackage *package);
+    void populate_known_effects(QMenu *menu, GnuitarPackage *package);
 private slots:
-    void add_effect(const QString& effect_name);
+    void add_effect(const char *package_name, const char *effect_name);
+    void set_driver(const char *package_name, const char *driver_name);
+    void on_actionFull_Screen_triggered(void);
     void on_quit_triggered(void);
-    void on_open_package_triggered(void);
     void on_report_an_issue_triggered(void);
     void on_view_documentation_triggered(void);
 private:
@@ -37,8 +39,7 @@ private:
     Gnuitar::Qt::DocBrowser *doc_browser;
     Gnuitar::Qt::Rack *rack;
     GnuitarTrack track;
-    GnuitarPackage package;
-    bool package_open;
+    GnuitarPackageManager package_manager;
 }; /* class MainWindow */
 
 } /* namespace Gnuitar */
