@@ -10,6 +10,7 @@ ELSE (MSVC)
     SET (CMAKE_CXX_FLAGS "-Wall -Wextra -Werror -Wfatal-errors")
 ENDIF (MSVC)
 
+SET (CMAKE_AUTORCC ON)
 SET (CMAKE_AUTOMOC ON)
 SET (CMAKE_AUTOUIC ON)
 SET (CMAKE_INCLUDE_CURRENT_DIR ON)
@@ -60,9 +61,11 @@ ADD_GNUITAR_QT_TEST(audio-panel-test
 ADD_GNUITAR_QT_TEST(menu-bar-test
     menu-bar-test.cc
     menu-bar.cc
-    doc-browser.cc)
+    doc-browser.cc
+    resources.qrc)
 
 ADD_GNUITAR_QT_TEST(doc-browser-test
     doc-browser-test.cc
-    doc-browser.cc)
+    doc-browser.cc
+    resources.qrc)
 

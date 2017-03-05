@@ -23,6 +23,8 @@ HEADERS += "rack.h"
 
 FORMS += "main-window.ui"
 
+RESOURCES += "resources.qrc"
+
 CFLAGS += -Wall -Wextra -Werror -Wfatal-errors -std=c++11
 
 LIBS +=  ../libgnuitar.so

@@ -7,8 +7,8 @@ src/gnuitar-sh/gnuitar-sh
 src/gnuitar-qt/gnuitar-qt
 src/gnuitar-qt/ui_*
 src/gnuitar-qt/moc_*
+src/gnuitar-qt/qrc_*
 src/gnuitar-qt/Makefile
-
 src/gnuitar-doc/*
 
 build/*
