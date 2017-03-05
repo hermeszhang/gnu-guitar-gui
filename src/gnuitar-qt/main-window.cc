@@ -23,6 +23,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     setCentralWidget(central_widget);
     setMenuBar(menu_bar);
 
+    connect(menu_bar, &MenuBar::quit_requested, this, &MainWindow::close);
+
     gnuitar_track_init(&track);
 
     gnuitar_package_manager_init(&package_manager);
