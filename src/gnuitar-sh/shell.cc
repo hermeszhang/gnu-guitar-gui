@@ -253,6 +253,14 @@ int Shell::set_driver(GnuitarPackage *package_ptr) noexcept
     Gnuitar::Package package(package_ptr);
     package.init_driver(driver_name.c_str(), &driver);
 
+    GnuitarMap driver_map;
+    gnuitar_map_init(&driver_map);
+    if (gnuitar_driver_get_map(&driver, &driver_map) == 0) {
+        prompt_map(&driver_map);
+        gnuitar_driver_set_map(&driver, &driver_map);
+    }
+    gnuitar_map_done(&driver_map);
+
     gnuitar_track_set_driver(&track, &driver);
 
     return 0;
@@ -291,10 +299,6 @@ Shell::prompt_map_entry(struct GnuitarMap *map, const char *entry_name) noexcept
 {
     struct GnuitarMapEntry *map_entry;
 
-    union {
-        double a1;
-    } variant;
-
     map_entry = gnuitar_map_find(map, entry_name);
     if (map_entry == NULL)
         return;
@@ -306,11 +310,7 @@ Shell::prompt_map_entry(struct GnuitarMap *map, const char *entry_name) noexcept
         return;
     }
 
-    if (map_entry->type == GNUITAR_MAP_TYPE_DOUBLE) {
-        if (sscanf(map_value.c_str(), "%lf", &variant.a1) == 1) {
-            gnuitar_map_set(map, entry_name, &variant.a1);
-        }
-    }
+    gnuitar_map_set_as_string(map, entry_name, map_value.c_str());
 }
 
 void
