@@ -1,7 +1,11 @@
 *.o
 *.a
 *.so
+*.so.*
 *-test
+
+Makefile
+Makefile.*
 
 src/gnuitar-sh/gnuitar-sh
 src/gnuitar-qt/gnuitar-qt
