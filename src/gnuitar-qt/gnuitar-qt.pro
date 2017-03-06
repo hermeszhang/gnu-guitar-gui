@@ -28,5 +28,7 @@ RESOURCES += "resources.qrc"
 
 INCLUDEPATH += $$PWD/../../include
 
-LIBS += ../libgnuitar.a -ldl -lpthread -lasound
+linux {
+  LIBS += ../libgnuitar.a -ldl -lpthread -lasound
+}
 

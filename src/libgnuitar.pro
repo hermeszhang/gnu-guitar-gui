@@ -1,6 +1,7 @@
 QT -= gui core
 
 TEMPLATE = lib
+CONFIG = staticlib
 VERSION = 0.4
 TARGET = gnuitar
 
@@ -15,7 +16,6 @@ HEADERS += "../include/gnuitar/plugin.h"
 HEADERS += "../include/gnuitar/plugin-manager.h"
 
 g++ {
-  CXXFLAGS += -fPIC
   CXXFLAGS += -Wall -Wextra -Werror -Wfatal-errors
   CXXFLAGS += -std=c++11
 }
