@@ -8,7 +8,7 @@ namespace
 } /* namespace */
 
 int
-main(void)
+main (void)
 {
   Gnuitar::Driver *driver;
 
@@ -17,10 +17,10 @@ main(void)
     return EXIT_FAILURE;
 
 #ifdef __unix__
-  Gnuitar::Plugin plugin("plugins/caps.so");
-  if (plugin.opened())
+  Gnuitar::Plugin plugin ("plugins/caps.so");
+  if (plugin.good ())
     {
-      auto effect = plugin.get_effect(0);
+      auto effect = plugin.get_effect (0);
       if (effect != nullptr)
         {
           std::cout << "using effect: " << effect->get_name () << std::endl;
