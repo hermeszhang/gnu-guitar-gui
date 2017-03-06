@@ -30,7 +30,7 @@ MainWindow::MainWindow (QWidget *parent) : QMainWindow (parent)
   driver = Driver::make();
 
   plugin_manager.parse_ladspa_env();
-  plugin_manager.open("caps");
+  plugin_manager.find_all_ladspa_plugins();
 
   for (size_t i = 0; i < plugin_manager.plugin_count(); i++)
     {
