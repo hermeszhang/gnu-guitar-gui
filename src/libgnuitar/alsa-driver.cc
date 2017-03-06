@@ -1,4 +1,4 @@
-#include "alsa-driver.h"
+#include <libgnuitar/alsa-driver.h>
 
 #ifdef GNUITAR_DEBUG
 #include <iostream>
