@@ -9,6 +9,7 @@
 #include "rack.h"
 
 #include <gnuitar/driver.h>
+#include <gnuitar/plugin-manager.h>
 
 namespace Gnuitar {
 
@@ -23,6 +24,8 @@ public:
 private slots:
   void on_play_triggered(void);
   void on_stop_triggered(void);
+protected:
+  void show_plugin(const Plugin *plugin) noexcept;
 private:
   QWidget *central_widget;
   QVBoxLayout *layout;
@@ -30,6 +33,7 @@ private:
   AudioPanel *audio_panel;
   Rack *rack;
   Driver *driver;
+  PluginManager plugin_manager;
 }; /* class MainWindow */
 
 } /* namespace Qt */

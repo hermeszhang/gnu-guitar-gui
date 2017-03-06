@@ -28,6 +28,16 @@ MainWindow::MainWindow (QWidget *parent) : QMainWindow (parent)
   connect (audio_panel, &AudioPanel::stop_triggered, this, &MainWindow::on_stop_triggered);
 
   driver = Driver::make();
+
+  plugin_manager.open("caps");
+
+  for (size_t i = 0; i < plugin_manager.plugin_count(); i++)
+    {
+      auto plugin = plugin_manager.plugin(i);
+      if (plugin == nullptr)
+        continue;
+      show_plugin(plugin);
+    }
 }
 
 MainWindow::~MainWindow (void)
@@ -48,6 +58,25 @@ MainWindow::on_stop_triggered (void)
 {
   if (driver != nullptr)
     driver->stop ();
+}
+
+void
+MainWindow::show_plugin (const Plugin *plugin) noexcept
+{
+  for (size_t i = 0; i < SIZE_MAX; i++)
+    {
+      auto effect = plugin->get_effect(i);
+      if (effect == nullptr)
+        break;
+      auto name = effect->get_name();
+      if (name == nullptr)
+        {
+          delete effect;
+          continue;
+        }
+      menu_bar->add_ladspa_plugin(name);
+      delete effect;
+    }
 }
 
 } /* namespace Qt */
