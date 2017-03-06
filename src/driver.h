@@ -1,37 +1,31 @@
 #ifndef GNUITAR_DRIVER_H
 #define GNUITAR_DRIVER_H
 
-#include "chain.h"
-#include "map.h"
+#include "plugin.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif /* __cplusplus */
+#include <string>
+#include <vector>
 
-struct GnuitarDriver {
-    void *data;
-    void (*done)(void *data);
-    int (*start)(void *data, struct GnuitarChain *chain);
-    int (*stop)(void *data);
-    int (*get_map)(const void *data, struct GnuitarMap *map);
-    int (*set_map)(void *data, const struct GnuitarMap *map);
-};
+namespace Gnuitar
+{
 
-void gnuitar_driver_init(struct GnuitarDriver *driver);
+class Driver
+{
+  std::vector<Effect*> effects;
+public:
+  static Driver * make (void) noexcept;
+  virtual ~Driver(void);
+  int add_effect(Effect *effect) noexcept;
+  virtual int set_input(const std::string& input_name) noexcept = 0;
+  virtual int set_output(const std::string& output_name) noexcept = 0;
+  virtual bool running (void) const noexcept = 0;
+  virtual int start (void) noexcept = 0;
+  virtual int stop (void) noexcept = 0;
+protected:
+  void process(float *sample_array, size_t sample_count) noexcept;
+}; /* class Driver */
 
-void gnuitar_driver_done(struct GnuitarDriver *driver);
-
-int gnuitar_driver_start(struct GnuitarDriver *driver, struct GnuitarChain *chain);
-
-int gnuitar_driver_stop(struct GnuitarDriver *driver);
-
-int gnuitar_driver_get_map(const struct GnuitarDriver *driver, struct GnuitarMap *map);
-
-int gnuitar_driver_set_map(struct GnuitarDriver *driver, const struct GnuitarMap *map);
-
-#ifdef __cplusplus
-} /* extern "C" { */
-#endif /* __cplusplus */
+} /* namespace Gnuitar */
 
 #endif /* GNUITAR_DRIVER_H */
 
