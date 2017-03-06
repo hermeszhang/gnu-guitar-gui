@@ -6,7 +6,7 @@
 
 #include <alsa/asoundlib.h>
 
-#include "driver.h"
+#include <gnuitar/driver.h>
 
 namespace Gnuitar
 {

@@ -1,6 +1,10 @@
 CXX = g++
 CXXFLAGS = -Wall -Wextra -Werror -Wfatal-errors -std=c++11
 
+CXXFLAGS += -I../include
+
+VPATH += ../include/gnuitar
+
 ifdef gnuitar_config
 include $(gnuitar_config)
 else

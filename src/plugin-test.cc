@@ -1,4 +1,4 @@
-#include "plugin.h"
+#include <gnuitar/plugin.h>
 
 #include <cstdlib>
 
