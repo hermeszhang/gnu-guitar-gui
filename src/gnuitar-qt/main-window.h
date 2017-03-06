@@ -8,8 +8,8 @@
 #include "menu-bar.h"
 #include "rack.h"
 
-#include <gnuitar/driver.h>
-#include <gnuitar/plugin-manager.h>
+#include <libgnuitar/driver.h>
+#include <libgnuitar/plugin-manager.h>
 
 namespace Gnuitar {
 

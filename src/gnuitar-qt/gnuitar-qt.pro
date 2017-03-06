@@ -6,6 +6,8 @@ TARGET = gnuitar-qt
 
 TEMPLATE = app
 
+INCLUDEPATH += ..
+
 SOURCES += "gnuitar-qt.cc"
 
 SOURCES += "audio-panel.cc"
@@ -26,9 +28,11 @@ HEADERS += "rack.h"
 
 RESOURCES += "resources.qrc"
 
-INCLUDEPATH += $$PWD/../../include
+unix {
+  LIBS += ../libgnuitar/libgnuitar.a -ldl -lpthread -lasound
+}
 
-linux {
-  LIBS += ../libgnuitar.a -ldl -lpthread -lasound
+win32 {
+  LIBS += ../libgnuitar/gnuitar.lib
 }
 
