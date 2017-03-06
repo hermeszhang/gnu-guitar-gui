@@ -24,20 +24,11 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     setMenuBar(menu_bar);
 
     connect(menu_bar, &MenuBar::quit_requested, this, &MainWindow::close);
-
-    gnuitar_track_init(&track);
-
-    gnuitar_package_manager_init(&package_manager);
-    auto packages_dir = std::getenv("GNUITAR_PACKAGES_PATH");
-    if (packages_dir != nullptr)
-        gnuitar_package_manager_set_packages_dir(&package_manager, packages_dir);
-    gnuitar_package_manager_refresh_packages(&package_manager);
 }
 
 MainWindow::~MainWindow(void)
 {
-    gnuitar_track_done(&track);
-    gnuitar_package_manager_done(&package_manager);
+
 }
 
 } /* namespace Qt */

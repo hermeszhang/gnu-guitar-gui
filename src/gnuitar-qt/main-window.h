@@ -4,9 +4,6 @@
 #include <QMainWindow>
 #include <QVBoxLayout>
 
-#include "../track.h"
-#include "../package-manager.h"
-
 #include "audio-panel.h"
 #include "menu-bar.h"
 #include "rack.h"
@@ -27,9 +24,6 @@ private:
     MenuBar *menu_bar;
     AudioPanel *audio_panel;
     Rack *rack;
-
-    GnuitarTrack track;
-    GnuitarPackageManager package_manager;
 }; /* class MainWindow */
 
 } /* namespace Qt */
