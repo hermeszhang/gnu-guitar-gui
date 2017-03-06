@@ -2,7 +2,11 @@
 
 #include <cerrno>
 
-#include <iostream>
+#ifdef _WIN32
+#include <windows.h>
+#else /* _WIN32 */
+#include <glob.h>
+#endif /* _WIN32 */
 
 namespace Gnuitar
 {
@@ -21,7 +25,7 @@ PluginManager::~PluginManager (void)
 }
 
 int
-PluginManager::open (const std::string& name) noexcept
+PluginManager::open_by_name (const std::string& name) noexcept
 {
   std::string filename;
 #ifdef _WIN32
@@ -32,16 +36,23 @@ PluginManager::open (const std::string& name) noexcept
 
   for (const std::string& ladspa_path : ladspa_paths)
     {
-      std::string plugin_path(ladspa_path + "/" + filename);
-      Plugin plugin (plugin_path);
-      if (plugin.good ())
-        {
-          plugins.push_back(plugin);
-          return 0;
-        }
+      if (open_by_path(ladspa_path + "/" + filename) == 0)
+        return 0;
     }
 
   return ENOENT;
+}
+
+int
+PluginManager::open_by_path (const std::string& path) noexcept
+{
+  Plugin plugin (path);
+  if (plugin.good ())
+    {
+      plugins.push_back(plugin);
+      return 0;
+    }
+  return EINVAL;
 }
 
 int
@@ -57,10 +68,46 @@ PluginManager::add_ladspa_path (const std::string& path) noexcept
         return 0;
     }
 
-  std::cout << "gnuitar: adding ladspa search path: " << path << std::endl;
   ladspa_paths.push_back(path);
 
   return 0;
+}
+
+int
+PluginManager::find_all_ladspa_plugins (void) noexcept
+{
+  for (const std::string& ladspa_path : ladspa_paths)
+    {
+      find_all_ladspa_plugins(ladspa_path);
+    }
+  return 0;
+}
+
+int
+PluginManager::find_all_ladspa_plugins (const std::string& path) noexcept
+{
+#ifdef _WIN32
+  (void) path;
+  return EFAULT;
+#else /* _WIN32 */
+
+  std::string pattern;
+  pattern = path + "/*.so";
+
+  glob_t glbuf;
+
+  if (glob(pattern.c_str(), 0, nullptr, &glbuf) != 0)
+    return EINVAL;
+
+  for (decltype(glbuf.gl_pathc) i = 0; i < glbuf.gl_pathc; i++)
+    {
+      open_by_path(glbuf.gl_pathv[i]);
+    }
+
+  globfree(&glbuf);
+
+  return 0;
+#endif /* _WIN32 */
 }
 
 int
