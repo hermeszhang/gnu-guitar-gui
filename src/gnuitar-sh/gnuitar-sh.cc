@@ -1,6 +1,4 @@
-#include "../gnuitar.h"
-
-#include "shell.h"
+#include <gnuitar-sh/shell.h>
 
 #include <stdlib.h>
 #include <string.h>
