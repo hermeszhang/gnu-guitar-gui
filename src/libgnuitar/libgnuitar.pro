@@ -5,7 +5,7 @@ CONFIG = staticlib
 VERSION = 0.4
 TARGET = gnuitar
 
-INCLUDEPATH += "$$PWD/../include"
+INCLUDEPATH += "$$PWD/.."
 
 SOURCES += "driver.cc"
 SOURCES += "plugin.cc"

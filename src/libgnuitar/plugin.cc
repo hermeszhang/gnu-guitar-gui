@@ -1,4 +1,4 @@
-#include <gnuitar/plugin.h>
+#include <libgnuitar/plugin.h>
 
 #include <cerrno>
 
