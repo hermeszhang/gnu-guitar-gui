@@ -56,10 +56,10 @@ public:
   Plugin (void) noexcept;
   ~Plugin (void);
   bool good (void) const noexcept;
-  Effect *get_effect (size_t index) noexcept;
+  int open (const char *path) noexcept;
+  Effect *get_effect (size_t index) const noexcept;
 protected:
-  int load (const char *path) noexcept;
-  int find_entry (void) noexcept;
+  int find_entry (void *handle) noexcept;
 private:
   enum class Type
   {
