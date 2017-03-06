@@ -135,17 +135,17 @@ Effect::connect_to_ladspa_ports (float *sample_array) noexcept
 
 Plugin::Plugin (void) noexcept
 {
-  is_open = false;
+  handle = nullptr;
 }
 
-Plugin::Plugin (const char *path) noexcept
+Plugin::Plugin (const char *path) noexcept : Plugin()
 {
   load (path);
 }
 
 Plugin::~Plugin (void)
 {
-  if (is_open)
+  if (handle != nullptr)
     {
 #ifdef _WIN32
 #else /* _WIN32 */
@@ -157,43 +157,36 @@ Plugin::~Plugin (void)
 Effect *
 Plugin::get_effect (size_t index) noexcept
 {
-  if (!is_open)
+  if (handle == nullptr)
     return nullptr;
 
-  union
-  {
-    const LADSPA_Descriptor *ladspa_effect;
-    const LV2_Descriptor *lv2_effect;
-  };
-
-  switch (type)
-  {
-    case Plugin::Type::ladspa:
-    ladspa_effect = ladspa_descriptor(index);
-    if (ladspa_effect == nullptr)
-      return nullptr;
-    return new Effect(ladspa_effect);
-
-    case Plugin::Type::lv2:
-    lv2_effect = lv2_descriptor(index);
-    if (lv2_effect == nullptr)
-      return nullptr;
-    return new Effect(lv2_effect);
-  }
+  if (type == Plugin::Type::ladspa)
+    {
+      auto ladspa_effect = ladspa_descriptor(index);
+      if (ladspa_effect == nullptr)
+        return nullptr;
+      return new Effect(ladspa_effect);
+    }
+  else if (type == Plugin::Type::lv2)
+    {
+      auto lv2_effect = lv2_descriptor(index);
+      if (lv2_effect == nullptr)
+        return nullptr;
+      return new Effect(lv2_effect);
+    }
 
   return nullptr;
 }
 
 bool
-Plugin::opened (void) const noexcept
+Plugin::good (void) const noexcept
 {
-  return is_open;
+  return handle != nullptr;
 }
 
 int
 Plugin::load (const char *path) noexcept
 {
-  is_open = false;
 #ifdef _WIN32
   (void) path;
   return EINVAL;
@@ -210,9 +203,9 @@ Plugin::load (const char *path) noexcept
   if (find_entry () != 0)
     {
       dlclose(handle);
+      handle = nullptr;
       return EINVAL;
     }
-  is_open = true;
   return 0;
 #endif /* _WIN32 */
 }
