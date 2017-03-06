@@ -28,6 +28,7 @@ class Effect final
   union
   {
     LADSPA_Handle ladspa_handle;
+    LV2_Handle lv2_handle;
   };
 public:
   Effect (void) = delete;
@@ -54,13 +55,12 @@ public:
   Plugin (const char *path) noexcept;
   Plugin (void) noexcept;
   ~Plugin (void);
-  bool opened (void) const noexcept;
+  bool good (void) const noexcept;
   Effect *get_effect (size_t index) noexcept;
 protected:
   int load (const char *path) noexcept;
   int find_entry (void) noexcept;
 private:
-  bool is_open;
   enum class Type
   {
     ladspa,
