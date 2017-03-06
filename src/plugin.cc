@@ -11,6 +11,7 @@ namespace Gnuitar {
 Effect::Effect (const LADSPA_Descriptor *ladspa_descriptor_) noexcept : ladspa_descriptor(ladspa_descriptor_)
 {
   type = Effect::Type::ladspa;
+  ladspa_handle = nullptr;
 }
 
 Effect::Effect (const LV2_Descriptor *lv2_descriptor_) noexcept : lv2_descriptor(lv2_descriptor_)
@@ -23,21 +24,113 @@ Effect::~Effect (void)
 
 }
 
+int
+Effect::activate (size_t sample_rate) noexcept
+{
+  switch (type)
+    {
+      case Effect::Type::ladspa:
+      ladspa_handle = ladspa_descriptor->instantiate(ladspa_descriptor, sample_rate);
+      ladspa_descriptor->activate(ladspa_handle);
+      break;
+
+      case Effect::Type::lv2:
+      break;
+    }
+
+  return EFAULT;
+}
+
 const char *
 Effect::get_maker (void) const noexcept
 {
   switch (type)
-  {
-    case Effect::Type::ladspa:
-    if (ladspa_descriptor == nullptr)
-      return nullptr;
-    return ladspa_descriptor->Maker;
+    {
+      case Effect::Type::ladspa:
+      if (ladspa_descriptor == nullptr)
+        return nullptr;
+      return ladspa_descriptor->Maker;
 
-    case Effect::Type::lv2:
-    return nullptr;
-  }
+      case Effect::Type::lv2:
+      return nullptr;
+    }
 
   return nullptr;
+}
+
+const char *
+Effect::get_name (void) const noexcept
+{
+  switch (type)
+    {
+      case Effect::Type::ladspa:
+      if (ladspa_descriptor == nullptr)
+        return nullptr;
+      return ladspa_descriptor->Name;
+
+      case Effect::Type::lv2:
+      if (lv2_descriptor == nullptr)
+        return nullptr;
+      return lv2_descriptor->URI;
+    }
+
+  return nullptr;
+}
+
+int
+Effect::process (float *sample_array, size_t sample_count) noexcept
+{
+  if (ladspa_handle == nullptr)
+    {
+#ifdef GNUITAR_DEBUG
+      std::cerr << "handle not instantiated" << std::endl;
+#endif /* GNUITAR_DEBUG */
+      return EFAULT;
+    }
+
+  int err = connect_to_ladspa_ports (sample_array);
+  if (err != 0)
+    {
+#ifdef GNUITAR_DEBUG
+      std::cerr << "gnuitar: failed to connect to LADSPA ports" << std::endl;
+      std::cerr << "ladspa port: " << get_name() << std::endl;
+#endif /* GNUITAR_DEBUG */
+      return err;
+    }
+  ladspa_descriptor->run (ladspa_handle, sample_count);
+  return 0;
+}
+
+int
+Effect::connect_to_ladspa_ports (float *sample_array) noexcept
+{
+  bool input_connected = false;
+  bool output_connected = false;
+  if (ladspa_handle == nullptr)
+    return EFAULT;
+
+  decltype (ladspa_descriptor->PortCount) i;
+  for (i = 0; i < ladspa_descriptor->PortCount; i++)
+    {
+      auto port = ladspa_descriptor->PortDescriptors[i];
+      if (!LADSPA_IS_PORT_AUDIO(port))
+        continue;
+      else if ((!input_connected) && LADSPA_IS_PORT_INPUT(port))
+        {
+          ladspa_descriptor->connect_port(ladspa_handle, i, sample_array);
+          input_connected = true;
+	}
+      else if ((!output_connected) && LADSPA_IS_PORT_OUTPUT(port))
+        {
+          ladspa_descriptor->connect_port(ladspa_handle, i, sample_array);
+          output_connected = true;
+	}
+    }
+
+  if (input_connected && output_connected)
+    return 0;
+
+  return EINVAL;
 }
 
 Plugin::Plugin (void) noexcept
@@ -89,6 +182,12 @@ Plugin::get_effect (size_t index) noexcept
   }
 
   return nullptr;
+}
+
+bool
+Plugin::opened (void) const noexcept
+{
+  return is_open;
 }
 
 int

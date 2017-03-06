@@ -25,14 +25,22 @@ class Effect final
     const LADSPA_Descriptor *ladspa_descriptor;
     const LV2_Descriptor *lv2_descriptor;
   };
+  union
+  {
+    LADSPA_Handle ladspa_handle;
+  };
 public:
   Effect (void) = delete;
   Effect (const Effect&) = delete;
   Effect (const LADSPA_Descriptor *ladspa_) noexcept;
   Effect (const LV2_Descriptor *lv2_) noexcept;
   ~Effect (void);
+  int activate(size_t sample_rate) noexcept;
   const char *get_maker (void) const noexcept;
-  void process (float *sample_array, size_t sample_count);
+  const char *get_name (void) const noexcept;
+  int process (float *sample_array, size_t sample_count) noexcept;
+protected:
+  int connect_to_ladspa_ports(float *sample_array) noexcept;
 }; /* class Effect */
 
 class Plugin final
