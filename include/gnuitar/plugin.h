@@ -10,6 +10,8 @@
 #include <dlfcn.h>
 #endif /* _WIN32 */
 
+#include <string>
+
 namespace Gnuitar
 {
 
@@ -52,11 +54,11 @@ class Plugin final
   void *handle;
 #endif /* _WIN32 */
 public:
-  Plugin (const char *path) noexcept;
+  Plugin (const std::string& path) noexcept;
   Plugin (void) noexcept;
   ~Plugin (void);
   bool good (void) const noexcept;
-  int open (const char *path) noexcept;
+  int open (const std::string& path) noexcept;
   Effect *get_effect (size_t index) const noexcept;
 protected:
   int find_entry (void *handle) noexcept;

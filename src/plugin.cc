@@ -138,7 +138,7 @@ Plugin::Plugin (void) noexcept
   handle = nullptr;
 }
 
-Plugin::Plugin (const char *path) noexcept : Plugin()
+Plugin::Plugin (const std::string& path) noexcept : Plugin()
 {
   open (path);
 }
@@ -185,13 +185,13 @@ Plugin::good (void) const noexcept
 }
 
 int
-Plugin::open (const char *path) noexcept
+Plugin::open (const std::string& path) noexcept
 {
 #ifdef _WIN32
   (void) path;
   return EINVAL;
 #else /* _WIN32 */
-  auto tmp_handle = dlopen (path, RTLD_LAZY);
+  auto tmp_handle = dlopen (path.c_str(), RTLD_LAZY);
   if (tmp_handle == nullptr)
     {
 #ifdef GNUITAR_DEBUG
