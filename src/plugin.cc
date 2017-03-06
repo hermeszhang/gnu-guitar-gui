@@ -140,7 +140,7 @@ Plugin::Plugin (void) noexcept
 
 Plugin::Plugin (const char *path) noexcept : Plugin()
 {
-  load (path);
+  open (path);
 }
 
 Plugin::~Plugin (void)
@@ -155,7 +155,7 @@ Plugin::~Plugin (void)
 }
 
 Effect *
-Plugin::get_effect (size_t index) noexcept
+Plugin::get_effect (size_t index) const noexcept
 {
   if (handle == nullptr)
     return nullptr;
@@ -185,14 +185,14 @@ Plugin::good (void) const noexcept
 }
 
 int
-Plugin::load (const char *path) noexcept
+Plugin::open (const char *path) noexcept
 {
 #ifdef _WIN32
   (void) path;
   return EINVAL;
 #else /* _WIN32 */
-  handle = dlopen (path, RTLD_LAZY);
-  if (handle == nullptr)
+  auto tmp_handle = dlopen (path, RTLD_LAZY);
+  if (tmp_handle == nullptr)
     {
 #ifdef GNUITAR_DEBUG
       std::cerr << "gnuitar: failed to load " << path << std::endl;
@@ -200,18 +200,20 @@ Plugin::load (const char *path) noexcept
 #endif /* GNUITAR_DEBUG */
       return ENOENT;
     }
-  if (find_entry () != 0)
+  if (find_entry (tmp_handle) != 0)
     {
-      dlclose(handle);
-      handle = nullptr;
+      dlclose(tmp_handle);
       return EINVAL;
     }
+  if (handle != nullptr)
+    dlclose(handle);
+  handle = tmp_handle;
   return 0;
 #endif /* _WIN32 */
 }
 
 int
-Plugin::find_entry (void) noexcept
+Plugin::find_entry (void *handle) noexcept
 {
 #ifdef _WIN32
   return EINVAL;
