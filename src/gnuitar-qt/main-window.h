@@ -8,22 +8,28 @@
 #include "menu-bar.h"
 #include "rack.h"
 
+#include <gnuitar/driver.h>
+
 namespace Gnuitar {
 
 namespace Qt {
 
 class MainWindow : public QMainWindow
 {
-    Q_OBJECT
+  Q_OBJECT
 public:
-    MainWindow(QWidget *parent = 0);
-    ~MainWindow(void);
+  MainWindow(QWidget *parent = 0);
+  ~MainWindow(void);
+private slots:
+  void on_play_triggered(void);
+  void on_stop_triggered(void);
 private:
-    QWidget *central_widget;
-    QVBoxLayout *layout;
-    MenuBar *menu_bar;
-    AudioPanel *audio_panel;
-    Rack *rack;
+  QWidget *central_widget;
+  QVBoxLayout *layout;
+  MenuBar *menu_bar;
+  AudioPanel *audio_panel;
+  Rack *rack;
+  Driver *driver;
 }; /* class MainWindow */
 
 } /* namespace Qt */

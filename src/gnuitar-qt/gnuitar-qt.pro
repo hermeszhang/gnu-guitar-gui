@@ -26,5 +26,7 @@ HEADERS += "rack.h"
 
 RESOURCES += "resources.qrc"
 
-CFLAGS += -Wall -Wextra -Werror -Wfatal-errors -std=c++11
+INCLUDEPATH += $$PWD/../../include
+
+LIBS += ../libgnuitar.a -ldl -lpthread -lasound
 
