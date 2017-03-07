@@ -28,11 +28,24 @@ Driver::add_effect (Effect *effect) noexcept
   return 0;
 }
 
-void
-Driver::process (float *sample_array, size_t sample_count) noexcept
+bool
+Driver::connect (float *sample_array) noexcept
 {
   for (Effect *effect : effects)
-    effect->process(sample_array, sample_count);
+    {
+      if (!effect->connect (sample_array))
+        return false;
+    }
+  return true;
+}
+
+void
+Driver::run (size_t sample_count) noexcept
+{
+  for (Effect *effect : effects)
+    {
+      effect->run (sample_count);
+    }
 }
 
 } /* namespace Gnuitar */

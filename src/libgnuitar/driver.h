@@ -22,7 +22,8 @@ public:
   virtual int start (void) noexcept = 0;
   virtual int stop (void) noexcept = 0;
 protected:
-  void process(float *sample_array, size_t sample_count) noexcept;
+  bool connect(float *sample_array) noexcept;
+  void run(size_t sample_count) noexcept;
 }; /* class Driver */
 
 } /* namespace Gnuitar */
