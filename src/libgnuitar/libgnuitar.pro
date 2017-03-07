@@ -9,11 +9,9 @@ INCLUDEPATH += "$$PWD/.."
 
 SOURCES += "driver.cc"
 SOURCES += "plugin.cc"
-SOURCES += "plugin-manager.cc"
 
-HEADERS += "../include/gnuitar/driver.h"
-HEADERS += "../include/gnuitar/plugin.h"
-HEADERS += "../include/gnuitar/plugin-manager.h"
+HEADERS += "driver.h"
+HEADERS += "plugin.h"
 
 packagesExist(alsa) {
   SOURCES += "alsa-driver.cc"
