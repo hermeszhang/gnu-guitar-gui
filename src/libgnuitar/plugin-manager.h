@@ -21,6 +21,7 @@ public:
   int add_ladspa_path(const std::string& path) noexcept;
   int find_all_ladspa_plugins(void) noexcept;
   int find_all_ladspa_plugins(const std::string& path) noexcept;
+  Effect *get_ladspa_effect(const std::string& name) noexcept;
   int parse_ladspa_paths(const std::string& paths) noexcept;
   int parse_ladspa_env(void) noexcept;
   Plugin *plugin (size_t index) noexcept;

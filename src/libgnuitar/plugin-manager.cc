@@ -14,8 +14,10 @@ namespace Gnuitar
 PluginManager::PluginManager (void) noexcept
 {
 #ifdef __unix__
+/*
   add_ladspa_path("/usr/lib/ladspa");
   add_ladspa_path("/usr/local/lib/ladspa");
+*/
 #endif /* __unix__ */
 }
 
@@ -108,6 +110,28 @@ PluginManager::find_all_ladspa_plugins (const std::string& path) noexcept
 
   return 0;
 #endif /* _WIN32 */
+}
+
+Effect *
+PluginManager::get_ladspa_effect (const std::string& name) noexcept
+{
+  for (const Plugin& plugin : plugins)
+    {
+      for (size_t i = 0; i < SIZE_MAX; i++)
+        {
+          auto effect = plugin.get_effect(i);
+          if (effect == nullptr)
+            break;
+          auto effect_name = effect->get_name();
+          if (effect_name != nullptr)
+            {
+              if (effect_name == name)
+                return effect;
+            }
+          delete effect;
+        }
+    }
+  return nullptr;
 }
 
 int
