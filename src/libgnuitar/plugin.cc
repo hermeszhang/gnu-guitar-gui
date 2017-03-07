@@ -19,6 +19,12 @@ Effect::~Effect (void)
 
 }
 
+Plugin::Plugin (Plugin&& plugin) noexcept
+{
+  handle = std::move(plugin.handle);
+  plugin.handle = nullptr;
+}
+
 Plugin::Plugin (void) noexcept
 {
   handle = nullptr;
@@ -213,6 +219,11 @@ Effect::run (size_t sample_count) noexcept
   descriptor->run (handle, sample_count);
 }
 
+Plugin::Plugin (Plugin&& plugin) noexcept : Gnuitar::Plugin(std::move(plugin))
+{
+  descriptor_function = std::move(plugin.descriptor_function);
+}
+
 Plugin::Plugin (void) noexcept
 {
   descriptor_function = nullptr;
@@ -267,10 +278,8 @@ Plugin::get_effect (size_t index) const noexcept
 PluginManager::PluginManager (void) noexcept
 {
 #ifdef __unix__
-/*
-  add_ladspa_path("/usr/lib/ladspa");
-  add_ladspa_path("/usr/local/lib/ladspa");
-*/
+  add_path("/usr/lib/ladspa");
+  add_path("/usr/local/lib/ladspa");
 #endif /* __unix__ */
 }
 
@@ -304,7 +313,7 @@ PluginManager::open_by_path (const std::string& path) noexcept
   Plugin plugin (path);
   if (plugin.good ())
     {
-      plugins.push_back(plugin);
+      plugins.emplace_back(std::move(plugin));
       return true;
     }
   return false;

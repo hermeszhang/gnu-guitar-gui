@@ -32,6 +32,8 @@ class Plugin
   void *handle;
 #endif /* _WIN32 */
 public:
+  Plugin (const Plugin& plugin) = delete;
+  Plugin (Plugin&& plugin) noexcept;
   Plugin (void) noexcept;
   Plugin (const std::string& path) noexcept;
   virtual ~Plugin (void);
@@ -64,6 +66,8 @@ class Plugin final : public Gnuitar::Plugin
 {
   LADSPA_Descriptor_Function descriptor_function;
 public:
+  Plugin (const Plugin& plugin) = delete;
+  Plugin (Plugin&& plugin) noexcept;
   Plugin (void) noexcept;
   Plugin (const std::string& path) noexcept;
   ~Plugin (void);
