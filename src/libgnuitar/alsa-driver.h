@@ -21,9 +21,13 @@ class Driver final : public Gnuitar::Driver
   bool keep_thread_running;
   snd_pcm_t *input_pcm;
   snd_pcm_t *output_pcm;
+  unsigned int channels;
+  unsigned int rate;
 public:
   Driver(void) noexcept;
   ~Driver(void);
+  size_t get_channels (void) const noexcept;
+  size_t get_rate (void) const noexcept;
   int set_input(const std::string& input_name) noexcept;
   int set_output(const std::string& output_name) noexcept;
   int start(void) noexcept;

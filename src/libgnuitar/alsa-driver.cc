@@ -15,6 +15,8 @@ Driver::Driver (void) noexcept
   input_pcm = NULL;
   output_pcm = NULL;
   keep_thread_running = false;
+  channels = 2;
+  rate = 48000;
 }
 
 Driver::~Driver (void)
@@ -24,6 +26,18 @@ Driver::~Driver (void)
     snd_pcm_close (input_pcm);
   if (output_pcm)
     snd_pcm_close (output_pcm);
+}
+
+size_t
+Driver::get_channels (void) const noexcept
+{
+  return channels;
+}
+
+size_t
+Driver::get_rate (void) const noexcept
+{
+  return rate;
 }
 
 bool
@@ -129,6 +143,8 @@ Driver::loop (void) noexcept
 
   sample_array = new float[frame_count * channel_count];
 
+  connect(sample_array);
+
   while (keep_thread_running)
     {
       mutex.lock ();
@@ -140,7 +156,7 @@ Driver::loop (void) noexcept
             return EPIPE;
         }
 
-      process(sample_array, read_count * channel_count);
+      run(read_count * channel_count);
 
       auto write_count = snd_pcm_writei (output_pcm, sample_array, read_count);
       if (write_count < 0)
@@ -180,15 +196,11 @@ Driver::configure_pcm (snd_pcm_t *pcm) noexcept
   {
     unsigned int period_size;
     unsigned int periods;
-    unsigned int channels;
-    unsigned int rate;
     snd_pcm_format_t format;
   } pcm_config;
 
   pcm_config.period_size = 128;
   pcm_config.periods = 4;
-  pcm_config.channels = 2;
-  pcm_config.rate = 48000;
   pcm_config.format = SND_PCM_FORMAT_FLOAT;
 
   err = snd_pcm_hw_params_malloc (&hw_params);
@@ -216,7 +228,7 @@ Driver::configure_pcm (snd_pcm_t *pcm) noexcept
       return 1;
     }
 
-  err = snd_pcm_hw_params_set_channels (pcm, hw_params, pcm_config.channels);
+  err = snd_pcm_hw_params_set_channels (pcm, hw_params, channels);
   if (err < 0)
     {
       snd_pcm_hw_params_free (hw_params);
@@ -229,7 +241,7 @@ Driver::configure_pcm (snd_pcm_t *pcm) noexcept
   snd_pcm_hw_params_set_rate_resample(pcm, hw_params, 0);
 #endif
 
-  err = snd_pcm_hw_params_set_rate_near (pcm, hw_params, &pcm_config.rate, 0);
+  err = snd_pcm_hw_params_set_rate_near (pcm, hw_params, &rate, 0);
   if (err < 0)
     {
       snd_pcm_hw_params_free (hw_params);
