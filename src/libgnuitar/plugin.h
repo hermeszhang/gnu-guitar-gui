@@ -11,6 +11,7 @@
 #endif /* _WIN32 */
 
 #include <string>
+#include <vector>
 
 namespace Gnuitar
 {
@@ -70,6 +71,25 @@ public:
   bool good (void) const noexcept;
   bool open (const std::string& path) noexcept;
 }; /* class Plugin */
+
+class PluginManager final
+{
+  std::vector<Plugin> plugins;
+  std::vector<std::string> paths;
+public:
+  PluginManager (void) noexcept;
+  ~PluginManager (void);
+  bool open_by_name(const std::string& name) noexcept;
+  bool open_by_path(const std::string& path) noexcept;
+  bool add_path(const std::string& path) noexcept;
+  bool find_all_plugins(void) noexcept;
+  bool find_all_plugins(const std::string& path) noexcept;
+  Effect *get_effect(const std::string& name) noexcept;
+  bool parse_paths(const std::string& paths) noexcept;
+  bool parse_env(void) noexcept;
+  Plugin *plugin (size_t index) noexcept;
+  size_t plugin_count(void) const noexcept;
+}; /* class PluginManager */
 
 } /* namespace LADSPA */
 

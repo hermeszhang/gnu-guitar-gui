@@ -6,6 +6,12 @@
 #include <iostream>
 #endif /* GNUITAR_DEBUG */
 
+#ifdef _WIN32
+#include <windows.h>
+#else /* _WIN32 */
+#include <glob.h>
+#endif /* _WIN32 */
+
 namespace Gnuitar {
 
 Effect::~Effect (void)
@@ -256,6 +262,175 @@ Plugin::get_effect (size_t index) const noexcept
     return nullptr;
 
   return new LADSPA::Effect(descriptor);
+}
+
+PluginManager::PluginManager (void) noexcept
+{
+#ifdef __unix__
+/*
+  add_ladspa_path("/usr/lib/ladspa");
+  add_ladspa_path("/usr/local/lib/ladspa");
+*/
+#endif /* __unix__ */
+}
+
+PluginManager::~PluginManager (void)
+{
+
+}
+
+bool
+PluginManager::open_by_name (const std::string& name) noexcept
+{
+  std::string filename;
+#ifdef _WIN32
+  filename = name + ".dll";
+#else /* _WIN32 */
+  filename = name + ".so";
+#endif /* _WIN32 */
+
+  for (const std::string& path : paths)
+    {
+      if (open_by_path (path + "/" + filename) == 0)
+        return true;
+    }
+
+  return false;
+}
+
+bool
+PluginManager::open_by_path (const std::string& path) noexcept
+{
+  Plugin plugin (path);
+  if (plugin.good ())
+    {
+      plugins.push_back(plugin);
+      return true;
+    }
+  return false;
+}
+
+bool
+PluginManager::add_path (const std::string& path) noexcept
+{
+  if (path.size() == 0)
+    return EINVAL;
+
+  /* check if path already exists */
+  for (const std::string& path_entry : paths)
+    {
+      if (path_entry == path)
+        return true;
+    }
+
+  paths.push_back(path);
+
+  return true;
+}
+
+bool
+PluginManager::find_all_plugins (void) noexcept
+{
+  for (const std::string& path : paths)
+    {
+      find_all_plugins(path);
+    }
+  return true;
+}
+
+bool
+PluginManager::find_all_plugins (const std::string& path) noexcept
+{
+#ifdef _WIN32
+  (void) path;
+  return false;
+#else /* _WIN32 */
+
+  std::string pattern;
+  pattern = path + "/*.so";
+
+  glob_t glbuf;
+
+  if (glob(pattern.c_str(), 0, nullptr, &glbuf) != 0)
+    return false;
+
+  for (decltype(glbuf.gl_pathc) i = 0; i < glbuf.gl_pathc; i++)
+    {
+      open_by_path(glbuf.gl_pathv[i]);
+    }
+
+  globfree(&glbuf);
+
+  return true;
+#endif /* _WIN32 */
+}
+
+Effect *
+PluginManager::get_effect (const std::string& name) noexcept
+{
+  if (name.size() == 0)
+    return nullptr;
+
+  for (const Plugin& plugin : plugins)
+    {
+      for (size_t i = 0; i < SIZE_MAX; i++)
+        {
+          auto effect = plugin.get_effect(i);
+          if (effect == nullptr)
+            break;
+
+          auto effect_name = effect->get_name();
+          if (effect_name == name)
+            return effect;
+
+          delete effect;
+        }
+    }
+  return nullptr;
+}
+
+bool
+PluginManager::parse_paths (const std::string& paths) noexcept
+{
+  std::string tmp_path;
+  for (auto c : paths)
+    {
+      if (c == ':')
+        {
+          add_path (tmp_path);
+          tmp_path.clear ();
+        }
+      else
+        tmp_path.push_back (c);
+    }
+
+  if (tmp_path.size () > 0)
+    add_path (tmp_path);
+
+  return true;
+}
+
+bool
+PluginManager::parse_env (void) noexcept
+{
+  std::string ladspa_paths = std::getenv ("LADSPA_PATH");
+  if (ladspa_paths.size () == 0)
+    return false;
+  return parse_paths (ladspa_paths);
+}
+
+Plugin *
+PluginManager::plugin (size_t index) noexcept
+{
+  if (index >= plugins.size ())
+    return nullptr;
+  return &plugins[index];
+}
+
+size_t
+PluginManager::plugin_count (void) const noexcept
+{
+  return plugins.size ();
 }
 
 } /* namespace LADSPA */
