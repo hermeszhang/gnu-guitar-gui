@@ -16,6 +16,8 @@ public:
   static Driver * make (void) noexcept;
   virtual ~Driver(void);
   int add_effect(Effect *effect) noexcept;
+  virtual size_t get_channels (void) const noexcept = 0;
+  virtual size_t get_rate (void) const noexcept = 0;
   virtual int set_input(const std::string& input_name) noexcept = 0;
   virtual int set_output(const std::string& output_name) noexcept = 0;
   virtual bool running (void) const noexcept = 0;
