@@ -57,7 +57,8 @@ MenuBar::~MenuBar(void)
 void
 MenuBar::add_ladspa_plugin(const QString& plugin_name)
 {
-    ladspa_plugins_menu->addAction(plugin_name);
+    auto plugin_action = ladspa_plugins_menu->addAction(plugin_name);
+    connect(plugin_action, &QAction::triggered, this, [this, plugin_name]{ ladspa_plugin_triggered (plugin_name); });
 }
 
 void
