@@ -1,5 +1,7 @@
 #include "main-window.h"
 
+#include <iostream>
+
 namespace Gnuitar {
 
 namespace Qt {
@@ -23,21 +25,22 @@ MainWindow::MainWindow (QWidget *parent) : QMainWindow (parent)
   setCentralWidget (central_widget);
   setMenuBar (menu_bar);
 
+  connect (menu_bar, &MenuBar::ladspa_plugin_selected, this, &MainWindow::ladspa_plugin_selected);
   connect (menu_bar, &MenuBar::quit_requested, this, &MainWindow::close);
   connect (audio_panel, &AudioPanel::play_triggered, this, &MainWindow::on_play_triggered);
   connect (audio_panel, &AudioPanel::stop_triggered, this, &MainWindow::on_stop_triggered);
 
   driver = Driver::make();
 
-  plugin_manager.parse_ladspa_env();
-  plugin_manager.find_all_ladspa_plugins();
+  ladspa_plugin_manager.parse_env();
+  ladspa_plugin_manager.find_all_plugins();
 
-  for (size_t i = 0; i < plugin_manager.plugin_count(); i++)
+  for (size_t i = 0; i < ladspa_plugin_manager.plugin_count(); i++)
     {
-      auto plugin = plugin_manager.plugin(i);
+      auto plugin = ladspa_plugin_manager.plugin(i);
       if (plugin == nullptr)
         continue;
-      show_plugin(plugin);
+      show_ladspa_plugin(*plugin);
     }
 }
 
@@ -62,20 +65,40 @@ MainWindow::on_stop_triggered (void)
 }
 
 void
-MainWindow::show_plugin (const Plugin *plugin) noexcept
+MainWindow::ladspa_plugin_selected (const QString& plugin_name)
+{
+  auto effect = ladspa_plugin_manager.get_effect(plugin_name.toStdString());
+  if (effect == nullptr)
+    return;
+
+  effect->instantiate(driver->get_rate());
+  effect->activate();
+  if (driver->add_effect(effect) != 0)
+    {
+      delete effect;
+      return;
+    }
+
+  auto effect_view = new Effect(plugin_name, rack);
+
+  rack->add_effect(effect_view);
+}
+
+void
+MainWindow::show_ladspa_plugin (const LADSPA::Plugin& plugin) noexcept
 {
   for (size_t i = 0; i < SIZE_MAX; i++)
     {
-      auto effect = plugin->get_effect(i);
+      auto effect = plugin.get_effect(i);
       if (effect == nullptr)
         break;
       auto name = effect->get_name();
-      if (name == nullptr)
+      if (name.size() == 0)
         {
           delete effect;
           continue;
         }
-      menu_bar->add_ladspa_plugin(name);
+      menu_bar->add_ladspa_plugin(name.c_str());
       delete effect;
     }
 }

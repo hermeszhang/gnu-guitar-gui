@@ -9,7 +9,7 @@
 #include "rack.h"
 
 #include <libgnuitar/driver.h>
-#include <libgnuitar/plugin-manager.h>
+#include <libgnuitar/plugin.h>
 
 namespace Gnuitar {
 
@@ -24,8 +24,9 @@ public:
 private slots:
   void on_play_triggered(void);
   void on_stop_triggered(void);
+  void ladspa_plugin_selected(const QString& name);
 protected:
-  void show_plugin(const Plugin *plugin) noexcept;
+  void show_ladspa_plugin(const LADSPA::Plugin& plugin) noexcept;
 private:
   QWidget *central_widget;
   QVBoxLayout *layout;
@@ -33,7 +34,7 @@ private:
   AudioPanel *audio_panel;
   Rack *rack;
   Driver *driver;
-  PluginManager plugin_manager;
+  LADSPA::PluginManager ladspa_plugin_manager;
 }; /* class MainWindow */
 
 } /* namespace Qt */
