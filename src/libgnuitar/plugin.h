@@ -15,38 +15,15 @@
 namespace Gnuitar
 {
 
-class Effect final
+class Effect
 {
-  enum class Type
-  {
-    ladspa,
-    lv2
-  } type;
-  union
-  {
-    const LADSPA_Descriptor *ladspa_descriptor;
-    const LV2_Descriptor *lv2_descriptor;
-  };
-  union
-  {
-    LADSPA_Handle ladspa_handle;
-    LV2_Handle lv2_handle;
-  };
 public:
-  Effect (void) = delete;
-  Effect (const Effect&) = delete;
-  Effect (const LADSPA_Descriptor *ladspa_) noexcept;
-  Effect (const LV2_Descriptor *lv2_) noexcept;
-  ~Effect (void);
-  int activate(size_t sample_rate) noexcept;
-  const char *get_maker (void) const noexcept;
-  const char *get_name (void) const noexcept;
-  int process (float *sample_array, size_t sample_count) noexcept;
-protected:
-  int connect_to_ladspa_ports(float *sample_array) noexcept;
+  virtual ~Effect (void);
+  virtual bool connect (float *sample_array) noexcept = 0;
+  virtual void run (size_t sample_count) noexcept = 0;
 }; /* class Effect */
 
-class Plugin final
+class Plugin
 {
 #ifdef _WIN32
   HANDLE handle;
@@ -54,26 +31,47 @@ class Plugin final
   void *handle;
 #endif /* _WIN32 */
 public:
-  Plugin (const std::string& path) noexcept;
   Plugin (void) noexcept;
-  ~Plugin (void);
-  bool good (void) const noexcept;
-  int open (const std::string& path) noexcept;
-  Effect *get_effect (size_t index) const noexcept;
+  Plugin (const std::string& path) noexcept;
+  virtual ~Plugin (void);
+  virtual bool good (void) const noexcept;
+  virtual bool open (const std::string& path) noexcept;
 protected:
-  int find_entry (void *handle) noexcept;
-private:
-  enum class Type
-  {
-    ladspa,
-    lv2
-  } type;
-  union
-  {
-    LADSPA_Descriptor_Function ladspa_descriptor;
-    LV2_Descriptor_Function lv2_descriptor;
-  };
+  virtual void *get_symbol(const std::string& symbol_name) noexcept;
 }; /* class Plugin */
+
+namespace LADSPA
+{
+
+class Effect final : public Gnuitar::Effect
+{
+  const LADSPA_Descriptor *descriptor;
+  LADSPA_Handle handle;
+public:
+  Effect(const LADSPA_Descriptor *descriptor_) noexcept;
+  ~Effect(void);
+  std::string get_name(void) const noexcept;
+  std::string get_maker(void) const noexcept;
+  bool instantiate (size_t rate) noexcept;
+  bool activate (void) noexcept;
+  bool deactivate (void) noexcept;
+  bool connect (float *sample_array) noexcept;
+  void run (size_t sample_count) noexcept;
+}; /* class Effect */
+
+class Plugin final : public Gnuitar::Plugin
+{
+  LADSPA_Descriptor_Function descriptor_function;
+public:
+  Plugin (void) noexcept;
+  Plugin (const std::string& path) noexcept;
+  ~Plugin (void);
+  LADSPA::Effect * get_effect (size_t index) const noexcept;
+  bool good (void) const noexcept;
+  bool open (const std::string& path) noexcept;
+}; /* class Plugin */
+
+} /* namespace LADSPA */
 
 } /* namespace Gnuitar */
 
