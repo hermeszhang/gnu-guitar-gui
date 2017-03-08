@@ -4,22 +4,25 @@
 #include <QLabel>
 #include <QPixmap>
 
-namespace Gnuitar {
+namespace Gnuitar
+{
 
-namespace Qt {
+namespace Qt
+{
 
-class Button : public QLabel {
+class Button : public QLabel
+{
     Q_OBJECT
 public:
-    Button(const QString& image_path, int width = 64, int height = 64, QWidget *parent = nullptr);
-    ~Button(void);
+  Button (const QString& image_path, int width = 64, int height = 64, QWidget *parent = nullptr);
+  ~Button (void);
 signals:
-    void clicked(void);
+  void clicked (void);
 protected:
-    void mousePressEvent(QMouseEvent *event);
+  void mousePressEvent (QMouseEvent *event);
 private:
-    QPixmap pixmap;
-};
+  QPixmap pixmap;
+}; /* class Button */
 
 } /* namespace Qt */
 

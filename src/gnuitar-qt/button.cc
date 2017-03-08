@@ -1,27 +1,32 @@
 #include "button.h"
 
-namespace Gnuitar {
-
-namespace Qt {
-
-Button::Button(const QString& image_path, int width, int height, QWidget *parent) : QLabel(parent)
+namespace Gnuitar
 {
-    if (pixmap.load(image_path) == true) {
-        pixmap = pixmap.scaled(width, height, ::Qt::KeepAspectRatio, ::Qt::SmoothTransformation);
-        setPixmap(pixmap);
-        setScaledContents(true);
-    } else
-        setText(image_path);
+
+namespace Qt
+{
+
+Button::Button (const QString& image_path, int width, int height, QWidget *parent) : QLabel (parent)
+{
+  if (pixmap.load (image_path) == true)
+    {
+      pixmap = pixmap.scaled (width, height, ::Qt::KeepAspectRatio, ::Qt::SmoothTransformation);
+      setPixmap (pixmap);
+      setScaledContents (false);
+    }
+  else
+    setText (image_path);
+  setAlignment (::Qt::AlignCenter);
 }
 
-Button::~Button(void)
+Button::~Button (void)
 {
 
 }
 
-void Button::mousePressEvent(QMouseEvent *)
+void Button::mousePressEvent (QMouseEvent *)
 {
-    emit clicked();
+    emit clicked ();
 }
 
 } /* namespace Qt */
