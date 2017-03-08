@@ -79,7 +79,7 @@ MainWindow::ladspa_plugin_selected (const QString& plugin_name)
       return;
     }
 
-  auto effect_view = new Effect(plugin_name, rack);
+  auto effect_view = new EffectView(plugin_name, rack);
 
   rack->add_effect(effect_view);
 }
