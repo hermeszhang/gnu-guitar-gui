@@ -4,28 +4,32 @@
 #include <QWidget>
 #include <QHBoxLayout>
 
-namespace Gnuitar {
+namespace Gnuitar
+{
 
-namespace Qt {
+namespace Qt
+{
 
-class Effect final : public QWidget {
-    Q_OBJECT
+class EffectView final : public QWidget
+{
+  Q_OBJECT
 public:
-    Effect(const QString& name, QWidget *parent = nullptr);
-    ~Effect(void);
-    void add_parameter(const QString& name, double value = 0.0);
+  EffectView (const QString& name, QWidget *parent = nullptr);
+  ~EffectView (void);
+  void add_parameter (const QString& name, double value = 0.0);
 private:
-    QHBoxLayout *layout;
+  QHBoxLayout *layout;
 }; /* class Effect */
 
-class Rack final : public QWidget {
-    Q_OBJECT
+class Rack final : public QWidget
+{
+  Q_OBJECT
 public:
-    Rack(QWidget *parent = nullptr);
-    ~Rack(void);
-    void add_effect(Effect *effect);
+  Rack (QWidget *parent = nullptr);
+  ~Rack (void);
+  void add_effect (EffectView *effect_view);
 private:
-    QVBoxLayout *layout;
+  QVBoxLayout *layout;
 }; /* class Rack */
 
 } /* namespace Qt */
