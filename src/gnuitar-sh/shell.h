@@ -5,7 +5,7 @@
 #include <string>
 
 #include <libgnuitar/driver.h>
-#include <libgnuitar/plugin-manager.h>
+#include <libgnuitar/plugin.h>
 
 namespace Gnuitar {
 
@@ -19,7 +19,7 @@ class Shell final {
     /** the shell's driver */
     Driver *driver;
     /** the shell's plugin manager */
-    PluginManager plugin_manager;
+    LADSPA::PluginManager plugin_manager;
 public:
     Shell(void) noexcept;
     ~Shell(void);
