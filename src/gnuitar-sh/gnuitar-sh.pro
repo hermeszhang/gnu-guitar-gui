@@ -11,7 +11,7 @@ HEADERS += "shell.h"
 
 unix {
   LIBS += ../libgnuitar/libgnuitar.a
-  LIBS += -ldl -lpthread
+  LIBS += -ldl -lpthread -lasound
 }
 
 win32 {
