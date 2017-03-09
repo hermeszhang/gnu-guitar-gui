@@ -8,12 +8,12 @@ TARGET = gnuitar
 INCLUDEPATH += "$$PWD/.."
 
 SOURCES += "driver.cc"
-SOURCES += "plugin.cc"
 SOURCES += "shared-library.cc"
+SOURCES += "shared-library-collection.cc"
 
 HEADERS += "driver.h"
-HEADERS += "plugin.h"
 HEADERS += "shared-library.h"
+HEADERS += "shared-library-collection.cc"
 
 packagesExist(alsa) {
   SOURCES += "alsa-driver.cc"
