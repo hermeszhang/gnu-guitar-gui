@@ -16,5 +16,11 @@ src/gnuitar-qt/Makefile
 src/gnuitar-doc/*
 
 build/*
-src/build/*
+*/build/*
+
+cmake-build/*
+*/cmake-build/*
+
+qmake-build/*
+*/qmake-build/*
 
