@@ -1,11 +1,8 @@
 #include <libgnuitar/driver.h>
+#include <libgnuitar/shared-library-collection.h>
+#include <libgnuitar/effect.h>
 
 #include <iostream>
-
-namespace
-{
-
-} /* namespace */
 
 int
 main (void)
@@ -16,18 +13,32 @@ main (void)
   if (driver == nullptr)
     return EXIT_FAILURE;
 
-  driver->set_input("plughw:1,0");
+  Gnuitar::SharedLibraryCollection shared_libs;
+  shared_libs.add_search_path_list_from_env ("LADSPA_PATH");
+  shared_libs.update ();
 
-  Gnuitar::LADSPA::PluginManager plugin_manager;
-  plugin_manager.parse_env();
-  plugin_manager.find_all_plugins();
-  auto effect = plugin_manager.get_effect("C* Scape - Stereo delay with chromatic resonances");
-  if (effect != nullptr)
+  LADSPA_Descriptor_Function ladspa_descriptor = nullptr;
+  for (const auto& shared_lib : shared_libs)
     {
-      std::cout << "using effect: " << effect->get_name () << std::endl;
-      effect->instantiate(driver->get_rate());
-      effect->activate();
-      driver->add_effect(effect);
+      ladspa_descriptor = (LADSPA_Descriptor_Function)(shared_lib.second.get_symbol ("ladspa_descriptor"));
+      if (ladspa_descriptor == nullptr)
+        continue;
+    }
+
+  const LADSPA_Descriptor* descriptor = nullptr;
+  if (ladspa_descriptor != nullptr)
+    descriptor = ladspa_descriptor (0);
+
+  if (descriptor != nullptr)
+    {
+      auto effect = new Gnuitar::Effect (descriptor);
+      effect->instantiate (driver->get_rate ());
+      effect->activate ();
+      driver->add_effect (effect);
+
+      std::string name;
+      effect->get_name (name);
+      std::cout << "using effect: " << name << std::endl;
     }
 
   driver->start();
