@@ -8,10 +8,12 @@ TARGET = gnuitar
 INCLUDEPATH += "$$PWD/.."
 
 SOURCES += "driver.cc"
+SOURCES += "effect.cc"
 SOURCES += "shared-library.cc"
 SOURCES += "shared-library-collection.cc"
 
 HEADERS += "driver.h"
+HEADERS += "effect.h"
 HEADERS += "shared-library.h"
 HEADERS += "shared-library-collection.cc"
 
