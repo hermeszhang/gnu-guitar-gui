@@ -6,6 +6,8 @@
 #include <glob.h>
 #endif /* _WIN32 */
 
+#include <iostream>
+
 namespace Gnuitar
 {
 
@@ -55,8 +57,9 @@ SharedLibraryCollection::add_search_path_list (const std::string& search_path_li
 void
 SharedLibraryCollection::add_search_path_list_from_env (const std::string& search_path_list_key) noexcept
 {
-  std::string search_path_list = std::getenv(search_path_list_key.c_str());
-  add_search_path_list(search_path_list);
+  auto env_str = std::getenv(search_path_list_key.c_str());
+  if (env_str != nullptr)
+    add_search_path_list(env_str);
 }
 
 void
@@ -106,13 +109,13 @@ SharedLibraryCollection::update_at_path (const std::string& path) noexcept
 }
 
 SharedLibraryCollection::const_iterator
-SharedLibraryCollection::cbegin (void) const noexcept
+SharedLibraryCollection::begin (void) const noexcept
 {
   return shared_libraries.cbegin ();
 }
 
 SharedLibraryCollection::const_iterator
-SharedLibraryCollection::cend (void) const noexcept
+SharedLibraryCollection::end (void) const noexcept
 {
   return shared_libraries.cend ();
 }

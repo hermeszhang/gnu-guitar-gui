@@ -49,9 +49,9 @@ public:
   /** Updates the list of libraries found at a certain path */
   void update_at_path (const std::string& path) noexcept;
   /** Returns an iterator to the beginning of the collection */
-  const_iterator cbegin (void) const noexcept;
+  const_iterator begin (void) const noexcept;
   /** Returns an iterator to the end of the collection */
-  const_iterator cend (void) const noexcept;
+  const_iterator end (void) const noexcept;
   /** Locates a shared library by it's path.
    * @returns If the library isn't found, then @ref cend is returned */
   const_iterator find (const std::string& path) const noexcept;
