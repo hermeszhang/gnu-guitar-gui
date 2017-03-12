@@ -12,7 +12,7 @@
 namespace Gnuitar
 {
 
-class SharedLibrary
+class SharedLibrary final
 {
 #ifdef _WIN32
   HANDLE handle;
@@ -24,11 +24,10 @@ public:
   SharedLibrary (SharedLibrary&& plugin) noexcept;
   SharedLibrary (void) noexcept;
   SharedLibrary (const std::string& path) noexcept;
-  virtual ~SharedLibrary (void);
-  virtual bool good (void) const noexcept;
-  virtual bool open (const std::string& path) noexcept;
-protected:
-  virtual void *get_symbol (const std::string& symbol_name) noexcept;
+  ~SharedLibrary (void);
+  bool good (void) const noexcept;
+  bool open (const std::string& path) noexcept;
+  void *get_symbol (const std::string& symbol_name) const noexcept;
 }; /* class SharedLibrary */
 
 } /* namespace Gnuitar */
