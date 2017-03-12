@@ -139,9 +139,8 @@ Driver::loop (void) noexcept
 {
   float *sample_array;
   size_t frame_count = 128;
-  size_t channel_count = 2;
 
-  sample_array = new float[frame_count * channel_count];
+  sample_array = new float[frame_count * channels];
 
   connect(sample_array);
 
@@ -154,15 +153,17 @@ Driver::loop (void) noexcept
         {
           if (recover_pcm(input_pcm) != 0)
             return EPIPE;
+          read_count = 0;
         }
 
-      run(read_count * channel_count);
+      run(read_count * channels);
 
       auto write_count = snd_pcm_writei (output_pcm, sample_array, read_count);
       if (write_count < 0)
         {
           if (recover_pcm(output_pcm) != 0)
             return EPIPE;
+          write_count = 0;
         }
 
       mutex.unlock ();
