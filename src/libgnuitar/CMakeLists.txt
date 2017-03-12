@@ -17,8 +17,14 @@ ENDIF (UNIX)
 SET (SOURCES
   "driver.h"
   "driver.cc"
+  "driver-manager.h"
+  "driver-manager.cc"
   "effect.h"
   "effect.cc"
+  "effect-list.h"
+  "effect-list.cc"
+  "exception.h"
+  "exception.cc"
   "shared-library.h"
   "shared-library.cc"
   "shared-library-collection.h"
@@ -42,4 +48,7 @@ ENDIF (DEFINED LIBS)
 
 ADD_EXECUTABLE ("driver-test" "driver-test.cc")
 TARGET_LINK_LIBRARIES ("driver-test" "gnuitar")
+
+ADD_EXECUTABLE ("driver-manager-test" "driver-manager-test.cc")
+TARGET_LINK_LIBRARIES ("driver-manager-test" "gnuitar")
 
