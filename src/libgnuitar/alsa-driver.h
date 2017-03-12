@@ -11,10 +11,7 @@
 namespace Gnuitar
 {
 
-namespace ALSA
-{
-
-class Driver final : public Gnuitar::Driver
+class AlsaDriver final : public Gnuitar::Driver
 {
   std::mutex mutex;
   std::thread thread;
@@ -24,22 +21,20 @@ class Driver final : public Gnuitar::Driver
   unsigned int channels;
   unsigned int rate;
 public:
-  Driver(void) noexcept;
-  ~Driver(void);
-  size_t get_channels (void) const noexcept;
-  size_t get_rate (void) const noexcept;
-  int set_input(const std::string& input_name) noexcept;
-  int set_output(const std::string& output_name) noexcept;
-  int start(void) noexcept;
-  int stop(void) noexcept;
-  bool running(void) const noexcept;
+  AlsaDriver (void) noexcept;
+  ~AlsaDriver (void);
+  size_t get_channels (void) const;
+  size_t get_rate (void) const;
+  void set_input (const std::string& input_name);
+  void set_output (const std::string& output_name);
+  void start (void);
+  void stop (void);
+  bool running (void) const noexcept;
 protected:
-  int configure_pcm(snd_pcm_t *pcm) noexcept;
-  int recover_pcm(snd_pcm_t *pcm) noexcept;
-  int loop(void) noexcept;
+  void configure_pcm (snd_pcm_t *pcm);
+  void recover_pcm (snd_pcm_t *pcm);
+  void loop (void);
 }; /* class Driver */
-
-} /* namespace ALSA */
 
 } /* namespace Gnuitar */
 

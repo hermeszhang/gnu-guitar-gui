@@ -13,19 +13,21 @@ class Driver
 {
   std::vector<Effect*> effects;
 public:
-  static Driver * make (void) noexcept;
-  virtual ~Driver(void);
-  int add_effect(Effect *effect) noexcept;
-  virtual size_t get_channels (void) const noexcept = 0;
-  virtual size_t get_rate (void) const noexcept = 0;
-  virtual int set_input(const std::string& input_name) noexcept = 0;
-  virtual int set_output(const std::string& output_name) noexcept = 0;
-  virtual bool running (void) const noexcept = 0;
-  virtual int start (void) noexcept = 0;
-  virtual int stop (void) noexcept = 0;
+  static Driver * make (void);
+  virtual ~Driver (void);
+  void add_effect (Effect *effect);
+  Effect * get_effect (void);
+  const Effect * get_effect (void) const;
+  virtual size_t get_channels (void) const = 0;
+  virtual size_t get_rate (void) const = 0;
+  virtual void set_input (const std::string& input_name) = 0;
+  virtual void set_output (const std::string& output_name) = 0;
+  virtual bool running (void) const = 0;
+  virtual void start (void) = 0;
+  virtual void stop (void) = 0;
 protected:
-  bool connect(float *sample_array) noexcept;
-  void run(size_t sample_count) noexcept;
+  void connect (float *sample_array);
+  void run (size_t sample_count);
 }; /* class Driver */
 
 } /* namespace Gnuitar */
