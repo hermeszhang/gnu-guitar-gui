@@ -8,8 +8,7 @@
 #include "menu-bar.h"
 #include "rack.h"
 
-#include <libgnuitar/driver.h>
-#include <libgnuitar/plugin.h>
+#include <libgnuitar/driver-manager.h>
 
 namespace Gnuitar {
 
@@ -19,22 +18,23 @@ class MainWindow : public QMainWindow
 {
   Q_OBJECT
 public:
-  MainWindow(QWidget *parent = 0);
-  ~MainWindow(void);
+  MainWindow (QWidget *parent = 0);
+  ~MainWindow (void);
 private slots:
-  void on_play_triggered(void);
-  void on_stop_triggered(void);
-  void ladspa_plugin_selected(const QString& name);
+  void on_play_triggered (void);
+  void on_stop_triggered (void);
+  void ladspa_plugin_selected (const QString& name);
 protected:
-  void show_ladspa_plugin(const LADSPA::Plugin& plugin) noexcept;
+  void add_ladspa_plugin (const LADSPA_Descriptor *descriptor) noexcept;
+  void show_ladspa_plugins (void) noexcept;
+  void show_ladspa_plugin (LADSPA_Descriptor_Function descriptor) noexcept;
 private:
   QWidget *central_widget;
   QVBoxLayout *layout;
   MenuBar *menu_bar;
   AudioPanel *audio_panel;
   Rack *rack;
-  Driver *driver;
-  LADSPA::PluginManager ladspa_plugin_manager;
+  DriverManager driver_manager;
 }; /* class MainWindow */
 
 } /* namespace Qt */

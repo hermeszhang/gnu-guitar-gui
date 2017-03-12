@@ -1,7 +1,5 @@
 #include "main-window.h"
 
-#include <iostream>
-
 namespace Gnuitar {
 
 namespace Qt {
@@ -30,77 +28,40 @@ MainWindow::MainWindow (QWidget *parent) : QMainWindow (parent)
   connect (audio_panel, &AudioPanel::play_triggered, this, &MainWindow::on_play_triggered);
   connect (audio_panel, &AudioPanel::stop_triggered, this, &MainWindow::on_stop_triggered);
 
-  driver = Driver::make();
+  driver_manager.update_libs ();
 
-  ladspa_plugin_manager.parse_env();
-  ladspa_plugin_manager.find_all_plugins();
-
-  for (size_t i = 0; i < ladspa_plugin_manager.plugin_count(); i++)
+  auto effect_list = driver_manager.get_effect_list ();
+  for (const auto& effect_name : effect_list)
     {
-      auto plugin = ladspa_plugin_manager.plugin(i);
-      if (plugin == nullptr)
-        continue;
-      show_ladspa_plugin(*plugin);
+      menu_bar->add_ladspa_plugin (effect_name.c_str ());
     }
 }
 
 MainWindow::~MainWindow (void)
 {
-  if (driver != nullptr)
-    delete driver;
+
 }
 
 void
 MainWindow::on_play_triggered (void)
 {
-  if (driver != nullptr)
-    driver->start ();
+  driver_manager.stop_driver ();
 }
 
 void
 MainWindow::on_stop_triggered (void)
 {
-  if (driver != nullptr)
-    driver->stop ();
+  driver_manager.start_driver ();
 }
 
 void
-MainWindow::ladspa_plugin_selected (const QString& plugin_name)
+MainWindow::ladspa_plugin_selected (const QString& qt_plugin_name)
 {
-  auto effect = ladspa_plugin_manager.get_effect(plugin_name.toStdString());
-  if (effect == nullptr)
-    return;
+  auto effect = driver_manager.add_effect (qt_plugin_name.toStdString ());
 
-  effect->instantiate(driver->get_rate());
-  effect->activate();
-  if (driver->add_effect(effect) != 0)
-    {
-      delete effect;
-      return;
-    }
+  auto effect_view = new EffectView (effect, rack);
 
-  auto effect_view = new EffectView(plugin_name, rack);
-
-  rack->add_effect(effect_view);
-}
-
-void
-MainWindow::show_ladspa_plugin (const LADSPA::Plugin& plugin) noexcept
-{
-  for (size_t i = 0; i < SIZE_MAX; i++)
-    {
-      auto effect = plugin.get_effect(i);
-      if (effect == nullptr)
-        break;
-      auto name = effect->get_name();
-      if (name.size() == 0)
-        {
-          delete effect;
-          continue;
-        }
-      menu_bar->add_ladspa_plugin(name.c_str());
-      delete effect;
-    }
+  rack->add_effect (effect_view);
 }
 
 } /* namespace Qt */
