@@ -1,51 +1,45 @@
-CMAKE_MINIMUM_REQUIRED(VERSION 3.1.0)
+CMAKE_MINIMUM_REQUIRED (VERSION 3.1.0)
 
-IF (CMAKE_COMPILER_IS_GNUCC)
-    SET (CMAKE_C_FLAGS "-Wall -Wextra -Werror -Wfatal-errors")
-ENDIF (CMAKE_COMPILER_IS_GNUCC)
+IF (CMAKE_COMPILER_IS_GNUCXX)
+    SET (CMAKE_CXX_FLAGS "-Wall -Wextra -Werror -Wfatal-errors")
+ENDIF (CMAKE_COMPILER_IS_GNUCXX)
 
 IF (MSVC)
-    SET (CMAKE_C_FLAGS "/Wall")
+    SET (CMAKE_CXX_FLAGS "/Wall")
 ENDIF (MSVC)
 
-SET(SOURCES
-    chain.h
-    chain.c
-    conversion.h
-    conversion.c
-    driver.h
-    driver.c
-    effect.h
-    effect.c
-    map.c
-    map.h
-    package.h
-    package.c
-    package-manager.h
-    package-manager.c
-    packet.h
-    packet.c
-    pipe.h
-    pipe.c
-    track.h
-    track.c
-    mutex.h
-    mutex.c)
+INCLUDE_DIRECTORIES ("..")
 
-ADD_LIBRARY(gnuitar SHARED ${SOURCES})
+IF (UNIX)
+  LIST (APPEND LIBS "dl")
+ENDIF (UNIX)
 
-INSTALL(TARGETS gnuitar
-    RUNTIME DESTINATION bin
-    ARCHIVE DESTINATION lib
-    LIBRARY DESTINATION lib)
+SET (SOURCES
+  "driver.h"
+  "driver.cc"
+  "effect.h"
+  "effect.cc"
+  "shared-library.h"
+  "shared-library.cc"
+  "shared-library-collection.h"
+  "shared-library-collection.cc")
 
-ADD_SUBDIRECTORY(gnuitar-builtins)
+FIND_PACKAGE(ALSA)
+if (ALSA_FOUND)
+  LIST (APPEND SOURCES
+    "alsa-driver.h"
+    "alsa-driver.cc")
+  ADD_DEFINITIONS (-DGNUITAR_WITH_ALSA=1)
+  LIST (APPEND LIBS ${ALSA_LIBRARIES})
+  LIST (APPEND LIBS "pthread")
+ENDIF (ALSA_FOUND)
 
-IF (GNUITAR_SH)
-    ADD_SUBDIRECTORY(gnuitar-sh)
-ENDIF (GNUITAR_SH)
+ADD_LIBRARY ("gnuitar" ${SOURCES})
 
-IF (GNUITAR_QT)
-    ADD_SUBDIRECTORY(gnuitar-qt)
-ENDIF (GNUITAR_QT)
+IF (DEFINED LIBS)
+  TARGET_LINK_LIBRARIES ("gnuitar" ${LIBS})
+ENDIF (DEFINED LIBS)
+
+ADD_EXECUTABLE ("driver-test" "driver-test.cc")
+TARGET_LINK_LIBRARIES ("driver-test" "gnuitar")
 
