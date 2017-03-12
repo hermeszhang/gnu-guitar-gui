@@ -6,19 +6,28 @@
 #include <QVBoxLayout>
 #include <QWidget>
 
-namespace Gnuitar {
+namespace Gnuitar
+{
 
-namespace Qt {
+namespace Qt
+{
 
-class Knob final : public QWidget {
-    Q_OBJECT
+class Knob final : public QWidget
+{
+  Q_OBJECT
 public:
-    Knob(const QString& name, QWidget *parent = nullptr);
-    ~Knob(void);
+  Knob (const QString& name, QWidget *parent = nullptr);
+  ~Knob (void);
+  float get_value (void) const;
+  void set_value (float value);
+signals:
+  void adjusted (float value);
+protected:
+  void on_adjustment (int value);
 private:
-    QDial *dial;
-    QLabel *label;
-    QVBoxLayout *layout;
+  QDial *dial;
+  QLabel *label;
+  QVBoxLayout *layout;
 }; /* class Knob */
 
 } /* namespace Qt */
