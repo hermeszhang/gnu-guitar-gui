@@ -1,5 +1,7 @@
 #include <libgnuitar/effect.h>
 
+#include <stdexcept>
+
 namespace Gnuitar
 {
 
@@ -14,6 +16,28 @@ Effect::~Effect (void)
    && (descriptor != nullptr)
    && (descriptor->cleanup != nullptr))
     descriptor->cleanup(handle);
+}
+
+std::vector<std::string>
+Effect::get_control_names (void) const
+{
+  std::vector<std::string> names;
+
+  if (descriptor == nullptr)
+    throw std::invalid_argument ("descriptor is null");
+  else if (descriptor->PortNames == nullptr)
+    throw std::invalid_argument ("port names array is null");
+
+  for (auto i = 0UL; i < descriptor->PortCount; i++)
+    {
+      auto name = descriptor->PortNames[i];
+      if (name == nullptr)
+        throw std::invalid_argument ("port name is null");
+
+      names.emplace_back (name);
+    }
+
+  return names;
 }
 
 bool
@@ -93,9 +117,9 @@ bool
 Effect::get_name (std::string& name) const noexcept
 {
   if ((descriptor == nullptr)
-   || (descriptor->Name == nullptr))
+   || (descriptor->Label == nullptr))
     return false;
-  name = descriptor->Name;
+  name = descriptor->Label;
   return true;
 }
 

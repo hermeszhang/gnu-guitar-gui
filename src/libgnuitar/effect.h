@@ -4,7 +4,7 @@
 #include <string>
 #include <vector>
 
-#include <ladspa.h>
+#include <plugins/ladspa.h>
 
 namespace Gnuitar
 {
@@ -19,7 +19,7 @@ public:
   bool instantiate (unsigned long rate) noexcept;
   bool activate (void) noexcept;
   bool get_name (std::string& name) const noexcept;
-  bool get_control_names (std::vector<std::string>& control_names) const noexcept;
+  std::vector<std::string> get_control_names (void) const;
   bool get_control_value (const std::string& name, float *value) const noexcept;
   bool set_control_value (const std::string& name, float *value) noexcept;
   bool connect (float *sample_array) noexcept;
