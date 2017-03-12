@@ -68,7 +68,7 @@ SharedLibrary::open (const std::string& path) noexcept
 }
 
 void *
-SharedLibrary::get_symbol (const std::string& symbol_name) noexcept
+SharedLibrary::get_symbol (const std::string& symbol_name) const noexcept
 {
 #ifdef _WIN32
   return nullptr;
