@@ -1,10 +1,10 @@
 #ifndef GNUITAR_DRIVER_H
 #define GNUITAR_DRIVER_H
 
-#include "plugin.h"
-
 #include <string>
 #include <vector>
+
+#include <libgnuitar/effect.h>
 
 namespace Gnuitar
 {
