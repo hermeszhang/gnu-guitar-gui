@@ -4,6 +4,10 @@
 #include <QWidget>
 #include <QHBoxLayout>
 
+#include <gnuitar-qt/knob.h>
+
+#include <libgnuitar/effect.h>
+
 namespace Gnuitar
 {
 
@@ -14,9 +18,11 @@ class EffectView final : public QWidget
 {
   Q_OBJECT
 public:
+  EffectView (const Effect *effect, QWidget *parent = nullptr);
   EffectView (const QString& name, QWidget *parent = nullptr);
   ~EffectView (void);
-  void add_parameter (const QString& name, double value = 0.0);
+protected:
+  void show_controls (const Effect *effect);
 private:
   QHBoxLayout *layout;
 }; /* class Effect */
