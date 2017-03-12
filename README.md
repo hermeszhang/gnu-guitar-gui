@@ -24,7 +24,7 @@ Here's a progress table.
 |       Client and Server Architecture | Not Started |
 |              <sup>1</sup>ALSA Driver | Not Started |
 |           <sup>1</sup>Windows Driver | Not Started |
-| <sup>2</sup>SPICE based amp emulator | Not Started |
+| <sup>2</sup>SPICE based amp emulator | In Progress |
 
 <sup>1</sup>The ALSA and Windows drivers allow Gnuitar to act as a virtual audio device, so that audio from Gnuitar may be read from other audio recording software.
 
