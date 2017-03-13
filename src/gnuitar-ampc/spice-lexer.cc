@@ -52,22 +52,14 @@ namespace Gnuitar
 namespace AmpC
 {
 
-SpiceLexer::SpiceLexer (std::istream& input_) noexcept : input(input_)
+SpiceLexer::SpiceLexer (std::istream& input_) noexcept : Lexer(input_)
 {
   next_token_available = false;
-  line = 1;
-  column = 1;
 }
 
 SpiceLexer::~SpiceLexer (void)
 {
 
-}
-
-bool
-SpiceLexer::eof (void) const noexcept
-{
-  return next_token_available || input.eof ();
 }
 
 bool
@@ -77,6 +69,7 @@ SpiceLexer::peek_token (SpiceToken& token)
     {
       if (!read_token(next_token))
         return false;
+      next_token_available = true;
     }
 
   token = next_token;
@@ -116,18 +109,6 @@ void
 SpiceLexer::clear_peek_token (void)
 {
   next_token_available = false;
-}
-
-size_t
-SpiceLexer::get_line (void) const noexcept
-{
-  return line;
-}
-
-size_t
-SpiceLexer::get_column (void) const noexcept
-{
-  return column;
 }
 
 bool
@@ -213,26 +194,6 @@ SpiceLexer::next (void)
       get ();
     }
   return true;
-}
-
-int
-SpiceLexer::peek (void) noexcept
-{
-  return input.peek ();
-}
-
-int
-SpiceLexer::get (void) noexcept
-{
-  auto c = input.get ();
-  if (c == '\n')
-    {
-      line++;
-      column = 1;
-    }
-  else
-    column++;
-  return c;
 }
 
 } /* namespace AmpC */
