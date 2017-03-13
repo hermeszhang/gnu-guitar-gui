@@ -43,12 +43,30 @@ void
 Control::set_max (float max_) noexcept
 {
   max = max_;
+  if (value > max)
+    value = max;
+  if (max < min)
+    min = max;
 }
 
 void
 Control::set_min (float min_) noexcept
 {
   min = min_;
+  if (min > value)
+    value = min;
+  if (min > max)
+    max = min;
+}
+
+void
+Control::set_value (float value_) noexcept
+{
+  value = value_;
+  if (value > max)
+    value = max;
+  else if (value < min)
+    value = min;
 }
 
 void
