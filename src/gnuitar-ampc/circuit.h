@@ -18,11 +18,12 @@ class Circuit final
 public:
   Circuit (void) noexcept;
   ~Circuit (void);
-  void accept (Visitor& visitor) const noexcept;
+  void accept (Visitor& visitor) const;
   void add (const Resistor& resistor);
   void add (const Capacitor& capacitor);
 protected:
   void add (Component *capacitor) noexcept;
+  const Component * find_connected (const Component *source) const noexcept;
 }; /* class Circuit */
 
 } /* namespace AmpC */

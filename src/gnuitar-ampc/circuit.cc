@@ -20,10 +20,30 @@ Circuit::~Circuit (void)
 }
 
 void
-Circuit::accept (Visitor& visitor) const noexcept
+Circuit::accept (Visitor& visitor) const
 {
-  for (const Component* component : components)
-    component->accept(visitor);
+  const Component *start = nullptr;
+
+  /* find a non-null component */
+  for (const auto it : components)
+    {
+      if (it != nullptr)
+        {
+          start = it;
+          break;
+        }
+    }
+
+  auto component = start;
+  while (component != nullptr)
+    {
+      component->accept (visitor);
+      component = find_connected (component);
+      if (component == start)
+        break;
+      else if (component == nullptr)
+        throw Exception ("component not connected");
+    }
 }
 
 void
@@ -43,6 +63,24 @@ Circuit::add (Component *component) noexcept
 {
   if (component != nullptr)
     components.push_back(component);
+}
+
+const Component *
+Circuit::find_connected (const Component *component) const noexcept
+{
+  if (component == nullptr)
+    return nullptr;
+
+  auto output = component->get_output ();
+
+  for (auto it : components)
+    {
+      if (it == nullptr)
+        continue;
+      if (it->get_input () == output)
+        return it;
+    }
+  return nullptr;
 }
 
 } /* namespace AmpC */
