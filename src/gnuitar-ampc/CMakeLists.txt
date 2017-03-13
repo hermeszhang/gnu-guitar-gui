@@ -17,6 +17,8 @@ ADD_LIBRARY ("ampc"
   "resistor.cc"
   "source-writer.h"
   "source-writer.cc"
+  "lexer.h"
+  "lexer.cc"
   "spice-token.h"
   "spice-token.cc"
   "spice-lexer.h"
@@ -37,5 +39,6 @@ ENDFUNCTION (ADD_AMPC_TEST TEST_NAME)
 
 ENABLE_TESTING ()
 
+ADD_AMPC_TEST ("spice-lexer-test" "spice-lexer-test.cc")
 ADD_AMPC_TEST ("spice-parser-test" "spice-parser-test.cc")
 
