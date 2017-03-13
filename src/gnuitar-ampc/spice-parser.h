@@ -23,6 +23,7 @@ public:
   bool read (Capacitor& capacitor);
 protected:
   void toss_unexpected_token (const char *expected, const char *unexpected) const;
+  void toss_unknown_component (void) const;
 }; /* class SpiceParser */
 
 } /* namespace AmpC */

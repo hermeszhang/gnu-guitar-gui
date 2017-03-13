@@ -36,7 +36,7 @@ SpiceParser::read (Circuit& circuit)
           continue;
         }
 
-      break;
+      toss_unknown_component ();
     }
 
   return false;
@@ -60,6 +60,8 @@ SpiceParser::read (Capacitor& capacitor)
     return false;
 
   capacitor.set_label (data.substr (1));
+
+  lexer.clear_peek_token ();
 
   long in;
   if (!lexer.read_token (token) || !token.get_integer (&in))
@@ -99,6 +101,8 @@ SpiceParser::read (Resistor& resistor)
 
   resistor.set_label (data.substr (1));
 
+  lexer.clear_peek_token ();
+
   long in;
   if (!lexer.read_token (token) || !token.get_integer (&in))
     toss_unexpected_token ("input connection", nullptr);
@@ -127,6 +131,15 @@ SpiceParser::toss_unexpected_token (const char *expected, const char *unexpected
   unexpected_token.set_line (lexer.get_line ());
   unexpected_token.set_column (lexer.get_column ());
   throw unexpected_token;
+}
+
+void
+SpiceParser::toss_unknown_component (void) const
+{
+  UnknownComponent unknown_component;
+  unknown_component.set_line (lexer.get_line ());
+  unknown_component.set_column (lexer.get_column ());
+  throw unknown_component;
 }
 
 } /* namespace AmpC */
