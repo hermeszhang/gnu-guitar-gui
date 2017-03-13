@@ -4,7 +4,7 @@
 #include <string>
 #include <vector>
 
-#include <plugins/ladspa.h>
+#include "plugin-apis/ladspa.h"
 
 namespace Gnuitar
 {
