@@ -16,7 +16,7 @@ Button::Button (const QString& image_path, int width, int height, QWidget *paren
     }
   else
     setText (image_path);
-  setAlignment (::Qt::AlignCenter);
+  setAlignment (::Qt::AlignHCenter);
 }
 
 Button::~Button (void)
