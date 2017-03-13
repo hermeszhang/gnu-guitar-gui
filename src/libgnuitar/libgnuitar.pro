@@ -7,6 +7,8 @@ TARGET = gnuitar
 
 INCLUDEPATH += "$$PWD/.."
 
+SOURCES += "control.cc"
+SOURCES += "control-set.cc"
 SOURCES += "driver.cc"
 SOURCES += "driver-manager.cc"
 SOURCES += "effect.cc"
@@ -15,6 +17,8 @@ SOURCES += "exception.cc"
 SOURCES += "shared-library.cc"
 SOURCES += "shared-library-collection.cc"
 
+HEADERS += "control.h"
+HEADERS += "control-set.h"
 HEADERS += "driver.h"
 HEADERS += "driver-manager.h"
 HEADERS += "effect.h"

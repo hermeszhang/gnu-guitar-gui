@@ -15,6 +15,10 @@ IF (UNIX)
 ENDIF (UNIX)
 
 SET (SOURCES
+  "control.h"
+  "control.cc"
+  "control-set.h"
+  "control-set.cc"
   "driver.h"
   "driver.cc"
   "driver-manager.h"
