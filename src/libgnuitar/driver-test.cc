@@ -36,8 +36,7 @@ main (void)
       effect->activate ();
       driver->add_effect (effect);
 
-      std::string name;
-      effect->get_name (name);
+      auto name = effect->get_name ();
       std::cout << "using effect: " << name << std::endl;
     }
 
