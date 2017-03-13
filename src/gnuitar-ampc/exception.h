@@ -45,6 +45,13 @@ public:
   const char *get_unexpected (void) const noexcept;
 }; /* class BadToken */
 
+class UnknownComponent final : public SyntaxError
+{
+public:
+  UnknownComponent (void) noexcept;
+  ~UnknownComponent (void);
+}; /* class UnknownComponent */
+
 } /* namespace AmpC */
 
 } /* namespace Gnuitar */

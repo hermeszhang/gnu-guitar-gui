@@ -87,6 +87,16 @@ UnexpectedToken::set_unexpected (const char *token_type) noexcept
     unexpected = token_type;
 }
 
+UnknownComponent::UnknownComponent (void) noexcept : SyntaxError("unknown component")
+{
+
+}
+
+UnknownComponent::~UnknownComponent (void)
+{
+
+}
+
 } /* namespace AmpC */
 
 } /* namespace Gnuitar */
