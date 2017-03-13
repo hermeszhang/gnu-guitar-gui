@@ -12,14 +12,24 @@ namespace
 {
 
 void
-log_exception (const Gnuitar::AmpC::Exception& exception)
+log (const Gnuitar::AmpC::Exception& exception)
 {
   std::cerr << "uncaught exception occured" << std::endl;
-  std::cerr << "what: " << exception.what () << std::endl;
+  std::cerr << "  " << exception.what () << std::endl;
 }
 
 void
-log_unexpected_token (const std::string& filename, const Gnuitar::AmpC::UnexpectedToken& unexpected_token)
+log (const std::string& filename, const Gnuitar::AmpC::SyntaxError& syntax_error)
+{
+  std::cerr << filename;
+  std::cerr << ":" << syntax_error.get_line ();
+  std::cerr << ":" << syntax_error.get_column ();
+  std::cerr << std::endl;
+  std::cerr << "  " << syntax_error.what () << std::endl;
+}
+
+void
+log (const std::string& filename, const Gnuitar::AmpC::UnexpectedToken& unexpected_token)
 {
   std::cerr << filename;
   std::cerr << ":" << unexpected_token.get_line ();
@@ -53,16 +63,28 @@ compile (const std::string& filename)
     }
   catch (const Gnuitar::AmpC::UnexpectedToken& unexpected_token)
     {
-      log_unexpected_token (filename, unexpected_token);
+      log (filename, unexpected_token);
+    }
+  catch (const Gnuitar::AmpC::SyntaxError& syntax_error)
+    {
+      log (filename, syntax_error);
     }
   catch (const Gnuitar::AmpC::Exception& exception)
     {
-      log_exception (exception);
+      log (exception);
     }
 
   Gnuitar::AmpC::SourceWriter source_writer;
 
-  circuit.accept (source_writer);
+  try
+    {
+      circuit.accept (source_writer);
+    }
+  catch (const Gnuitar::AmpC::Exception& exception)
+    {
+      log (exception);
+    }
+
 
   std::ofstream outfile (filename + ".c");
   if (!outfile.good ())
