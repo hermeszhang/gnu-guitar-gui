@@ -1,4 +1,4 @@
-#include "main-window.h"
+#include <gnuitar-qt/controller.h>
 
 #include <QApplication>
 #include <QDebug>
@@ -60,9 +60,7 @@ main(int argc, char *argv[])
 
   QApplication a(argc, argv);
 
-  Gnuitar::Qt::MainWindow w;
-  w.resize (640, 480);
-  w.show();
+  Gnuitar::Qt::Controller controller;
 
   return a.exec();
 }
