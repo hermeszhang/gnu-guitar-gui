@@ -1,5 +1,7 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 
+INCLUDE_DIRECTORIES ("..")
+
 SET (CMAKE_CXX_STANDARD 11)
 SET (CMAKE_CXX_STANDARD_REQUIRED ON)
 SET (CMAKE_CXX_EXTENSIONS OFF)
@@ -23,6 +25,10 @@ ADD_EXECUTABLE(gnuitar-qt
     gnuitar-qt.cc
     audio-panel.h
     audio-panel.cc
+    controller.h
+    controller.cc
+    effect-view.h
+    effect-view.cc
     button.h
     button.cc
     doc-browser.h
