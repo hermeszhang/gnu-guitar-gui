@@ -1,13 +1,56 @@
 #include <libgnuitar/effect.h>
+#include <libgnuitar/exception.h>
 
-#include <stdexcept>
+#include <climits>
+
+namespace
+{
+
+bool
+init_control (const LADSPA_Descriptor *descriptor, unsigned long i, Gnuitar::Control& control)
+{
+  auto port = descriptor->PortDescriptors[i];
+  if (!LADSPA_IS_PORT_CONTROL (port))
+    return false;
+
+  if (descriptor->PortNames[i] != nullptr)
+    control.set_label (descriptor->PortNames[i]);
+
+  return true;
+}
+
+Gnuitar::ControlSet
+init_control_set (const LADSPA_Descriptor *descriptor)
+{
+  Gnuitar::ControlSet control_set;
+  if (descriptor == nullptr)
+    return control_set;
+  else if (descriptor->PortNames == nullptr)
+    return control_set;
+  else if (descriptor->PortDescriptors == nullptr)
+    return control_set;
+
+  for (auto i = 0UL; i < descriptor->PortCount; i++)
+    {
+      Gnuitar::Control control;
+      if (init_control (descriptor, i, control))
+        control_set.add (std::move (control));
+    }
+  return control_set;
+}
+
+} /* namespace */
 
 namespace Gnuitar
 {
 
 Effect::Effect (const LADSPA_Descriptor *descriptor_) noexcept : descriptor(descriptor_)
 {
-
+  if (descriptor != nullptr)
+    {
+      if (descriptor->Name != nullptr)
+        name = descriptor->Label;
+    }
 }
 
 Effect::~Effect (void)
@@ -18,62 +61,49 @@ Effect::~Effect (void)
     descriptor->cleanup(handle);
 }
 
-std::vector<std::string>
-Effect::get_control_names (void) const
+const ControlSet&
+Effect::get_control_set (void) const
 {
-  std::vector<std::string> names;
-
-  if (descriptor == nullptr)
-    throw std::invalid_argument ("descriptor is null");
-  else if (descriptor->PortNames == nullptr)
-    throw std::invalid_argument ("port names array is null");
-
-  for (auto i = 0UL; i < descriptor->PortCount; i++)
-    {
-      auto name = descriptor->PortNames[i];
-      if (name == nullptr)
-        throw std::invalid_argument ("port name is null");
-
-      names.emplace_back (name);
-    }
-
-  return names;
+  return control_set;
 }
 
-bool
-Effect::instantiate (unsigned long rate) noexcept
+void
+Effect::instantiate (unsigned long rate)
 {
-  if ((descriptor == nullptr)
-   || (descriptor->instantiate == nullptr))
-    return false;
+  if (descriptor == nullptr)
+    throw Exception ("LADSPA descriptor is null");
+  else if (descriptor->instantiate == nullptr)
+    throw Exception ("LADSPA instantiation function is null");
 
   handle = descriptor->instantiate (descriptor, rate);
   if (handle == nullptr)
-    return false;
+    throw Exception ("failed to instantiate LADSPA handle");
 
-  return true;
+  control_set = init_control_set (descriptor);
 }
 
-bool
-Effect::activate (void) noexcept
+void
+Effect::activate (void)
 {
-  if ((descriptor == nullptr)
-   || (descriptor->activate == nullptr)
-   || (handle == nullptr))
-    return false;
+  if (descriptor == nullptr)
+    throw Exception ("LADSPA descriptor is null");
+  else if (descriptor->activate == nullptr)
+    throw Exception ("LADSPA activation function is null");
+  else if (handle == nullptr)
+    throw Exception ("LADSPA handle is null");
 
   descriptor->activate(handle);
-
-  return true;
 }
 
-bool
-Effect::connect (float *sample_array) noexcept
+void
+Effect::connect (float *sample_array)
 {
-  if ((descriptor == nullptr)
-   || (descriptor->connect_port == nullptr)
-   || (handle == nullptr))
-    return false;
+  if (descriptor == nullptr)
+    throw Exception ("LADSPA descriptor is null");
+  else if (descriptor->connect_port == nullptr)
+    throw Exception ("LADSPA port connection function is null");
+  else if (handle == nullptr)
+    throw Exception ("LADSPA handle is null");
 
   bool input_found = false;
   bool output_found = false;
@@ -94,33 +124,29 @@ Effect::connect (float *sample_array) noexcept
         }
     }
 
-  if (input_found && output_found)
-    return true;
-
-  return false;
+  if (!input_found)
+    throw Exception ("LADSPA descriptor has no input port");
+  else if (!output_found)
+    throw Exception ("LADSPA descriptor has no output port");
 }
 
-bool
-Effect::run (size_t sample_count) noexcept
+void
+Effect::run (size_t sample_count)
 {
-  if ((descriptor == nullptr)
-   || (descriptor->run == nullptr)
-   || (handle == nullptr))
-    return false;
+  if (descriptor == nullptr)
+    throw Exception ("LADSPA descriptor is null");
+  else if (descriptor->run == nullptr)
+    throw Exception ("LADSPA run function is null");
+  else if (handle == nullptr)
+    throw Exception ("LADSPA handle is null");
 
   descriptor->run (handle, sample_count);
-
-  return true;
 }
 
-bool
-Effect::get_name (std::string& name) const noexcept
+const std::string&
+Effect::get_name (void) const
 {
-  if ((descriptor == nullptr)
-   || (descriptor->Label == nullptr))
-    return false;
-  name = descriptor->Label;
-  return true;
+  return name;
 }
 
 } /* namespace Gnuitar */

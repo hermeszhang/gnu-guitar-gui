@@ -2,7 +2,8 @@
 #define GNUITAR_EFFECT_H
 
 #include <string>
-#include <vector>
+
+#include <libgnuitar/control-set.h>
 
 #include "plugin-apis/ladspa.h"
 
@@ -13,17 +14,21 @@ class Effect final
 {
   LADSPA_Handle handle;
   const LADSPA_Descriptor *descriptor;
+  std::string name;
+  ControlSet control_set;
 public:
   Effect(const LADSPA_Descriptor *descriptor) noexcept;
   ~Effect(void);
-  bool instantiate (unsigned long rate) noexcept;
-  bool activate (void) noexcept;
-  bool get_name (std::string& name) const noexcept;
-  std::vector<std::string> get_control_names (void) const;
-  bool get_control_value (const std::string& name, float *value) const noexcept;
-  bool set_control_value (const std::string& name, float *value) noexcept;
-  bool connect (float *sample_array) noexcept;
-  bool run (size_t sample_count) noexcept;
+  void instantiate (unsigned long rate);
+  void activate (void);
+  const std::string& get_name (void) const;
+  const ControlSet& get_control_set (void) const;
+  float get_control_value (const std::string& name) const;
+  void set_control_value (const std::string& name, float value);
+  void connect (float *sample_array);
+  void run (size_t sample_count);
+protected:
+  void create_controls (void);
 }; /* class Effect */
 
 } /* namespace Gnuitar */
