@@ -23,18 +23,10 @@ MainWindow::MainWindow (QWidget *parent) : QMainWindow (parent)
   setCentralWidget (central_widget);
   setMenuBar (menu_bar);
 
-  connect (menu_bar, &MenuBar::ladspa_plugin_selected, this, &MainWindow::ladspa_plugin_selected);
-  connect (menu_bar, &MenuBar::quit_requested, this, &MainWindow::close);
-  connect (audio_panel, &AudioPanel::play_triggered, this, &MainWindow::on_play_triggered);
-  connect (audio_panel, &AudioPanel::stop_triggered, this, &MainWindow::on_stop_triggered);
-
-  driver_manager.update_libs ();
-
-  auto effect_list = driver_manager.get_effect_list ();
-  for (const auto& effect_name : effect_list)
-    {
-      menu_bar->add_ladspa_plugin (effect_name.c_str ());
-    }
+  connect (menu_bar, &MenuBar::effect_selected, this, &MainWindow::on_effect_selected);
+  connect (menu_bar, &MenuBar::quit_selected, this, &MainWindow::on_quit_selected);
+  connect (audio_panel, &AudioPanel::play_triggered, this, &MainWindow::on_play_selected);
+  connect (audio_panel, &AudioPanel::stop_triggered, this, &MainWindow::on_stop_selected);
 }
 
 MainWindow::~MainWindow (void)
@@ -43,25 +35,27 @@ MainWindow::~MainWindow (void)
 }
 
 void
-MainWindow::on_play_triggered (void)
+MainWindow::on_play_selected (void)
 {
-  driver_manager.stop_driver ();
+
 }
 
 void
-MainWindow::on_stop_triggered (void)
+MainWindow::on_stop_selected (void)
 {
-  driver_manager.start_driver ();
+
 }
 
 void
-MainWindow::ladspa_plugin_selected (const QString& qt_plugin_name)
+MainWindow::on_effect_selected (const QString& effect_name)
 {
-  auto effect = driver_manager.add_effect (qt_plugin_name.toStdString ());
+  emit effect_selected (effect_name);
+}
 
-  auto effect_view = new EffectView (effect, rack);
+void
+MainWindow::on_quit_selected (void)
+{
 
-  rack->add_effect (effect_view);
 }
 
 } /* namespace Qt */

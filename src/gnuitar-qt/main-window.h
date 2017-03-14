@@ -1,14 +1,12 @@
-#ifndef GNUITAR_MAIN_WINDOW_H
-#define GNUITAR_MAIN_WINDOW_H
+#ifndef GNUITAR_QT_MAIN_WINDOW_H
+#define GNUITAR_QT_MAIN_WINDOW_H
 
 #include <QMainWindow>
 #include <QVBoxLayout>
 
-#include "audio-panel.h"
-#include "menu-bar.h"
-#include "rack.h"
-
-#include <libgnuitar/driver-manager.h>
+#include <gnuitar-qt/audio-panel.h>
+#include <gnuitar-qt/menu-bar.h>
+#include <gnuitar-qt/rack.h>
 
 namespace Gnuitar {
 
@@ -20,26 +18,24 @@ class MainWindow : public QMainWindow
 public:
   MainWindow (QWidget *parent = 0);
   ~MainWindow (void);
+signals:
+  void effect_selected (const QString& effect_name);
 private slots:
-  void on_play_triggered (void);
-  void on_stop_triggered (void);
-  void ladspa_plugin_selected (const QString& name);
-protected:
-  void add_ladspa_plugin (const LADSPA_Descriptor *descriptor) noexcept;
-  void show_ladspa_plugins (void) noexcept;
-  void show_ladspa_plugin (LADSPA_Descriptor_Function descriptor) noexcept;
+  void on_play_selected (void);
+  void on_stop_selected (void);
+  void on_effect_selected (const QString& effect_name);
+  void on_quit_selected (void);
 private:
   QWidget *central_widget;
   QVBoxLayout *layout;
   MenuBar *menu_bar;
   AudioPanel *audio_panel;
   Rack *rack;
-  DriverManager driver_manager;
 }; /* class MainWindow */
 
 } /* namespace Qt */
 
 } /* namespace Gnuitar */
 
-#endif /* GNUITAR_MAIN_WINDOW_H */
+#endif /* GNUITAR_QT_MAIN_WINDOW_H */
 
