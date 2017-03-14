@@ -1,24 +1,21 @@
 #include <QApplication>
 #include <QMainWindow>
 
-#include "menu-bar.h"
+#include <gnuitar-qt/menu-bar.h>
 
 int
-main(int argc, char **argv)
+main (int argc, char **argv)
 {
-    QApplication app(argc, argv);
+  QApplication app (argc, argv);
 
-    QMainWindow window;
-    window.show();
+  QMainWindow window;
 
-    Gnuitar::Qt::MenuBar menu_bar(&window);
-    menu_bar.add_ladspa_plugin("Reverb");
-    menu_bar.add_ladspa_plugin("Echo");
+  window.show ();
 
-    menu_bar.add_lv2_plugin("Tube Amplifier");
-    menu_bar.add_lv2_plugin("Delay");
-    menu_bar.add_lv2_plugin("Equalizer");
+  Gnuitar::Qt::MenuBar menu_bar (&window);
+  menu_bar.add_effect ("Reverb");
+  menu_bar.add_effect ("Echo");
 
-    return app.exec();
+  return app.exec ();
 }
 
