@@ -10,7 +10,7 @@ Knob::Knob (const QString& name, QWidget *parent) : QWidget (parent)
 {
   dial = new QDial;
 
-  connect (dial, &QDial::sliderMoved, this, &Knob::on_adjustment);
+  connect (dial, &QDial::sliderReleased, this, &Knob::on_released);
 
   label = new QLabel;
   label->setText (name);
@@ -28,10 +28,28 @@ Knob::~Knob (void)
 
 }
 
-void
-Knob::on_adjustment (int value)
+QString
+Knob::get_label (void) const
 {
-  emit adjusted (static_cast<float> (value));
+  return label->text ();
+}
+
+int
+Knob::get_value (void) const
+{
+  return dial->value ();
+}
+
+void
+Knob::set_value (int value)
+{
+  dial->setValue (value);
+}
+
+void
+Knob::on_released (void)
+{
+  emit released ();
 }
 
 } /* namespace Qt */

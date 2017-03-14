@@ -16,14 +16,16 @@ class Knob final : public QWidget
 {
   Q_OBJECT
 public:
-  Knob (const QString& name, QWidget *parent = nullptr);
+  Knob (const QString& label, QWidget *parent = nullptr);
   ~Knob (void);
-  float get_value (void) const;
-  void set_value (float value);
+  QString get_label (void) const;
+  int get_value (void) const;
+  void set_label (const QString& label);
+  void set_value (int value);
 signals:
-  void adjusted (float value);
-protected:
-  void on_adjustment (int value);
+  void released (void);
+protected slots:
+  void on_released (void);
 private:
   QDial *dial;
   QLabel *label;
