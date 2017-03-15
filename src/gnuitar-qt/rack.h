@@ -19,6 +19,8 @@ public:
   Rack (QWidget *parent = nullptr);
   ~Rack (void);
   void add_effect (EffectView *effect_view);
+protected:
+  void on_effect_changed (const QString& effect_name, const QString& control_name, int value);
 private:
   QVBoxLayout *layout;
 }; /* class Rack */
