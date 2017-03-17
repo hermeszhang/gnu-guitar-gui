@@ -16,6 +16,21 @@ init_control (const LADSPA_Descriptor *descriptor, unsigned long i, Gnuitar::Con
   if (descriptor->PortNames[i] != nullptr)
     control.set_label (descriptor->PortNames[i]);
 
+  float min = 0.0f;
+  float max = 1.0f;
+
+  if (descriptor->PortRangeHints != nullptr)
+    {
+      auto hint_descriptor = descriptor->PortRangeHints[i].HintDescriptor;
+      if (LADSPA_IS_HINT_BOUNDED_BELOW (hint_descriptor))
+        min = descriptor->PortRangeHints[i].LowerBound;
+      if (LADSPA_IS_HINT_BOUNDED_ABOVE (hint_descriptor))
+        max = descriptor->PortRangeHints[i].UpperBound;
+    }
+
+  control.set_max (max);
+  control.set_min (min);
+
   return true;
 }
 
@@ -65,6 +80,12 @@ const ControlSet&
 Effect::get_control_set (void) const
 {
   return control_set;
+}
+
+void
+Effect::set_control_value (const std::string& control_name, float control_value)
+{
+  control_set.set (control_name, control_value);
 }
 
 void
