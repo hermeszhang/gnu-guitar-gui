@@ -1,23 +1,22 @@
 #include <gnuitar-qt/effect-view.h>
 #include <gnuitar-qt/knob.h>
 
-#include <QLabel>
-
 namespace Gnuitar
 {
 
 namespace Qt
 {
 
-EffectView::EffectView (const QString& name, QWidget *parent) : QWidget(parent)
+EffectView::EffectView (const QString& label_text_, QWidget *parent) : QWidget(parent)
 {
-  auto effect_label = new QLabel;
-  effect_label->setTextFormat (::Qt::RichText);
-  effect_label->setText ("<i><b>" + name + "</i></b>");
-  effect_label->setAlignment (::Qt::AlignCenter);
+  label = new QLabel;
+  label->setTextFormat (::Qt::RichText);
+  label->setAlignment (::Qt::AlignCenter);
   layout = new QHBoxLayout;
-  layout->addWidget (effect_label);
+  layout->addWidget (label);
   setLayout (layout);
+
+  set_label (label_text_);
 }
 
 EffectView::~EffectView (void)
@@ -34,6 +33,19 @@ EffectView::add_control (const QString& control_name)
   };
   connect (control_knob, &Knob::released, this, control_callback);
   layout->addWidget (control_knob);
+}
+
+const QString&
+EffectView::get_label (void) const
+{
+  return label_text;
+}
+
+void
+EffectView::set_label (const QString& label_text_)
+{
+  label_text = label_text_;
+  label->setText ("<i><b>" + label_text + "</i></b>");
 }
 
 void

@@ -3,6 +3,7 @@
 
 #include <QWidget>
 #include <QHBoxLayout>
+#include <QLabel>
 
 #include <gnuitar-qt/knob.h>
 
@@ -16,15 +17,19 @@ class EffectView final : public QWidget
 {
   Q_OBJECT
 public:
-  EffectView (const QString& effect_name, QWidget *parent = nullptr);
+  EffectView (const QString& label_text, QWidget *parent = nullptr);
   ~EffectView (void);
   void add_control (const QString& control_name);
+  const QString& get_label (void) const;
+  void set_label (const QString& label);
 signals:
   void control_changed (const QString& label, int value);
 protected slots:
   void on_knob_changed (const Knob *knob);
 private:
+  QString label_text;
   QHBoxLayout *layout;
+  QLabel *label;
 }; /* class Effect */
 
 } /* namespace Qt */
