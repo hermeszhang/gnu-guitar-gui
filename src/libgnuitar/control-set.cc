@@ -29,7 +29,7 @@ ControlSet::set (const std::string& label, float value)
       if (control.get_label () == label)
         {
           control.set_value (value);
-	  return;
+          return;
         }
     }
   throw Exception("control does not exist");
