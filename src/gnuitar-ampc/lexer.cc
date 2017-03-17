@@ -45,7 +45,7 @@ Lexer::get (void)
       line++;
       column = 1;
     }
-  else
+  else if (c != EOF)
     column++;
 
   return c;
