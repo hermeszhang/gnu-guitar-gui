@@ -18,9 +18,15 @@ SpiceParser::~SpiceParser (void)
 }
 
 bool
+SpiceParser::eof (void) const
+{
+  return lexer.eof ();
+}
+
+bool
 SpiceParser::read (Circuit& circuit)
 {
-  while (!lexer.eof ())
+  while (!eof ())
     {
       Resistor r;
       if (read (r))
@@ -47,7 +53,7 @@ SpiceParser::read (Capacitor& capacitor)
 {
   SpiceToken token;
 
-  if (!lexer.peek_token (token))
+  if (!peek (token))
     return false;
 
   if (token.get_type () != SpiceToken::Type::identifier)
@@ -64,15 +70,15 @@ SpiceParser::read (Capacitor& capacitor)
   lexer.clear_peek_token ();
 
   long in;
-  if (!lexer.read_token (token) || !token.get_integer (&in))
+  if (!read (token) || !token.get_integer (&in))
     toss_unexpected_token ("input connection", nullptr);
 
   long out;
-  if (!lexer.read_token (token) || !token.get_integer (&out))
+  if (!read (token) || !token.get_integer (&out))
     toss_unexpected_token ("output connection", nullptr);
 
   float capacitance;
-  if (!lexer.read_token (token) || !token.get_real_number (&capacitance))
+  if (!read (token) || !token.get_real_number (&capacitance))
     toss_unexpected_token ("capacitance", nullptr);
 
   capacitor.set_capacitance (capacitance);
@@ -87,7 +93,7 @@ SpiceParser::read (Resistor& resistor)
 {
   SpiceToken token;
 
-  if (!lexer.peek_token (token))
+  if (!peek (token))
     return false;
 
   if (token.get_type () != SpiceToken::Type::identifier)
@@ -104,15 +110,15 @@ SpiceParser::read (Resistor& resistor)
   lexer.clear_peek_token ();
 
   long in;
-  if (!lexer.read_token (token) || !token.get_integer (&in))
+  if (!read (token) || !token.get_integer (&in))
     toss_unexpected_token ("input connection", nullptr);
 
   long out;
-  if (!lexer.read_token (token) || !token.get_integer (&out))
+  if (!read (token) || !token.get_integer (&out))
     toss_unexpected_token ("output connection", nullptr);
 
   float resistance;
-  if (!lexer.read_token (token) || !token.get_real_number (&resistance))
+  if (!read (token) || !token.get_real_number (&resistance))
     toss_unexpected_token ("resistance", nullptr);
 
   resistor.set_resistance (resistance);
@@ -140,6 +146,18 @@ SpiceParser::toss_unknown_component (void) const
   unknown_component.set_line (lexer.get_line ());
   unknown_component.set_column (lexer.get_column ());
   throw unknown_component;
+}
+
+bool
+SpiceParser::read (SpiceToken& token)
+{
+  lexer.read_token (token);
+}
+
+bool
+SpiceParser::peek (SpiceToken& token)
+{
+  lexer.peek_token (token);
 }
 
 } /* namespace AmpC */

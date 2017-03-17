@@ -18,12 +18,16 @@ class SpiceParser final
 public:
   SpiceParser (SpiceLexer& lexer_) noexcept;
   ~SpiceParser (void);
+  bool eof (void) const;
   bool read (Circuit& circuit);
   bool read (Resistor& resistor);
   bool read (Capacitor& capacitor);
 protected:
   void toss_unexpected_token (const char *expected, const char *unexpected) const;
   void toss_unknown_component (void) const;
+private:
+  bool read (SpiceToken& token);
+  bool peek (SpiceToken& token);
 }; /* class SpiceParser */
 
 } /* namespace AmpC */
