@@ -20,6 +20,8 @@ public:
   const Effect * get_effect (void) const;
   virtual size_t get_channels (void) const = 0;
   virtual size_t get_rate (void) const = 0;
+  float get_control_value (const std::string& control_name);
+  void set_control_value (const std::string& effect_name, const std::string& control_name, float value);
   virtual void set_input (const std::string& input_name) = 0;
   virtual void set_output (const std::string& output_name) = 0;
   virtual bool running (void) const = 0;

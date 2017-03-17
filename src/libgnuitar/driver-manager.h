@@ -17,6 +17,7 @@ public:
   ~DriverManager (void);
   Effect * add_effect (const std::string& name);
   EffectList get_effect_list (void) const;
+  void set_control_value (const std::string& effect_name, const std::string& control_name, float control_value);
   void start_driver (void);
   void stop_driver (void);
   void update_libs (void) noexcept;

@@ -37,6 +37,22 @@ Driver::add_effect (Effect *effect)
   effects.push_back(effect);
 }
 
+float
+Driver::get_control_value (const std::string&)
+{
+  return 0.0f;
+}
+
+void
+Driver::set_control_value (const std::string& effect_name, const std::string& control_name, float control_value)
+{
+  for (Effect *effect : effects)
+    {
+      if (effect->get_name () == effect_name)
+        effect->set_control_value (control_name, control_value);
+    }
+}
+
 void
 Driver::connect (float *sample_array)
 {

@@ -66,6 +66,12 @@ DriverManager::get_effect_list (void) const
 }
 
 void
+DriverManager::set_control_value (const std::string& effect_name, const std::string& control_name, float control_value)
+{
+  driver->set_control_value (effect_name, control_name, control_value);
+}
+
+void
 DriverManager::start_driver (void)
 {
   if (driver == nullptr)
