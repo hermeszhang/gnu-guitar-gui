@@ -15,12 +15,7 @@ src/gnuitar-qt/qrc_*
 src/gnuitar-qt/Makefile
 src/gnuitar-doc/*
 
-build/*
-*/build/*
-
-cmake-build/*
-*/cmake-build/*
-
-qmake-build/*
-*/qmake-build/*
+build
+cmake-build
+qmake-build/
 
