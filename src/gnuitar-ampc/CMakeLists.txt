@@ -4,6 +4,10 @@ PROJECT ("gnuitar-ampc")
 
 INCLUDE_DIRECTORIES ("..")
 
+IF (CMAKE_COMPILER_IS_GNUCXX)
+  SET (CMAKE_CXX_FLAGS "-Wall -Wextra -Werror -Wfatal-errors -std=c++11")
+ENDIF (CMAKE_COMPILER_IS_GNUCXX)
+
 ADD_LIBRARY ("ampc"
   "capacitor.h"
   "capacitor.cc"
@@ -17,6 +21,8 @@ ADD_LIBRARY ("ampc"
   "resistor.cc"
   "source-writer.h"
   "source-writer.cc"
+  "voltage.h"
+  "voltage.cc"
   "lexer.h"
   "lexer.cc"
   "spice-token.h"
