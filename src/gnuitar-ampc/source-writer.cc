@@ -24,7 +24,7 @@ SourceWriter::SourceWriter (void) noexcept
   add_process_var ("resistance");
 
   add_process_stmt ("/* represent input as a signal */");
-  add_process_stmt ("voltage = in;");
+  add_process_stmt ("voltage = 0.001f;");
   add_process_stmt ("resistance = 0.001f;");
 }
 
@@ -97,6 +97,20 @@ SourceWriter::visit (const Capacitor& capacitor) noexcept
 
   /* we now have one more capacitor in the amp */
   capacitor_count++;
+}
+
+void
+SourceWriter::visit (const Voltage& voltage) noexcept
+{
+  if (voltage.get_label () == "in")
+    add_process_stmt ("voltage += in;");
+  else
+    {
+      std::string voltage_add_stmt = "voltage += ";
+      voltage_add_stmt += std::to_string (voltage.get_voltage ());
+      voltage_add_stmt += ";";
+      add_process_stmt (std::move (voltage_add_stmt));
+    }
 }
 
 void

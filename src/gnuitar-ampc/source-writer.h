@@ -31,9 +31,10 @@ class SourceWriter final : public Visitor
 public:
   SourceWriter (void) noexcept;
   ~SourceWriter (void);
-  void visit(const Resistor& resisitor) noexcept;
-  void visit(const Capacitor& capacitor) noexcept;
-  void write(std::ostream& out) const noexcept;
+  void visit (const Resistor& resisitor) noexcept;
+  void visit (const Capacitor& capacitor) noexcept;
+  void visit (const Voltage& voltage) noexcept;
+  void write (std::ostream& out) const noexcept;
 protected:
   void add_bracket_include (const std::string& include_path) noexcept;
   void add_member (const std::string& member) noexcept;
