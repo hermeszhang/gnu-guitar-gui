@@ -14,8 +14,10 @@ class Resistor final : public Component
   float resistance;
 public:
   Resistor (void) noexcept;
+  Resistor (Component&& component);
+  Resistor (Resistor&& resistor);
   ~Resistor (void);
-  void accept(Visitor& visitor) const noexcept;
+  void accept (Visitor& visitor) const noexcept;
   float get_resistance (void) const noexcept;
   void set_resistance (float resistance_) noexcept;
 }; /* class Resistor */

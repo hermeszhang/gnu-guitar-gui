@@ -13,6 +13,16 @@ Capacitor::Capacitor (void) noexcept
 
 }
 
+Capacitor::Capacitor (Component&& component) : Component (std::move (component))
+{
+
+}
+
+Capacitor::Capacitor (Capacitor&& capacitor) : Component (std::move (capacitor))
+{
+  capacitance = capacitor.capacitance;
+}
+
 Capacitor::~Capacitor (void)
 {
 

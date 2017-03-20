@@ -15,6 +15,8 @@ class Capacitor final : public Component
   float charge;
 public:
   Capacitor (void) noexcept;
+  Capacitor (Component&& component);
+  Capacitor (Capacitor&& capacitor);
   ~Capacitor (void);
   void accept (Visitor& visitor) const noexcept;
   void set_capacitance (float capacitance_) noexcept;

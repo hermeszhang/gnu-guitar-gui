@@ -13,6 +13,16 @@ Resistor::Resistor (void) noexcept
 
 }
 
+Resistor::Resistor (Component&& component) : Component (std::move (component))
+{
+
+}
+
+Resistor::Resistor (Resistor&& resistor) : Component (std::move (resistor))
+{
+  resistance = resistor.resistance;
+}
+
 Resistor::~Resistor (void)
 {
 
