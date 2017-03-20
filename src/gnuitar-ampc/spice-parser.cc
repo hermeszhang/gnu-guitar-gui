@@ -28,71 +28,84 @@ SpiceParser::read (Circuit& circuit)
 {
   while (!eof ())
     {
-      Resistor r;
-      if (read (r))
-        {
-          circuit.add (r);
-          continue;
-        }
-    
-      Capacitor c;
-      if (read (c))
-        {
-          circuit.add (c);
-          continue;
-        }
-
-      if (eof ())
-        return false;
-
-      toss_unknown_component ();
+      if (!read_single (circuit))
+        break;
     }
-
   return false;
 }
 
 bool
+SpiceParser::read_single (Circuit& circuit)
+{
+  Component component;
+
+  if (!read (component))
+    return false;
+
+  if (component.get_designator () == 'C')
+    {
+      Capacitor c (std::move (component));
+      read (c);
+      circuit.add (std::move (c));
+    }
+  else if (component.get_designator () == 'R')
+    {
+      Resistor r (std::move (component));
+      read (r);
+      circuit.add (std::move (r));
+    }
+  else if (component.get_designator () == 'V')
+    {
+      Voltage v (std::move (component));
+      read (v);
+      circuit.add (std::move (v));
+    }
+  else
+    throw UnknownDesignator (component.get_designator ());
+
+  return true;
+}
+
+void
 SpiceParser::read (Capacitor& capacitor)
 {
   SpiceToken token;
-
-  if (!peek (token))
-    return false;
-
-  if (token.get_type () != SpiceToken::Type::identifier)
-    return false;
-
-  const std::string& data = token.get_data ();
-  if (data.size () == 0)
-    return false;
-  else if (data[0] != 'C')
-    return false;
-
-  capacitor.set_label (data.substr (1));
-
-  lexer.clear_peek_token ();
-
-  long in;
-  if (!read (token) || !token.get_integer (&in))
-    toss_unexpected_token ("input connection", nullptr);
-
-  long out;
-  if (!read (token) || !token.get_integer (&out))
-    toss_unexpected_token ("output connection", nullptr);
 
   float capacitance;
   if (!read (token) || !token.get_real_number (&capacitance))
     toss_unexpected_token ("capacitance", nullptr);
 
   capacitor.set_capacitance (capacitance);
-  capacitor.set_input (in);
-  capacitor.set_output (out);
+}
 
-  return true;
+void
+SpiceParser::read (Resistor& resistor)
+{
+  SpiceToken token;
+
+  float resistance;
+  if (!read (token) || !token.get_real_number (&resistance))
+    toss_unexpected_token ("resistance", nullptr);
+  else
+    resistor.set_resistance (resistance);
+}
+
+void
+SpiceParser::read (Voltage& voltage)
+{
+  if (voltage.get_label () == "in")
+    return;
+
+  SpiceToken token;
+  float voltage_value;
+  if (!read (token) || !token.get_real_number (&voltage_value))
+    toss_unexpected_token ("voltage", nullptr);
+  else
+    voltage.set_voltage (voltage_value);
 }
 
 bool
-SpiceParser::read (Resistor& resistor)
+SpiceParser::read (Component& component)
 {
   SpiceToken token;
 
@@ -105,10 +118,11 @@ SpiceParser::read (Resistor& resistor)
   const std::string& data = token.get_data ();
   if (data.size () == 0)
     return false;
-  else if (data[0] != 'R')
-    return false;
-
-  resistor.set_label (data.substr (1));
+  else
+    {
+      component.set_designator (data[0]);
+      component.set_label (data.substr (1));
+    }
 
   lexer.clear_peek_token ();
 
@@ -120,13 +134,8 @@ SpiceParser::read (Resistor& resistor)
   if (!read (token) || !token.get_integer (&out))
     toss_unexpected_token ("output connection", nullptr);
 
-  float resistance;
-  if (!read (token) || !token.get_real_number (&resistance))
-    toss_unexpected_token ("resistance", nullptr);
-
-  resistor.set_resistance (resistance);
-  resistor.set_input (in);
-  resistor.set_output (out);
+  component.set_input (in);
+  component.set_output (out);
 
   return true;
 }
@@ -154,13 +163,13 @@ SpiceParser::toss_unknown_component (void) const
 bool
 SpiceParser::read (SpiceToken& token)
 {
-  lexer.read_token (token);
+  return lexer.read_token (token);
 }
 
 bool
 SpiceParser::peek (SpiceToken& token)
 {
-  lexer.peek_token (token);
+  return lexer.peek_token (token);
 }
 
 } /* namespace AmpC */

@@ -20,9 +20,12 @@ public:
   ~SpiceParser (void);
   bool eof (void) const;
   bool read (Circuit& circuit);
-  bool read (Resistor& resistor);
-  bool read (Capacitor& capacitor);
 protected:
+  bool read_single (Circuit& circuit);
+  void read (Resistor& resistor);
+  void read (Capacitor& capacitor);
+  void read (Voltage& voltage);
+  bool read (Component& component);
   void toss_unexpected_token (const char *expected, const char *unexpected) const;
   void toss_unknown_component (void) const;
 private:
