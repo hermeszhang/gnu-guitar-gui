@@ -64,14 +64,17 @@ compile (const std::string& filename)
   catch (const Gnuitar::AmpC::UnexpectedToken& unexpected_token)
     {
       log (filename, unexpected_token);
+      return false;
     }
   catch (const Gnuitar::AmpC::SyntaxError& syntax_error)
     {
       log (filename, syntax_error);
+      return false;
     }
   catch (const Gnuitar::AmpC::Exception& exception)
     {
       log (exception);
+      return false;
     }
 
   Gnuitar::AmpC::SourceWriter source_writer;
@@ -83,6 +86,7 @@ compile (const std::string& filename)
   catch (const Gnuitar::AmpC::Exception& exception)
     {
       log (exception);
+      return false;
     }
 
 
