@@ -52,6 +52,15 @@ public:
   ~UnknownComponent (void);
 }; /* class UnknownComponent */
 
+class UnknownDesignator final : public SyntaxError
+{
+  char designator;
+public:
+  UnknownDesignator (char designator_) noexcept;
+  ~UnknownDesignator (void);
+  char get_designator (void) const noexcept;
+}; /* class UnknownDesignator */
+
 } /* namespace AmpC */
 
 } /* namespace Gnuitar */

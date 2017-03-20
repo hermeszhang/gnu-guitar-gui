@@ -97,6 +97,22 @@ UnknownComponent::~UnknownComponent (void)
 
 }
 
+UnknownDesignator::UnknownDesignator (char designator_) noexcept : SyntaxError("unknown designator")
+{
+  designator = designator_;
+}
+
+UnknownDesignator::~UnknownDesignator (void)
+{
+
+}
+
+char
+UnknownDesignator::get_designator (void) const noexcept
+{
+  return designator;
+}
+
 } /* namespace AmpC */
 
 } /* namespace Gnuitar */
