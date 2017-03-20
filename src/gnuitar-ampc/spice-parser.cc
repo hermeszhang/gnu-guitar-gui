@@ -42,6 +42,9 @@ SpiceParser::read (Circuit& circuit)
           continue;
         }
 
+      if (eof ())
+        return false;
+
       toss_unknown_component ();
     }
 
