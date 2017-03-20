@@ -47,15 +47,21 @@ Circuit::accept (Visitor& visitor) const
 }
 
 void
-Circuit::add (const Capacitor& capacitor)
+Circuit::add (Capacitor&& capacitor)
 {
-  return add (new Capacitor(capacitor));
+  return add (new Capacitor(std::move (capacitor)));
 }
 
 void
-Circuit::add (const Resistor& resistor)
+Circuit::add (Resistor&& resistor)
 {
-  return add (new Resistor(resistor));
+  return add (new Resistor(std::move (resistor)));
+}
+
+void
+Circuit::add (Voltage&& voltage)
+{
+  return add (new Voltage(std::move (voltage)));
 }
 
 void

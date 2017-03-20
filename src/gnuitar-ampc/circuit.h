@@ -3,6 +3,7 @@
 
 #include <gnuitar-ampc/resistor.h>
 #include <gnuitar-ampc/capacitor.h>
+#include <gnuitar-ampc/voltage.h>
 
 #include <vector>
 
@@ -19,8 +20,9 @@ public:
   Circuit (void) noexcept;
   ~Circuit (void);
   void accept (Visitor& visitor) const;
-  void add (const Resistor& resistor);
-  void add (const Capacitor& capacitor);
+  void add (Resistor&& resistor);
+  void add (Capacitor&& capacitor);
+  void add (Voltage&& voltage);
 protected:
   void add (Component *capacitor) noexcept;
   const Component * find_connected (const Component *source) const noexcept;
