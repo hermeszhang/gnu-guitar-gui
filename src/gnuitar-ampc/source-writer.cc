@@ -41,7 +41,11 @@ SourceWriter::visit (const Resistor& resistor) noexcept
   /** mention which resistor this expression is
    * originating from */
   line = "/* from R";
-  line += resistor.get_label ();
+  if (resistor.get_label ().size () == 0)
+    line += std::to_string (resistor_count + 1);
+  else
+    line += resistor.get_label ();
+
   line += " */";
   add_process_stmt(std::move(line));
 
@@ -62,7 +66,10 @@ SourceWriter::visit (const Capacitor& capacitor) noexcept
   /* declare the charge for the capacitor */
   std::string q_name;
   q_name += 'c';
-  q_name += capacitor.get_label ();
+  if (capacitor.get_label ().size () == 0)
+    q_name += std::to_string (capacitor_count + 1);
+  else
+    q_name += capacitor.get_label ();
   q_name += "_Q";
   add_member (q_name);
 
@@ -72,21 +79,20 @@ SourceWriter::visit (const Capacitor& capacitor) noexcept
   /* mention where the expression is coming from */
   std::string comment;
   comment = "/* from C";
-  comment += capacitor.get_label ();
+  if (capacitor.get_label ().size () == 0)
+    comment += std::to_string (capacitor_count + 1);
+  else
+    comment += capacitor.get_label ();
   comment += " */";
   add_process_stmt (std::move (comment));
 
   std::string q_stmt;
+  q_stmt = "voltage -= " + q_name + " / " + capacitance + ";";
+  add_process_stmt (std::move (q_stmt));
   q_stmt = q_name;
-  q_stmt += " = voltage * ";
+  q_stmt += " += voltage * ";
   q_stmt += capacitance;
   q_stmt += " * (1 - expf(-1.0 / (amp->rate * resistance * " + capacitance + ")));";
-  add_process_stmt (std::move (q_stmt));
-/*
-  q_stmt = "current *= (voltage - (" + q_name + " / " + capacitance + ")) / voltage;";
-  add_process_stmt (std::move (q_stmt));
-*/
-  q_stmt = "voltage -= " + q_name + " / " + capacitance + ";";
   add_process_stmt (std::move (q_stmt));
 
   /* we now have one more capacitor in the amp */
