@@ -7,9 +7,9 @@ extern "C" {
 
 struct GnuitarAmp;
 
-struct GnuitarAmp * gnuitar_amp_init(void);
+struct GnuitarAmp * gnuitar_amp_init (void);
 
-float gnuitar_amp_process_signal(struct GnuitarAmp *amp, float signal);
+float gnuitar_amp_process_signal (struct GnuitarAmp *amp, float signal);
 
 #ifdef __cplusplus
 } /* extern "C" { */
