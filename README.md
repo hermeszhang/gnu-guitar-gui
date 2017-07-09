@@ -3,6 +3,8 @@ Gnuitar
 
 [![Travis Badge](https://travis-ci.org/gnuitar/gnuitar.svg?branch=master)](https://travis-ci.org/gnuitar/gnuitar)
 
+Note : this project is on pause until January of the year 2018.
+
 The GNU Guitar Effects Processor
 
 ### What is Gnuitar?
