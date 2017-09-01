@@ -1,9 +1,9 @@
-#include "menu-bar.h"
+#include <gnu-guitar-qt/menu-bar.h>
 
 #include <QDesktopServices>
 
 #ifndef GNUITAR_ISSUES_LINK
-#define GNUITAR_ISSUES_LINK "https://github.com/gnuitar/gnuitar/issues/new"
+#define GNUITAR_ISSUES_LINK "https://github.com/gnu-guitar/gnu-guitar-qt/issues/new"
 #endif /* GNUITAR_ISSUES_LINK */
 
 namespace Gnuitar

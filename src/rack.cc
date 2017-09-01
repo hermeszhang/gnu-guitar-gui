@@ -1,6 +1,6 @@
-#include "rack.h"
+#include <gnu-guitar-qt/rack.h>
 
-#include "knob.h"
+#include <gnu-guitar-qt/knob.h>
 
 #include <QDial>
 #include <QLabel>

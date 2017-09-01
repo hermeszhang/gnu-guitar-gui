@@ -1,4 +1,4 @@
-#include <gnuitar-qt/controller.h>
+#include <gnu-guitar-qt/controller.h>
 
 #include <QApplication>
 #include <QDebug>

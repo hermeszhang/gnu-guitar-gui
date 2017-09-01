@@ -4,9 +4,9 @@
 #include <QMainWindow>
 #include <QVBoxLayout>
 
-#include <gnuitar-qt/audio-panel.h>
-#include <gnuitar-qt/menu-bar.h>
-#include <gnuitar-qt/rack.h>
+#include <gnu-guitar-qt/audio-panel.h>
+#include <gnu-guitar-qt/menu-bar.h>
+#include <gnu-guitar-qt/rack.h>
 
 namespace Gnuitar {
 

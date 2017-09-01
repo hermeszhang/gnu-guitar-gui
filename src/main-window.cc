@@ -1,4 +1,4 @@
-#include "main-window.h"
+#include <gnu-guitar-qt/main-window.h>
 
 namespace Gnuitar {
 

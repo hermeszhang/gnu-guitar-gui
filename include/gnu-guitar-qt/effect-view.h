@@ -5,7 +5,7 @@
 #include <QHBoxLayout>
 #include <QLabel>
 
-#include <gnuitar-qt/knob.h>
+#include <gnu-guitar-qt/knob.h>
 
 namespace Gnuitar
 {

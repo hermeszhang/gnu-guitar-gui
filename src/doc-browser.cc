@@ -1,4 +1,4 @@
-#include "doc-browser.h"
+#include <gnu-guitar-qt/doc-browser.h>
 
 #include <QFile>
 

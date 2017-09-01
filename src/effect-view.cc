@@ -1,5 +1,5 @@
-#include <gnuitar-qt/effect-view.h>
-#include <gnuitar-qt/knob.h>
+#include <gnu-guitar-qt/effect-view.h>
+#include <gnu-guitar-qt/knob.h>
 
 namespace Gnuitar
 {

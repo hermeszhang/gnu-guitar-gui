@@ -1,4 +1,4 @@
-#include "audio-panel.h"
+#include <gnu-guitar-qt/audio-panel.h>
 
 namespace Gnuitar {
 

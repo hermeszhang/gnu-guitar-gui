@@ -1,7 +1,7 @@
 #ifndef GNUITAR_QT_CONTROLLER_H
 #define GNUITAR_QT_CONTROLLER_H
 
-#include <gnuitar-qt/main-window.h>
+#include <gnu-guitar-qt/main-window.h>
 
 #include <rtaudio/ladspa-plugins.hpp>
 #include <rtaudio/session.hpp>

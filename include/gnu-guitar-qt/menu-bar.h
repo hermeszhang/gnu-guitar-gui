@@ -3,7 +3,7 @@
 
 #include <QMenuBar>
 
-#include <gnuitar-qt/doc-browser.h>
+#include <gnu-guitar-qt/doc-browser.h>
 
 namespace Gnuitar
 {

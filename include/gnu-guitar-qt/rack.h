@@ -4,7 +4,7 @@
 #include <QWidget>
 #include <QVBoxLayout>
 
-#include <gnuitar-qt/effect-view.h>
+#include <gnu-guitar-qt/effect-view.h>
 
 namespace Gnuitar
 {
