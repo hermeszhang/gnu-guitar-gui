@@ -1,4 +1,0 @@
-LIBRARY gnuitar-builtins
-EXPORTS
-	gnuitar_package_entry
-
