@@ -3,7 +3,8 @@
 
 #include <gnuitar-qt/main-window.h>
 
-#include <libgnuitar/driver-manager.h>
+#include <rtaudio/ladspa-plugins.hpp>
+#include <rtaudio/session.hpp>
 
 namespace Gnuitar
 {
@@ -25,7 +26,8 @@ protected slots:
 protected:
   void update_effect_list (void);
 private:
-  Gnuitar::DriverManager driver_manager;
+  RtAudio::LadspaPlugins ladspa_plugins;
+  RtAudio::Session session;
   Gnuitar::Qt::MainWindow main_window;
 }; /* class Controller */
 
