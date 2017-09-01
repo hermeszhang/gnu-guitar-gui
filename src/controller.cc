@@ -26,7 +26,7 @@ Controller::Controller (void)
 
 Controller::~Controller (void)
 {
-  session.stopStream();
+
 }
 
 void
