@@ -43,7 +43,7 @@ ADD_EXECUTABLE(gnuitar-qt
     rack.cc
     resources.qrc)
 TARGET_LINK_LIBRARIES(gnuitar-qt ${Qt5Core_QTMAIN_LIBRARIES})
-TARGET_LINK_LIBRARIES(gnuitar-qt gnuitar)
+TARGET_LINK_LIBRARIES(gnuitar-qt ${RTAUDIO_LIBRARIES})
 QT5_USE_MODULES(gnuitar-qt Widgets)
 
 INSTALL(TARGETS gnuitar-qt
