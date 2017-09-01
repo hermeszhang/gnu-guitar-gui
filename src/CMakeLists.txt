@@ -45,7 +45,7 @@ add_executable("gnu-guitar-qt"
   "resources.qrc")
 
 target_link_libraries("gnu-guitar-qt"
-  ${RTAUDIO_LIBRARIES}
+  "rtaudio"
   Qt5::Widgets)
 #  ${Qt5Core_QTMAIN_LIBRARIES})
 
