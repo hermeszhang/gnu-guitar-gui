@@ -6,25 +6,25 @@
 #include <rtaudio/ladspa-plugins.hpp>
 #include <rtaudio/session.hpp>
 
-namespace Gnuitar
-{
+namespace Gnuitar {
 
-namespace Qt
-{
+namespace Qt {
 
-class Controller : public QObject
-{
+class Controller : public QObject {
   Q_OBJECT
 public:
-  Controller (void);
-  ~Controller (void);
-  void add_effect (const QString& effect_name);
+  Controller(void);
+  ~Controller(void);
+  void add_effect(const QString &effect_name);
 protected slots:
-  void on_effect_changed (const QString& effect_name, const QString& control_name, int value);
-  void on_play_selected (void);
-  void on_stop_selected (void);
+  void on_effect_changed(const QString &effect_name,
+                         const QString &control_name, int value);
+  void on_play_selected(void);
+  void on_stop_selected(void);
+
 protected:
-  void update_effect_list (void);
+  void update_effect_list(void);
+
 private:
   RtAudio::LadspaPlugins ladspa_plugins;
   RtAudio::Session session;
@@ -36,4 +36,3 @@ private:
 } /* namespace Gnuitar */
 
 #endif /* GNUITAR_QT_CONTROLLER_H */
-

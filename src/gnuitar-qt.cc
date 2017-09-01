@@ -15,9 +15,7 @@
 #include <pmmintrin.h>
 #endif /* __SSE3__ */
 
-int
-main(int argc, char *argv[])
-{
+int main(int argc, char *argv[]) {
 
 #ifdef __linux__
 
@@ -29,26 +27,25 @@ main(int argc, char *argv[])
 
   p.sched_priority = max_priority / 2;
 
-  if (sched_setscheduler (0, SCHED_FIFO, &p))
-    {
-      const char * dbgMsg = "warning: unable to set realtime priority (needs root privileges)";
-      qDebug() << dbgMsg;
-    }
+  if (sched_setscheduler(0, SCHED_FIFO, &p)) {
+    const char *dbgMsg =
+        "warning: unable to set realtime priority (needs root privileges)";
+    qDebug() << dbgMsg;
+  }
 
-    /* We might have been running to this point as setuid root program.
-     * Switching to real user id. */
+  /* We might have been running to this point as setuid root program.
+   * Switching to real user id. */
 
-  if (setuid (getuid ()) != 0)
-    {
-      const char * dbgMsg = "error: unable to drop root privileges";
-      qDebug() << dbgMsg;
-      return EXIT_FAILURE;
-    }
+  if (setuid(getuid()) != 0) {
+    const char *dbgMsg = "error: unable to drop root privileges";
+    qDebug() << dbgMsg;
+    return EXIT_FAILURE;
+  }
 
 #endif /* __linux__ */
 
-  /* Some FPU flags for faster performance. It is likely that
-   * -ffast-math already generates code to turn these on, though. */
+/* Some FPU flags for faster performance. It is likely that
+ * -ffast-math already generates code to turn these on, though. */
 
 #ifdef __SSE__
   _MM_SET_FLUSH_ZERO_MODE(_MM_FLUSH_ZERO_ON);
@@ -64,4 +61,3 @@ main(int argc, char *argv[])
 
   return a.exec();
 }
-

@@ -5,28 +5,26 @@
 
 #include <gnu-guitar-qt/doc-browser.h>
 
-namespace Gnuitar
-{
+namespace Gnuitar {
 
-namespace Qt
-{
+namespace Qt {
 
-class MenuBar final : public QMenuBar
-{
+class MenuBar final : public QMenuBar {
   Q_OBJECT
 public:
-  MenuBar (QWidget *parent = nullptr);
-  ~MenuBar (void);
-  void add_effect (const QString& plugin_name);
+  MenuBar(QWidget *parent = nullptr);
+  ~MenuBar(void);
+  void add_effect(const QString &plugin_name);
 private slots:
-  void on_quit_selected (void);
-  void on_effect_selected (const QString& plugin_name);
-  void on_view_documentation_selected (void);
-  void on_report_an_issue_selected (void);
-  void on_about_selected (void);
+  void on_quit_selected(void);
+  void on_effect_selected(const QString &plugin_name);
+  void on_view_documentation_selected(void);
+  void on_report_an_issue_selected(void);
+  void on_about_selected(void);
 signals:
-  void quit_selected (void);
-  void effect_selected (const QString& effect_name);
+  void quit_selected(void);
+  void effect_selected(const QString &effect_name);
+
 private:
   QMenu *file_menu;
   QAction *open_preset_action;
@@ -59,4 +57,3 @@ private:
 } /* namespace Gnuitar */
 
 #endif /* GNUITAR_QT_MENU_BAR_H */
-

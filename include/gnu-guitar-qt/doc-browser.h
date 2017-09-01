@@ -8,10 +8,10 @@ namespace Gnuitar {
 namespace Qt {
 
 class DocBrowser : public QTextBrowser {
-    Q_OBJECT
+  Q_OBJECT
 public:
-    DocBrowser(QWidget *parent = 0);
-    ~DocBrowser(void);
+  DocBrowser(QWidget *parent = 0);
+  ~DocBrowser(void);
 }; /* class DocBrowser */
 
 } /* namespace Qt */
@@ -19,4 +19,3 @@ public:
 } /* namespace Gnuitar */
 
 #endif /* GNUITAR_qT_DOC_BROWSER_H */
-

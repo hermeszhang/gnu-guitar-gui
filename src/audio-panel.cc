@@ -4,43 +4,29 @@ namespace Gnuitar {
 
 namespace Qt {
 
-AudioPanel::AudioPanel(QWidget *parent) : QWidget(parent)
-{
-    layout = new QHBoxLayout();
+AudioPanel::AudioPanel(QWidget *parent) : QWidget(parent) {
+  layout = new QHBoxLayout();
 
-    play_button = new Button(":/icons/play.png");
-    stop_button = new Button(":/icons/stop.png");
+  play_button = new Button(":/icons/play.png");
+  stop_button = new Button(":/icons/stop.png");
 
-    connect(play_button, &Button::clicked, this, &AudioPanel::on_play_triggered);
-    connect(stop_button, &Button::clicked, this, &AudioPanel::on_stop_triggered);
+  connect(play_button, &Button::clicked, this, &AudioPanel::on_play_triggered);
+  connect(stop_button, &Button::clicked, this, &AudioPanel::on_stop_triggered);
 
-    layout->addWidget(play_button);
-    layout->addWidget(stop_button);
+  layout->addWidget(play_button);
+  layout->addWidget(stop_button);
 
-    setLayout(layout);
+  setLayout(layout);
 }
 
-AudioPanel::~AudioPanel(void)
-{
+AudioPanel::~AudioPanel(void) {}
 
-}
+void AudioPanel::add_control(const char *name) { (void)name; }
 
-void AudioPanel::add_control(const char *name)
-{
-    (void) name;
-}
+void AudioPanel::on_play_triggered(void) { emit play_triggered(); }
 
-void AudioPanel::on_play_triggered(void)
-{
-    emit play_triggered();
-}
-
-void AudioPanel::on_stop_triggered(void)
-{
-    emit stop_triggered();
-}
+void AudioPanel::on_stop_triggered(void) { emit stop_triggered(); }
 
 } /* namespace Qt */
 
 } /* namespace Gnuitar */
-
