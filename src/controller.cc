@@ -1,6 +1,7 @@
 #include <gnu-guitar-qt/controller.h>
 
 #include <rtaudio/api-specifier.hpp>
+#include <rtaudio/ladspa-processor.hpp>
 
 namespace Gnuitar {
 
@@ -28,17 +29,23 @@ Controller::Controller(void) {
 Controller::~Controller(void) {}
 
 void Controller::add_effect(const QString &effect_name) {
-  /*
-  auto effect = driver_manager.add_effect (effect_name.toStdString ());
-  */
+
+  auto effect = new RtAudio::LadspaProcessor;
+  if (!ladspa_plugins.find(effect_name.toStdString(), *effect)) {
+    delete effect;
+    // TODO : log this error
+    return;
+  }
+
+  effect->instantiate(48000);
+  effect->activate();
+  // TODO : have user select the
+  //        input and output
+  effect->selectInput("Input");
+  effect->selectOutput("Output");
+  session.setProcessor(effect);
 
   auto effect_view = new EffectView(effect_name);
-
-  /*
-  auto control_set = effect->get_control_set ();
-  for (const auto& control : control_set)
-    effect_view->add_control (control.get_label ().c_str ());
-  */
 
   main_window.add_effect(effect_view);
 }
@@ -48,23 +55,27 @@ void Controller::on_effect_changed(const QString &effect_name,
   (void)effect_name;
   (void)control_name;
   (void)value;
-  /*
-    driver_manager.set_control_value (effect_name.toStdString (),
-                                      control_name.toStdString (),
-                                      value);
-   */
 }
 
 void Controller::on_play_selected(void) {
-  /*
-  driver_manager.start_driver ();
-  */
+
+  RtAudio::StreamParameters iparams;
+  RtAudio::StreamParameters oparams;
+  RtAudio::StreamOptions options;
+
+  unsigned int buffer_frames = 512;
+
+  session.openStream(&oparams,
+                     &iparams,
+                     RTAUDIO_FLOAT32,
+                     48000UL,
+                     &buffer_frames,
+                     &options);
+  session.startStream();
 }
 
 void Controller::on_stop_selected(void) {
-  /*
-  driver_manager.stop_driver ();
-  */
+  session.stopStream();
 }
 
 void Controller::update_effect_list(void) {
