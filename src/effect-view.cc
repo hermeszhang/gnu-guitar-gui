@@ -15,6 +15,7 @@ EffectView::EffectView(const QString &label_text_, QWidget *parent)
   label->setFixedSize(200, 100);
 
   layout = new QHBoxLayout;
+  layout->setAlignment(::Qt::AlignLeft);
   layout->addWidget(label);
   setLayout(layout);
 
