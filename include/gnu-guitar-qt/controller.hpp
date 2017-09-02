@@ -6,6 +6,12 @@
 #include <rtaudio/ladspa-plugins.hpp>
 #include <rtaudio/session.hpp>
 
+namespace RtAudio {
+
+class CompositeProcessor;
+
+} // namespace RtAudio
+
 namespace GnuGuitar {
 
 namespace Qt {
@@ -31,6 +37,7 @@ protected:
 
 private:
   RtAudio::LadspaPlugins ladspaPlugins;
+  RtAudio::CompositeProcessor *processor;
   RtAudio::Session session;
   MainWindow *mainWindow;
 }; /* class Controller */
