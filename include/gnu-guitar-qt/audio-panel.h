@@ -1,10 +1,10 @@
 #ifndef GNUITAR_AUDIO_PANEL_H
 #define GNUITAR_AUDIO_PANEL_H
 
-#include <QHBoxLayout>
 #include <QWidget>
 
-#include "button.h"
+class QPushButton;
+class QHBoxLayout;
 
 namespace Gnuitar {
 
@@ -15,18 +15,16 @@ class AudioPanel : public QWidget {
 public:
   AudioPanel(QWidget *parent = nullptr);
   ~AudioPanel(void);
-  void add_control(const char *name);
 public slots:
-  void on_play_triggered(void);
-  void on_stop_triggered(void);
+  void onPowerButtonClicked(void);
 signals:
   void play_triggered(void);
   void stop_triggered(void);
 
 private:
+  bool on;
   QHBoxLayout *layout;
-  Button *play_button;
-  Button *stop_button;
+  QPushButton *powerButton;
 }; /* class AudioPanel */
 
 } /* namespace Qt */
