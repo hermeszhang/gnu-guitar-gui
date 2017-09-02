@@ -1,7 +1,12 @@
 #include <gnu-guitar-qt/controller.h>
 
+#include <gnu-guitar-qt/ladspa-setup.hpp>
+
 #include <rtaudio/api-specifier.hpp>
 #include <rtaudio/ladspa-processor.hpp>
+
+// TODO : remove
+using namespace GnuGuitar;
 
 namespace Gnuitar {
 
@@ -39,14 +44,36 @@ void Controller::add_effect(const QString &effect_name) {
 
   effect->instantiate(48000);
   effect->activate();
+
+  std::vector<std::string> inputs;
+  effect->listInputs(inputs);
+
+  std::vector<std::string> outputs;
+  effect->listOutputs(outputs);
+
+  LadspaSetup ladspaSetup;
+  for (const auto &input : inputs)
+    ladspaSetup.addInput(input);
+  for (const auto &output : outputs)
+    ladspaSetup.addOutput(output);
+
+  ladspaSetup.exec();
+
+  if (ladspaSetup.cancelled()) {
+    delete effect;
+    return;
+  }
+
+  auto inputName = ladspaSetup.getInputName();
+  auto outputName = ladspaSetup.getOutputName();
+
   // TODO : have user select the
   //        input and output
-  effect->selectInput("Input");
-  effect->selectOutput("Output");
+  effect->selectInput(inputName);
+  effect->selectOutput(outputName);
   session.setProcessor(effect);
 
   auto effect_view = new EffectView(effect_name);
-
   main_window.add_effect(effect_view);
 }
 
