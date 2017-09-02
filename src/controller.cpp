@@ -69,10 +69,18 @@ void Controller::add_effect(const QString &effect_name) {
 
   effect->selectInput(inputName);
   effect->selectOutput(outputName);
-  session.setProcessor(effect);
+
+  std::vector<std::string> controls;
+  effect->listControls(controls);
 
   auto effect_view = new EffectView(effect_name);
+
+  for (const auto &control : controls)
+    effect_view->add_control(control.c_str());
+
   main_window.add_effect(effect_view);
+
+  session.setProcessor(effect);
 }
 
 void Controller::on_effect_changed(const QString &effect_name,
