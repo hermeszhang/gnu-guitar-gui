@@ -5,7 +5,9 @@ namespace Gnuitar {
 namespace Qt {
 
 Knob::Knob(const QString &name, QWidget *parent) : QWidget(parent) {
-  dial = new QDial;
+
+  dial = new QDial(this);
+  dial->setNotchesVisible(true);
 
   connect(dial, &QDial::sliderReleased, this, &Knob::on_released);
 
