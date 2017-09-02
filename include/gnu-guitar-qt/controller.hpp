@@ -1,7 +1,7 @@
 #ifndef GNU_GUITAR_QT_CONTROLLER_HPP
 #define GNU_GUITAR_QT_CONTROLLER_HPP
 
-#include <gnu-guitar-qt/main-window.h>
+#include <QObject>
 
 #include <rtaudio/ladspa-plugins.hpp>
 #include <rtaudio/session.hpp>
@@ -10,25 +10,29 @@ namespace GnuGuitar {
 
 namespace Qt {
 
+class MainWindow;
+
 class Controller : public QObject {
   Q_OBJECT
 public:
-  Controller(void);
-  ~Controller(void);
-  void add_effect(const QString &effect_name);
+  Controller();
+  ~Controller();
 protected slots:
-  void on_effect_changed(const QString &effect_name,
-                         const QString &control_name, int value);
-  void on_play_selected(void);
-  void on_stop_selected(void);
+  void onEffectChanged(const QString &effectName,
+                       const QString &controlName,
+                       int value);
+  void onPlayClicked();
+  void onStopClicked();
+  void onQuitClicked();
 
 protected:
-  void update_effect_list(void);
+  void addEffect(const QString &name);
+  void updateEffectList();
 
 private:
-  RtAudio::LadspaPlugins ladspa_plugins;
+  RtAudio::LadspaPlugins ladspaPlugins;
   RtAudio::Session session;
-  Gnuitar::Qt::MainWindow main_window;
+  MainWindow *mainWindow;
 }; /* class Controller */
 
 } /* namespace Qt */

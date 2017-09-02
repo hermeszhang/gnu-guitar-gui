@@ -1,6 +1,7 @@
 #include <gnu-guitar-qt/controller.hpp>
 
 #include <gnu-guitar-qt/ladspa-setup.hpp>
+#include <gnu-guitar-qt/main-window.hpp>
 
 #include <rtaudio/api-specifier.hpp>
 #include <rtaudio/ladspa-processor.hpp>
@@ -12,31 +13,41 @@ namespace GnuGuitar {
 
 namespace Qt {
 
-Controller::Controller(void) {
-  main_window.resize(640, 480);
-  main_window.show();
+Controller::Controller() {
 
-  main_window.connect(&main_window, &MainWindow::effect_changed, this,
-                      &Controller::on_effect_changed);
-  main_window.connect(&main_window, &MainWindow::effect_selected, this,
-                      &Controller::add_effect);
-  main_window.connect(&main_window, &MainWindow::play_selected, this,
-                      &Controller::on_play_selected);
-  main_window.connect(&main_window, &MainWindow::stop_selected, this,
-                      &Controller::on_stop_selected);
+  mainWindow = new MainWindow();
+
+  mainWindow->resize(640, 480);
+  mainWindow->show();
+
+  mainWindow->connect(mainWindow, &MainWindow::effectChanged,
+                      this, &Controller::onEffectChanged);
+  mainWindow->connect(mainWindow, &MainWindow::effectClicked,
+                      this, &Controller::addEffect);
+  mainWindow->connect(mainWindow, &MainWindow::playClicked,
+                      this, &Controller::onPlayClicked);
+  mainWindow->connect(mainWindow, &MainWindow::stopClicked,
+                      this, &Controller::onStopClicked);
+  mainWindow->connect(mainWindow, &MainWindow::quitClicked,
+                      this, &Controller::onQuitClicked);
 
   session.openRtApi(RtAudio::ApiSpecifier::ALSA);
 
-  ladspa_plugins.addDefaultSearchPaths();
-  update_effect_list();
+  ladspaPlugins.addDefaultSearchPaths();
+  updateEffectList();
 }
 
-Controller::~Controller(void) {}
+Controller::~Controller() {
+  if (mainWindow != nullptr) {
+    delete mainWindow;
+    mainWindow = nullptr;
+  }
+}
 
-void Controller::add_effect(const QString &effect_name) {
+void Controller::addEffect(const QString &effect_name) {
 
   auto effect = new RtAudio::LadspaProcessor;
-  if (!ladspa_plugins.find(effect_name.toStdString(), *effect)) {
+  if (!ladspaPlugins.find(effect_name.toStdString(), *effect)) {
     delete effect;
     // TODO : log this error
     return;
@@ -73,50 +84,55 @@ void Controller::add_effect(const QString &effect_name) {
   std::vector<std::string> controls;
   effect->listControls(controls);
 
-  auto effect_view = new EffectView(effect_name);
+  auto effectView = new EffectView(effect_name);
 
   for (const auto &control : controls)
-    effect_view->add_control(control.c_str());
+    effectView->add_control(control.c_str());
 
-  main_window.add_effect(effect_view);
+  mainWindow->addEffect(effectView);
 
   session.setProcessor(effect);
 }
 
-void Controller::on_effect_changed(const QString &effect_name,
-                                   const QString &control_name, int value) {
+void Controller::onEffectChanged(const QString &effect_name,
+                                 const QString &control_name,
+                                 int value) {
   (void)effect_name;
   (void)control_name;
   (void)value;
 }
 
-void Controller::on_play_selected(void) {
+void Controller::onPlayClicked() {
 
   RtAudio::StreamParameters iparams;
   RtAudio::StreamParameters oparams;
   RtAudio::StreamOptions options;
 
-  unsigned int buffer_frames = 512;
+  unsigned int bufferFrames = 512;
 
   session.openStream(&oparams,
                      &iparams,
                      RTAUDIO_FLOAT32,
                      48000UL,
-                     &buffer_frames,
+                     &bufferFrames,
                      &options);
   session.startStream();
 }
 
-void Controller::on_stop_selected(void) {
+void Controller::onStopClicked() {
   session.stopStream();
 }
 
-void Controller::update_effect_list(void) {
-  ladspa_plugins.update();
+void Controller::onQuitClicked() {
+  mainWindow->close();
+}
 
-  auto effect_list = ladspa_plugins.list();
-  for (const auto &effect_name : effect_list)
-    main_window.add_effect_choice(effect_name.c_str());
+void Controller::updateEffectList() {
+  ladspaPlugins.update();
+
+  auto effectList = ladspaPlugins.list();
+  for (const auto &effectName : effectList)
+    mainWindow->addEffectChoice(effectName.c_str());
 }
 
 } /* namespace Qt */
