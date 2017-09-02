@@ -1,6 +1,8 @@
 #include <gnu-guitar-qt/effect-view.h>
 #include <gnu-guitar-qt/knob.h>
 
+#include <QSizePolicy>
+
 namespace Gnuitar {
 
 namespace Qt {
@@ -9,7 +11,9 @@ EffectView::EffectView(const QString &label_text_, QWidget *parent)
     : QWidget(parent) {
   label = new QLabel;
   label->setTextFormat(::Qt::RichText);
-  label->setAlignment(::Qt::AlignCenter);
+  label->setAlignment(::Qt::AlignLeft | ::Qt::AlignVCenter);
+  label->setFixedSize(200, 100);
+
   layout = new QHBoxLayout;
   layout->addWidget(label);
   setLayout(layout);
@@ -20,11 +24,15 @@ EffectView::EffectView(const QString &label_text_, QWidget *parent)
 EffectView::~EffectView(void) {}
 
 void EffectView::add_control(const QString &control_name) {
+
   auto control_knob = new Knob(control_name, this);
+
   auto control_callback = [this, control_knob] {
     EffectView::on_knob_changed(control_knob);
   };
+
   connect(control_knob, &Knob::released, this, control_callback);
+
   layout->addWidget(control_knob);
 }
 
