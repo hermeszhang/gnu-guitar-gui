@@ -12,6 +12,7 @@ namespace Qt {
 
 Rack::Rack(QWidget *parent) : QWidget(parent) {
   layout = new QVBoxLayout;
+  layout->setAlignment(::Qt::AlignTop);
   setLayout(layout);
 }
 
