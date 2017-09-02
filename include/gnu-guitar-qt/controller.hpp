@@ -1,12 +1,12 @@
-#ifndef GNUITAR_QT_CONTROLLER_H
-#define GNUITAR_QT_CONTROLLER_H
+#ifndef GNU_GUITAR_QT_CONTROLLER_HPP
+#define GNU_GUITAR_QT_CONTROLLER_HPP
 
 #include <gnu-guitar-qt/main-window.h>
 
 #include <rtaudio/ladspa-plugins.hpp>
 #include <rtaudio/session.hpp>
 
-namespace Gnuitar {
+namespace GnuGuitar {
 
 namespace Qt {
 
@@ -33,6 +33,6 @@ private:
 
 } /* namespace Qt */
 
-} /* namespace Gnuitar */
+} /* namespace GnuGuitar */
 
-#endif /* GNUITAR_QT_CONTROLLER_H */
+#endif /* GNU_GUITAR_QT_CONTROLLER_HPP */

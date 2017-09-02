@@ -1,4 +1,4 @@
-#include <gnu-guitar-qt/controller.h>
+#include <gnu-guitar-qt/controller.hpp>
 
 #include <gnu-guitar-qt/ladspa-setup.hpp>
 
@@ -6,9 +6,9 @@
 #include <rtaudio/ladspa-processor.hpp>
 
 // TODO : remove
-using namespace GnuGuitar;
+using namespace Gnuitar::Qt;
 
-namespace Gnuitar {
+namespace GnuGuitar {
 
 namespace Qt {
 
@@ -67,8 +67,6 @@ void Controller::add_effect(const QString &effect_name) {
   auto inputName = ladspaSetup.getInputName();
   auto outputName = ladspaSetup.getOutputName();
 
-  // TODO : have user select the
-  //        input and output
   effect->selectInput(inputName);
   effect->selectOutput(outputName);
   session.setProcessor(effect);
@@ -115,4 +113,4 @@ void Controller::update_effect_list(void) {
 
 } /* namespace Qt */
 
-} /* namespace Gnuitar */
+} /* namespace GnuGuitar */

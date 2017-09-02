@@ -23,11 +23,11 @@ set (INCDIR "${PROJECT_SOURCE_DIR}/include/gnu-guitar-qt")
 set (SRCDIR "${CMAKE_CURRENT_SOURCE_DIR}")
 
 add_executable("gnu-guitar-qt"
-  "${SRCDIR}/gnuitar-qt.cc"
+  "${SRCDIR}/gnu-guitar-qt.cpp"
   "${SRCDIR}/audio-panel.cc"
   "${INCDIR}/audio-panel.h"
-  "${SRCDIR}/controller.cc"
-  "${INCDIR}/controller.h"
+  "${SRCDIR}/controller.cpp"
+  "${INCDIR}/controller.hpp"
   "${SRCDIR}/effect-view.cc"
   "${INCDIR}/effect-view.h"
   "${SRCDIR}/button.cc"

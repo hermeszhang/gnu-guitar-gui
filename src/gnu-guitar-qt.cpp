@@ -1,4 +1,4 @@
-#include <gnu-guitar-qt/controller.h>
+#include <gnu-guitar-qt/controller.hpp>
 
 #include <QApplication>
 #include <QDebug>
@@ -57,7 +57,7 @@ int main(int argc, char *argv[]) {
 
   QApplication a(argc, argv);
 
-  Gnuitar::Qt::Controller controller;
+  GnuGuitar::Qt::Controller controller;
 
   return a.exec();
 }
