@@ -3,7 +3,7 @@
 namespace GnuGuitar {
 
 Preferences::Preferences(QWidget *parent) : QDialog(parent) {
-  setWindowTitle("GNU Guitar Preferences");
+  setWindowTitle("Preferences");
 }
 
 Preferences::~Preferences() {
