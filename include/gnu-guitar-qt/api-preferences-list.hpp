@@ -3,6 +3,7 @@
 
 #include <QWidget>
 
+class QString;
 class QVBoxLayout;
 
 namespace GnuGuitar {
@@ -12,9 +13,12 @@ namespace Qt {
 class ApiPreferencesList final : public QWidget {
   Q_OBJECT
 public:
-    ApiPreferencesList(QWidget *parent = nullptr);
-    ~ApiPreferencesList();
-    QString getSelectedApi() const;
+  ApiPreferencesList(QWidget *parent = nullptr);
+  ~ApiPreferencesList();
+  QString getSelectedApi() const;
+protected:
+  void addApi(const QString &name);
+  void createApiList();
 private:
     QVBoxLayout *layout;
 };

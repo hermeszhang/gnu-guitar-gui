@@ -11,6 +11,7 @@ namespace Qt {
 Preferences::Preferences(QWidget *parent) : QDialog(parent) {
   setWindowTitle("Preferences");
   scrollArea = new QScrollArea(this);
+  scrollArea->setWidgetResizable(true);
   apiPreferencesList = new ApiPreferencesList(this);
   scrollArea->setWidget(apiPreferencesList);
 }
