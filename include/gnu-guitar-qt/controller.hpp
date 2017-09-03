@@ -28,6 +28,7 @@ protected slots:
                        const QString &controlName,
                        int value);
   void onPlayClicked();
+  void onPreferencesClicked();
   void onStopClicked();
   void onQuitClicked();
 

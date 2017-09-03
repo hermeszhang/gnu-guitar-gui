@@ -2,14 +2,13 @@
 
 #include <gnu-guitar-qt/ladspa-setup.hpp>
 #include <gnu-guitar-qt/main-window.hpp>
+#include <gnu-guitar-qt/preferences.hpp>
 
 #include <rtaudio/api-specifier.hpp>
 #include <rtaudio/composite-processor.hpp>
 #include <rtaudio/ladspa-port.hpp>
 #include <rtaudio/ladspa-processor.hpp>
 #include <rtaudio/processor-visitor.hpp>
-
-#include <iostream>
 
 // TODO : remove
 using namespace Gnuitar::Qt;
@@ -84,6 +83,8 @@ Controller::Controller() {
                       this, &Controller::addEffect);
   mainWindow->connect(mainWindow, &MainWindow::playClicked,
                       this, &Controller::onPlayClicked);
+  mainWindow->connect(mainWindow, &MainWindow::preferencesClicked,
+                      this, &Controller::onPreferencesClicked);
   mainWindow->connect(mainWindow, &MainWindow::stopClicked,
                       this, &Controller::onStopClicked);
   mainWindow->connect(mainWindow, &MainWindow::quitClicked,
@@ -186,6 +187,11 @@ void Controller::onPlayClicked() {
                      &bufferFrames,
                      &options);
   session.startStream();
+}
+
+void Controller::onPreferencesClicked() {
+  Preferences preferences;
+  preferences.exec();
 }
 
 void Controller::onStopClicked() {

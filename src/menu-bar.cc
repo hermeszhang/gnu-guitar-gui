@@ -24,6 +24,8 @@ MenuBar::MenuBar(QWidget *parent) : QMenuBar(parent) {
   redo_action = edit_menu->addAction("Redo");
   edit_menu->addSeparator();
   preferences_action = edit_menu->addAction("Preferences");
+  connect(preferences_action, &QAction::triggered,
+          this, &MenuBar::onPreferencesClicked);
 
   view_menu = addMenu("View");
   zoom_in_action = view_menu->addAction("Zoom In");
@@ -74,6 +76,10 @@ void MenuBar::on_report_an_issue_selected(void) {
 }
 
 void MenuBar::on_about_selected(void) {}
+
+void MenuBar::onPreferencesClicked() {
+  emit preferencesClicked();
+}
 
 } /* namespace Qt */
 

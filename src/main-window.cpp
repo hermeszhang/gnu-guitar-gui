@@ -10,6 +10,8 @@ namespace Qt {
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
 
+  setWindowTitle("GNU Guitar");
+
   scrollArea = new QScrollArea(this);
   scrollArea->setWidgetResizable(true);
   setCentralWidget(scrollArea);
@@ -34,6 +36,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
           this, &MainWindow::onEffectChanged);
   connect(menuBar, &MenuBar::effect_selected,
           this, &MainWindow::onEffectClicked);
+  connect(menuBar, &MenuBar::preferencesClicked,
+          this, &MainWindow::onPreferencesClicked);
   connect(menuBar, &MenuBar::quit_selected,
           this, &MainWindow::onQuitClicked);
   connect(audioPanel, &AudioPanel::play_triggered,
@@ -72,6 +76,10 @@ void MainWindow::onEffectChanged(const QString &effectName,
 
 void MainWindow::onEffectClicked(const QString &effectName) {
   emit effectClicked(effectName);
+}
+
+void MainWindow::onPreferencesClicked() {
+  emit preferencesClicked();
 }
 
 void MainWindow::onQuitClicked() {

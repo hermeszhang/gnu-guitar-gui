@@ -33,11 +33,14 @@ signals:
                      int controlValue);
   void effectClicked(const QString &effectName);
   void playClicked();
+  void preferencesClicked();
   void stopClicked();
   void quitClicked();
 private slots:
   /// @brief User clicked the play button.
   void onPlayClicked();
+  /// @brief User wants to open preferences.
+  void onPreferencesClicked();
   /// @brief User clicked the stop button.
   void onStopClicked();
   /// @brief User changed the value of an effect

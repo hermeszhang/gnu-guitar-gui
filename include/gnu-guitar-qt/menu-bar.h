@@ -21,9 +21,11 @@ private slots:
   void on_view_documentation_selected(void);
   void on_report_an_issue_selected(void);
   void on_about_selected(void);
+  void onPreferencesClicked();
 signals:
   void quit_selected(void);
   void effect_selected(const QString &effect_name);
+  void preferencesClicked();
 
 private:
   QMenu *file_menu;
