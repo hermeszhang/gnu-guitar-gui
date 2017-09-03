@@ -182,7 +182,7 @@ void Controller::onPlayClicked() {
 
   session.openStream(&oparams,
                      &iparams,
-                     RTAUDIO_FLOAT32,
+                     RtAudio::Format::Float32,
                      48000UL,
                      &bufferFrames,
                      &options);
