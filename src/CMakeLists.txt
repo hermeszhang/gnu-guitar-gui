@@ -42,6 +42,8 @@ add_executable("gnu-guitar-qt"
   "${INCDIR}/main-window.hpp"
   "${SRCDIR}/menu-bar.cc"
   "${INCDIR}/menu-bar.h"
+  "${SRCDIR}/preferences.cpp"
+  "${INCDIR}/preferences.hpp"
   "${SRCDIR}/rack.cc"
   "${INCDIR}/rack.h"
   "resources.qrc")
