@@ -24,6 +24,8 @@ set (SRCDIR "${CMAKE_CURRENT_SOURCE_DIR}")
 
 add_executable("gnu-guitar-qt"
   "${SRCDIR}/gnu-guitar-qt.cpp"
+  "${SRCDIR}/api-preferences-list.cpp"
+  "${INCDIR}/api-preferences-list.hpp"
   "${SRCDIR}/audio-panel.cc"
   "${INCDIR}/audio-panel.h"
   "${SRCDIR}/controller.cpp"
