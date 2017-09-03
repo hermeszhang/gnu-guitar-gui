@@ -9,6 +9,8 @@ namespace GnuGuitar {
 
 LadspaSetup::LadspaSetup(QWidget *parent) : QDialog(parent) {
 
+  setWindowTitle("Ladspa Setup");
+
   cancelPushed  = false;
 
   layout = new QGridLayout(this);
