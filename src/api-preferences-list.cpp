@@ -56,7 +56,7 @@ void ApiPreferencesList::addApi(const QString &apiName) {
 
 void ApiPreferencesList::createApiList() {
   std::vector<RtAudio::ApiSpecifier> apiList;
-  RtAudio::getCompiledApi(apiList);
+  RtAudio::getCompiledApis(apiList);
   for (auto api : apiList) {
     switch (api) {
       case RtAudio::ApiSpecifier::ALSA:
