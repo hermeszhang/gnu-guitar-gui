@@ -1,0 +1,5 @@
+cmake_minimum_required(VERSION 2.6)
+
+if (NOT GNU_GUITAR_ARTWORK_DIR)
+
+endif (NOT GNU_GUITAR_ARTWORK_DIR)

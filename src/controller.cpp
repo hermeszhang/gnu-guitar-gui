@@ -10,6 +10,8 @@
 #include <rtaudio/ladspa-processor.hpp>
 #include <rtaudio/processor-visitor.hpp>
 
+#include <iostream>
+
 // TODO : remove
 using namespace Gnuitar::Qt;
 
@@ -178,6 +180,9 @@ void Controller::onPlayClicked() {
   RtAudio::StreamParameters oparams;
   RtAudio::StreamOptions options;
 
+  iparams.setDeviceID(3);
+  //oparams.setDeviceID(session.getDefaultOutputDevice());
+
   unsigned int bufferFrames = 512;
 
   session.openStream(&oparams,
@@ -186,6 +191,7 @@ void Controller::onPlayClicked() {
                      48000UL,
                      &bufferFrames,
                      &options);
+
   session.startStream();
 }
 

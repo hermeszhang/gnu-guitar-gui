@@ -3,28 +3,28 @@
 
 #include <QWidget>
 
-class QPushButton;
 class QHBoxLayout;
 
-namespace Gnuitar {
+namespace GnuGuitar {
 
 namespace Qt {
+
+class PowerButton;
 
 class AudioPanel : public QWidget {
   Q_OBJECT
 public:
   AudioPanel(QWidget *parent = nullptr);
   ~AudioPanel(void);
-public slots:
-  void onPowerButtonClicked(void);
 signals:
   void play_triggered(void);
   void stop_triggered(void);
-
+protected slots:
+  void onPowerButtonActivated();
+  void onPowerButtonDeactivated();
 private:
-  bool on;
   QHBoxLayout *layout;
-  QPushButton *powerButton;
+  PowerButton *powerButton;
 }; /* class AudioPanel */
 
 } /* namespace Qt */

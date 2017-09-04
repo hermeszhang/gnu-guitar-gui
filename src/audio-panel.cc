@@ -1,42 +1,24 @@
 #include <gnu-guitar-qt/audio-panel.h>
 
+#include <gnu-guitar-qt/power-button.hpp>
+
 #include <QHBoxLayout>
-#include <QPushButton>
 
-namespace {
-
-void setStopped(QPushButton *pushButton) {
-  pushButton->setText("Start");
-  pushButton->setStyleSheet("QPushButton { background: rgba(0, 255, 0, 0) }");
-}
-
-void setStarted(QPushButton *pushButton) {
-  pushButton->setText("Stop");
-  pushButton->setStyleSheet("QPushButton { background: rgba(255, 0, 0, 0) }");
-}
-
-} // namespace
-
-namespace Gnuitar {
+namespace GnuGuitar {
 
 namespace Qt {
 
 AudioPanel::AudioPanel(QWidget *parent) : QWidget(parent) {
 
-  on = false;
-
   setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
   layout = new QHBoxLayout();
   layout->setAlignment(::Qt::AlignVCenter | ::Qt::AlignLeft);
 
-  powerButton = new QPushButton(this);
-  auto width = 75;
-  auto height = 50;
-  powerButton->setFixedSize(width, height);
-  setStopped(powerButton);
-
-  connect(powerButton, &QPushButton::clicked,
-          this, &AudioPanel::onPowerButtonClicked);
+  powerButton = new PowerButton(this);
+  connect(powerButton, &PowerButton::activated,
+          this, &AudioPanel::onPowerButtonActivated);
+  connect(powerButton, &PowerButton::deactivated,
+          this, &AudioPanel::onPowerButtonDeactivated);
 
   layout->addWidget(powerButton);
 
@@ -54,16 +36,12 @@ AudioPanel::~AudioPanel(void) {
   }
 }
 
-void AudioPanel::onPowerButtonClicked() {
-  if (!on) {
-    setStarted(powerButton);
-    emit play_triggered();
-    on = true;
-  } else {
-    setStopped(powerButton);
-    emit stop_triggered();
-    on = false;
-  }
+void AudioPanel::onPowerButtonActivated() {
+  emit play_triggered();
+}
+
+void AudioPanel::onPowerButtonDeactivated() {
+  emit stop_triggered();
 }
 
 } /* namespace Qt */
