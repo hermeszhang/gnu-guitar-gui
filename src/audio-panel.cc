@@ -14,7 +14,7 @@ AudioPanel::AudioPanel(QWidget *parent) : QWidget(parent) {
 
   setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
   layout = new QHBoxLayout();
-  layout->setAlignment(::Qt::AlignVCenter | ::Qt::AlignLeft);
+  layout->setAlignment(::Qt::AlignCenter);
 
   powerButton = new PowerButton(this);
   connect(powerButton, &PowerButton::activated,
