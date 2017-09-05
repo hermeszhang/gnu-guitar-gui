@@ -46,6 +46,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
           this, &MainWindow::onStopClicked);
 
   scrollArea->setWidget(centralWidget);
+
+  setupColors();
 }
 
 MainWindow::~MainWindow() {
@@ -84,6 +86,13 @@ void MainWindow::onPreferencesClicked() {
 
 void MainWindow::onQuitClicked() {
   emit quitClicked();
+}
+
+void MainWindow::setupColors() {
+  auto palette_ = centralWidget->palette();
+  palette_.setColor(QPalette::Background, QColor(15, 15, 15));
+  centralWidget->setAutoFillBackground(true);
+  centralWidget->setPalette(palette_);
 }
 
 } // namespace Qt

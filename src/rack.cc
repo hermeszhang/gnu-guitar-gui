@@ -11,6 +11,7 @@ namespace Gnuitar {
 namespace Qt {
 
 Rack::Rack(QWidget *parent) : QWidget(parent) {
+  setupColors();
   layout = new QVBoxLayout;
   layout->setAlignment(::Qt::AlignTop);
   setLayout(layout);
@@ -32,6 +33,13 @@ void Rack::add_effect(EffectView *effect_view) {
 void Rack::on_effect_changed(const QString &effect_name,
                              const QString &control_name, int control_value) {
   emit effect_changed(effect_name, control_name, control_value);
+}
+
+void Rack::setupColors() {
+  auto palette_ = palette();
+  palette_.setColor(QPalette::Background, QColor(17, 17, 17));
+  setAutoFillBackground(true);
+  setPalette(palette_);
 }
 
 } /* namespace Qt */

@@ -21,6 +21,8 @@ public:
   void set_label(const QString &label);
 signals:
   void control_changed(const QString &label, int value);
+protected:
+  void setupColors();
 protected slots:
   void on_knob_changed(const Knob *knob);
 

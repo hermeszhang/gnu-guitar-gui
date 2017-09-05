@@ -7,8 +7,10 @@ namespace Gnuitar {
 
 namespace Qt {
 
-EffectView::EffectView(const QString &label_text_, QWidget *parent)
-    : QWidget(parent) {
+EffectView::EffectView(const QString &label_text_, QWidget *parent) : QWidget(parent) {
+
+  setupColors();
+
   label = new QLabel;
   label->setTextFormat(::Qt::RichText);
   label->setAlignment(::Qt::AlignLeft | ::Qt::AlignVCenter);
@@ -48,6 +50,13 @@ void EffectView::on_knob_changed(const Knob *knob) {
   auto text = knob->get_label();
   auto value = knob->get_value();
   emit control_changed(text, value);
+}
+
+void EffectView::setupColors() {
+  auto palette_ = palette();
+  palette_.setColor(QPalette::Background, QColor(20, 20, 20));
+  setPalette(palette_);
+  setAutoFillBackground(true);
 }
 
 } /* namespace Qt */

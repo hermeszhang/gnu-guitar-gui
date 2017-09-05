@@ -22,6 +22,8 @@ signals:
 protected slots:
   void on_effect_changed(const QString &effect_name,
                          const QString &control_name, int value);
+protected:
+  void setupColors();
 
 private:
   QVBoxLayout *layout;

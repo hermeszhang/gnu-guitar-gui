@@ -53,6 +53,10 @@ private slots:
   /// @brief User clicked the 'quit' button.
   void onQuitClicked();
 
+protected:
+  /// @brief Assigns colors to the window.
+  void setupColors();
+
 private:
   /// @brief The area that will be encapsulated
   ///  by scroll bars for navigation.
