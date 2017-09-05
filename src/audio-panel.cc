@@ -10,6 +10,8 @@ namespace Qt {
 
 AudioPanel::AudioPanel(QWidget *parent) : QWidget(parent) {
 
+  setupColors();
+
   setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
   layout = new QHBoxLayout();
   layout->setAlignment(::Qt::AlignVCenter | ::Qt::AlignLeft);
@@ -42,6 +44,13 @@ void AudioPanel::onPowerButtonActivated() {
 
 void AudioPanel::onPowerButtonDeactivated() {
   emit stop_triggered();
+}
+
+void AudioPanel::setupColors() {
+  auto panelPalette = palette();
+  panelPalette.setColor(QPalette::Background, QColor(10, 10, 10));
+  setAutoFillBackground(true);
+  setPalette(panelPalette);
 }
 
 } /* namespace Qt */

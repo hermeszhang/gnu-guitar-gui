@@ -22,6 +22,7 @@ signals:
 protected slots:
   void onPowerButtonActivated();
   void onPowerButtonDeactivated();
+  void setupColors();
 private:
   QHBoxLayout *layout;
   PowerButton *powerButton;
