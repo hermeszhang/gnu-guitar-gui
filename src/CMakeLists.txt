@@ -5,7 +5,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 if(MSVC)
-  set(CMAKE_CXX_FLAGS "/Wall")
+  set(CMAKE_CXX_FLAGS "/W3 /EHsc /std:c++latest")
 else(MSVC)
   set(CMAKE_CXX_FLAGS "-Wall -Wextra -Werror -Wfatal-errors")
 endif(MSVC)
