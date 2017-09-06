@@ -1,4 +1,5 @@
-#include <gnu-guitar-qt/effect-view.h>
+#include <gnu-guitar-qt/effect-view.hpp>
+
 #include <gnu-guitar-qt/knob.h>
 
 #include <QSizePolicy>

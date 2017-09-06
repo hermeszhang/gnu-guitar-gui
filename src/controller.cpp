@@ -2,6 +2,7 @@
 
 #include <gnu-guitar-qt/driver.hpp>
 #include <gnu-guitar-qt/driver.hpp>
+#include <gnu-guitar-qt/effect-view.hpp>
 #include <gnu-guitar-qt/main-window.hpp>
 
 #ifdef GNU_GUITAR_QT_WITH_CORE

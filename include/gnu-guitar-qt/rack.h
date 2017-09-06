@@ -4,11 +4,11 @@
 #include <QVBoxLayout>
 #include <QWidget>
 
-#include <gnu-guitar-qt/effect-view.h>
-
 namespace Gnuitar {
 
 namespace Qt {
+
+class EffectView;
 
 class Rack final : public QWidget {
   Q_OBJECT

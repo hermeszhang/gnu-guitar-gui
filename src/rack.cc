@@ -1,5 +1,6 @@
 #include <gnu-guitar-qt/rack.h>
 
+#include <gnu-guitar-qt/effect-view.hpp>
 #include <gnu-guitar-qt/knob.h>
 
 #include <QDial>
@@ -20,6 +21,7 @@ Rack::Rack(QWidget *parent) : QWidget(parent) {
 Rack::~Rack(void) {}
 
 void Rack::add_effect(EffectView *effect_view) {
+
   layout->addWidget(effect_view);
 
   auto effect_callback = [this, effect_view](const QString &control_name,
