@@ -1,7 +1,7 @@
-GNU Guitar
-==========
+GNU Guitar Qt
+=============
 
-[![Travis Badge](https://travis-ci.org/gnuitar/gnuitar.svg?branch=master)](https://travis-ci.org/gnu-guitar/gnu-guitar-qt)
+[![Travis Badge](https://travis-ci.org/gnu-guitar/gnu-guitar-qt.svg?branch=master)](https://travis-ci.org/gnu-guitar/gnu-guitar-qt)
 
 The Qt implementation of the GNU Guitar application.
 
