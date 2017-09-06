@@ -1,7 +1,5 @@
 #include <gnu-guitar-qt/api-preferences-list.hpp>
 
-#include <rtaudio/rtaudio.hpp>
-
 #include <iostream>
 
 #include <QGridLayout>
@@ -55,41 +53,7 @@ void ApiPreferencesList::addApi(const QString &apiName) {
 }
 
 void ApiPreferencesList::createApiList() {
-  std::vector<RtAudio::ApiSpecifier> apiList;
-  RtAudio::getCompiledApis(apiList);
-  for (auto api : apiList) {
-    switch (api) {
-      case RtAudio::ApiSpecifier::ALSA:
-        addApi("ALSA");
-        break;
-      case RtAudio::ApiSpecifier::Jack:
-        addApi("Jack");
-        break;
-      case RtAudio::ApiSpecifier::Pulse:
-        addApi("Pulse");
-        break;
-      case RtAudio::ApiSpecifier::WASAPI:
-        addApi("WASAPI");
-        break;
-      case RtAudio::ApiSpecifier::ASIO:
-        addApi("ASIO");
-        break;
-      case RtAudio::ApiSpecifier::CoreAudio:
-        addApi("Core Audio");
-        break;
-      case RtAudio::ApiSpecifier::OpenSoundSystem:
-        addApi("Open Sound System");
-        break;
-      case RtAudio::ApiSpecifier::DirectSound:
-        addApi("Direct Sound");
-        break;
-      case RtAudio::ApiSpecifier::Dummy:
-        addApi("Dummy");
-        break;
-      case RtAudio::ApiSpecifier::Any:
-        break;
-    }
-  }
+
 }
 
 } // namespace Qt

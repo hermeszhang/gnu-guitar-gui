@@ -1,19 +1,18 @@
 #include <gnu-guitar-qt/controller.hpp>
 
-#include <gnu-guitar-qt/ladspa-setup.hpp>
+#include <gnu-guitar-qt/driver.hpp>
+#include <gnu-guitar-qt/driver.hpp>
 #include <gnu-guitar-qt/main-window.hpp>
-#include <gnu-guitar-qt/preferences.hpp>
 
-#include <rtaudio/api-specifier.hpp>
-#include <rtaudio/composite-processor.hpp>
-#include <rtaudio/ladspa-port.hpp>
-#include <rtaudio/ladspa-processor.hpp>
-#include <rtaudio/processor-visitor.hpp>
+#ifdef GNU_GUITAR_QT_WITH_CORE
+#include <gnu-guitar-qt/core-driver.hpp>
+#else
+#include <gnu-guitar-qt/fake-driver.hpp>
+#endif // GNU_GUITAR_QT_WITH_CORE
 
-#include <iostream>
-
-// TODO : remove
 using namespace Gnuitar::Qt;
+
+#if 0
 
 namespace {
 
@@ -68,6 +67,8 @@ public:
 
 } // namespace
 
+#endif
+
 namespace GnuGuitar {
 
 namespace Qt {
@@ -91,117 +92,49 @@ Controller::Controller() {
                       this, &Controller::onStopClicked);
   mainWindow->connect(mainWindow, &MainWindow::quitClicked,
                       this, &Controller::onQuitClicked);
-
-  session.openRtApi(RtAudio::ApiSpecifier::ALSA);
-
-  processor = new RtAudio::CompositeProcessor;
-  session.setProcessor(processor);
-
-  ladspaPlugins.addDefaultSearchPaths();
-  updateEffectList();
+#ifdef GNU_GUITAR_QT_WITH_CORE
+  driver = new CoreDriver();
+#else
+  driver = new FakeDriver();
+#endif
 }
 
 Controller::~Controller() {
+  if (driver != nullptr) {
+    delete driver;
+    driver = nullptr;
+  }
   if (mainWindow != nullptr) {
     delete mainWindow;
     mainWindow = nullptr;
   }
 }
 
-void Controller::addEffect(const QString &effect_name) {
-
-  auto effect = new RtAudio::LadspaProcessor;
-  if (!ladspaPlugins.find(effect_name.toStdString(), *effect)) {
-    delete effect;
-    // TODO : log this error
-    return;
-  }
-
-  effect->instantiate(48000);
-  effect->activate();
-
-  std::vector<std::string> inputs;
-  effect->listInputs(inputs);
-
-  std::vector<std::string> outputs;
-  effect->listOutputs(outputs);
-
-  LadspaSetup ladspaSetup;
-  for (const auto &input : inputs)
-    ladspaSetup.addInput(input);
-  for (const auto &output : outputs)
-    ladspaSetup.addOutput(output);
-
-  ladspaSetup.exec();
-
-  if (ladspaSetup.cancelled()) {
-    delete effect;
-    return;
-  }
-
-  auto inputName = ladspaSetup.getInputName();
-  auto outputName = ladspaSetup.getOutputName();
-
-  effect->selectInput(inputName);
-  effect->selectOutput(outputName);
-
-  std::vector<std::string> controls;
-  effect->listControls(controls);
-
-  auto effectView = new EffectView(effect_name);
-
-  for (const auto &control : controls)
-    effectView->add_control(control.c_str());
-
-  mainWindow->addEffect(effectView);
-
-  processor->append(effect);
+void Controller::addEffect(const QString &effectName) {
+  driver->addEffect(effectName.toStdString());
 }
 
 void Controller::onEffectChanged(const QString &effectName,
                                  const QString &controlName,
                                  int value) {
-
-  float controlValue = 0.0f;
-  controlValue += value;
-  controlValue /= 100.0f;
-
-  ControlUpdater controlUpdater;
-  controlUpdater.setEffectName(effectName.toStdString());
-  controlUpdater.setControlName(controlName.toStdString());
-  controlUpdater.setControlValue(controlValue);
-
-  processor->accept(controlUpdater);
+  float valueRatio = 0.0f;
+  valueRatio = (float) value;
+  valueRatio /= 100.0f;
+  driver->setEffectControlValue(effectName.toStdString(),
+                                controlName.toStdString(),
+                                valueRatio);
 }
 
 void Controller::onPlayClicked() {
-
-  RtAudio::StreamParameters iparams;
-  RtAudio::StreamParameters oparams;
-  RtAudio::StreamOptions options;
-
-  iparams.setDeviceID(3);
-  //oparams.setDeviceID(session.getDefaultOutputDevice());
-
-  unsigned int bufferFrames = 512;
-
-  session.openStream(&oparams,
-                     &iparams,
-                     RtAudio::Format::Float32,
-                     48000UL,
-                     &bufferFrames,
-                     &options);
-
-  session.startStream();
+  driver->start();
 }
 
 void Controller::onPreferencesClicked() {
-  Preferences preferences;
-  preferences.exec();
+
 }
 
 void Controller::onStopClicked() {
-  session.stopStream();
+  driver->stop();
 }
 
 void Controller::onQuitClicked() {
@@ -209,9 +142,8 @@ void Controller::onQuitClicked() {
 }
 
 void Controller::updateEffectList() {
-  ladspaPlugins.update();
-
-  auto effectList = ladspaPlugins.list();
+  std::vector<std::string> effectList;
+  driver->listEffects(effectList);
   for (const auto &effectName : effectList)
     mainWindow->addEffectChoice(effectName.c_str());
 }

@@ -7,7 +7,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 if(MSVC)
   set(CMAKE_CXX_FLAGS "/W3 /EHsc /std:c++latest")
 else(MSVC)
-  set(CMAKE_CXX_FLAGS "-Wall -Wextra -Werror -Wfatal-errors")
+  set(CMAKE_CXX_FLAGS "-Wall -Wextra -Werror -Wfatal-errors -std=c++17")
 endif(MSVC)
 
 set(CMAKE_AUTORCC ON)
@@ -28,14 +28,18 @@ add_executable("gnu-guitar-qt"
   "${INCDIR}/api-preferences-list.hpp"
   "${SRCDIR}/audio-panel.cc"
   "${INCDIR}/audio-panel.h"
-  "${SRCDIR}/controller.cpp"
-  "${INCDIR}/controller.hpp"
-  "${SRCDIR}/effect-view.cc"
-  "${INCDIR}/effect-view.h"
   "${SRCDIR}/button.cc"
   "${INCDIR}/button.h"
+  "${SRCDIR}/controller.cpp"
+  "${INCDIR}/controller.hpp"
+  "${INCDIR}/driver.hpp"
+  "${SRCDIR}/driver.cpp"
   "${SRCDIR}/doc-browser.cc"
   "${INCDIR}/doc-browser.h"
+  "${SRCDIR}/effect-view.cc"
+  "${INCDIR}/effect-view.h"
+  "${INCDIR}/fake-driver.hpp"
+  "${SRCDIR}/fake-driver.cpp"
   "${INCDIR}/ladspa-setup.hpp"
   "${SRCDIR}/ladspa-setup.cpp"
   "${SRCDIR}/knob.cc"
@@ -53,7 +57,6 @@ add_executable("gnu-guitar-qt"
   "resources.qrc")
 
 target_link_libraries("gnu-guitar-qt"
-  "rtaudio"
   Qt5::Widgets)
 #  ${Qt5Core_QTMAIN_LIBRARIES})
 

@@ -3,19 +3,11 @@
 
 #include <QObject>
 
-#include <rtaudio/ladspa-plugins.hpp>
-#include <rtaudio/session.hpp>
-
-namespace RtAudio {
-
-class CompositeProcessor;
-
-} // namespace RtAudio
-
 namespace GnuGuitar {
 
 namespace Qt {
 
+class Driver;
 class MainWindow;
 
 class Controller : public QObject {
@@ -31,15 +23,11 @@ protected slots:
   void onPreferencesClicked();
   void onStopClicked();
   void onQuitClicked();
-
 protected:
   void addEffect(const QString &name);
   void updateEffectList();
-
 private:
-  RtAudio::LadspaPlugins ladspaPlugins;
-  RtAudio::CompositeProcessor *processor;
-  RtAudio::Session session;
+  Driver *driver;
   MainWindow *mainWindow;
 }; /* class Controller */
 
