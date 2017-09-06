@@ -1,7 +1,5 @@
 dist: trusty
-language:
-- c
-- cpp
+language: cpp
 compiler:
 - clang
 - gcc
@@ -13,12 +11,10 @@ addons:
   apt:
     sources:
     - ubuntu-toolchain-r-test
-    - llvm-toolchain-precise-3.6
+    - llvm-toolchain-3.9
     packages:
-    - libasound2-dev
-    - gcc-6
-    - g++-6
-    - clang-3.6
+    - g++-7
+    - clang-3.9
 script:
 - bash travis-ci/build.bash
 
