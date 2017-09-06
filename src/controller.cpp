@@ -97,6 +97,8 @@ Controller::Controller() {
 #else
   driver = new FakeDriver();
 #endif
+
+  updateEffectList();
 }
 
 Controller::~Controller() {
@@ -112,6 +114,9 @@ Controller::~Controller() {
 
 void Controller::addEffect(const QString &effectName) {
   driver->addEffect(effectName.toStdString());
+
+  auto effectView = new EffectView(effectName, mainWindow);
+  mainWindow->addEffect(effectView);
 }
 
 void Controller::onEffectChanged(const QString &effectName,
