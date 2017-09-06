@@ -113,9 +113,16 @@ Controller::~Controller() {
 }
 
 void Controller::addEffect(const QString &effectName) {
+
   driver->addEffect(effectName.toStdString());
 
+  std::vector<std::string> controlList;
+  driver->listEffectControls(effectName.toStdString(), controlList);
+
   auto effectView = new EffectView(effectName, mainWindow);
+  for (const auto& control : controlList)
+    effectView->add_control(control.c_str());
+
   mainWindow->addEffect(effectView);
 }
 
