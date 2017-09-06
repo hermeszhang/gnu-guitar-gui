@@ -63,6 +63,8 @@ void FakeDriver::addEffect(const std::string &effectName) {
   auto found = hasEffect(effectName);
   if (!found) {
     // THROW
+  } else {
+    effectList.push_back(effectName);
   }
 }
 
