@@ -15,6 +15,7 @@ EffectView::EffectView(const QString &label_text_, QWidget *parent) : QWidget(pa
   label->setTextFormat(::Qt::RichText);
   label->setAlignment(::Qt::AlignLeft | ::Qt::AlignVCenter);
   label->setFixedSize(200, 100);
+  label->setStyleSheet("QLabel { color: rgb(255,63,0); }");
 
   layout = new QHBoxLayout;
   layout->setAlignment(::Qt::AlignLeft);

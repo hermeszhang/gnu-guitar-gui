@@ -14,6 +14,7 @@ Knob::Knob(const QString &name, QWidget *parent) : QWidget(parent) {
   label = new QLabel;
   label->setText(name);
   label->setAlignment(::Qt::AlignHCenter);
+  label->setStyleSheet("QLabel { color: rgb(255, 63, 0); }");
 
   layout = new QVBoxLayout;
   layout->addWidget(dial);
