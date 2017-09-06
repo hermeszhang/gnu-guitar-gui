@@ -1,8 +1,8 @@
 <!DOCTYPE RCC>
 <RCC version="1.0">
   <qresource prefix="/icons">
-    <file alias="power-button-on.png">../../artwork/power-button/on.png</file>
-    <file alias="power-button-off.png">../../artwork/power-button/off.png</file>
+    <file alias="power-button-on.png">../icons/power-button/on.png</file>
+    <file alias="power-button-off.png">../icons/power-button/off.png</file>
     <file alias="logo.png">../icons/gnuitar.png</file>
   </qresource>
   <qresource prefix="/docs">

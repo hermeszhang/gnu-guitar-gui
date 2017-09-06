@@ -5,8 +5,8 @@
 namespace GnuGuitar::Qt {
 
 PowerButton::PowerButton(QWidget *parent) : QLabel(parent) {
-  setOnImage("repositories/artwork/power-button/on.png");
-  setOffImage("repositories/artwork/power-button/off.png");
+  setOnImage(":/icons/power-button-on.png");
+  setOffImage(":/icons/power-button-off.png");
   // setOnImage(":/power-button-on.png");
   // setOffImage(":/power-button-off.png");
   setOffState();
