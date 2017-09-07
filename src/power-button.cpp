@@ -2,7 +2,9 @@
 
 #include <iostream>
 
-namespace GnuGuitar::Qt {
+namespace GnuGuitar {
+
+namespace Qt {
 
 PowerButton::PowerButton(QWidget *parent) : QLabel(parent) {
   setOnImage(":/icons/power-button-on.png");
@@ -48,5 +50,7 @@ void PowerButton::mousePressEvent(QMouseEvent *) {
   toggleState();
 }
 
-} // namespace GnuGuitar::Qt
+} // namespace Qt
+
+} // namespace GnuGuitar
 

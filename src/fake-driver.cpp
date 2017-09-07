@@ -5,28 +5,28 @@
 
 namespace {
 
-const std::array<const char *, 3> masterApiList = {
+const std::array<const char *, 3> masterApiList = { {
   "Fake API #1",
   "Fake API #2",
   "Fake API #3"
-};
+} };
 
-const std::array<const char *, 5> masterEffectList = {
+const std::array<const char *, 5> masterEffectList = { {
   "Fake Effect #1",
   "Fake Effect #2",
   "Fake Effect #3",
   "Fake Effect #4",
   "Fake Effect #5"
-};
+} };
 
-const std::array<const char *, 6> masterControlList = {
+const std::array<const char *, 6> masterControlList = { {
   "Control #1",
   "Control #2",
   "Control #3",
   "Control #4",
   "Control #5",
   "Control #6"
-};
+} };
 
 bool hasControl(const std::string &controlName) {
   for (auto control : masterControlList) {
@@ -49,7 +49,9 @@ bool hasEffect(const std::string &effectName) {
 
 } // namespace
 
-namespace GnuGuitar::Qt {
+namespace GnuGuitar {
+
+namespace Qt {
 
 FakeDriver::FakeDriver() noexcept {
 
@@ -158,4 +160,6 @@ bool FakeDriver::usingEffect(const std::string &effectName) {
   return false;
 }
 
-} // namespace GnuGuitar::Qt
+} // namespace Qt
+
+} // namespace GnuGuitar

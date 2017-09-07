@@ -20,7 +20,9 @@
 
 #include <gnu-guitar-qt/driver.hpp>
 
-namespace GnuGuitar::Qt {
+namespace GnuGuitar {
+
+namespace Qt {
 
 /// @brief Implements a fake driver.
 ///  This is useful for developing the
@@ -47,6 +49,8 @@ protected:
   bool usingEffect(const std::string &effectName);
 };
 
-} // namespace GnuGuitar::Qt
+} // namespace Qt
+
+} // namespace GnuGuitar
 
 #endif // GNU_GUITAR_QT_FAKE_DRIVER_HPP

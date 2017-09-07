@@ -1,10 +1,14 @@
 #include <gnu-guitar-qt/driver.hpp>
 
-namespace GnuGuitar::Qt {
+namespace GnuGuitar {
+
+namespace Qt {
 
 Driver::~Driver() {
 
 }
 
-} // namespace GnuGuitar::Qt
+} // namespace Qt
+
+} // namespace GnuGuitar
 

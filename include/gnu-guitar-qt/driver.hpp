@@ -21,7 +21,9 @@
 #include <string>
 #include <vector>
 
-namespace GnuGuitar::Qt {
+namespace GnuGuitar {
+
+namespace Qt {
 
 /// @brief This class is designed for binding
 ///  the @ref Controller class to the program logic.
@@ -54,6 +56,8 @@ public:
   virtual void stop() = 0;
 };
 
-} // namespace GnuGuitar::Qt
+} // namespace Qt
+
+} // namespace GnuGuitar
 
 #endif // GNU_GUITAR_QT_DRIVER_HPP
