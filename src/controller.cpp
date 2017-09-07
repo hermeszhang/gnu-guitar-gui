@@ -11,8 +11,6 @@
 #include <gnu-guitar-qt/fake-driver.hpp>
 #endif // GNU_GUITAR_QT_WITH_CORE
 
-using namespace Gnuitar::Qt;
-
 #if 0
 
 namespace {
@@ -120,9 +118,10 @@ void Controller::addEffect(const QString &effectName) {
   std::vector<std::string> controlList;
   driver->listEffectControls(effectName.toStdString(), controlList);
 
-  auto effectView = new EffectView(effectName, mainWindow);
+  auto effectView = new EffectView(mainWindow);
+  effectView->setLabel(effectName);
   for (const auto& control : controlList)
-    effectView->add_control(control.c_str());
+    effectView->addControl(control.c_str());
 
   mainWindow->addEffect(effectView);
 }

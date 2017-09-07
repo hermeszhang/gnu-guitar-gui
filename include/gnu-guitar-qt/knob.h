@@ -6,7 +6,7 @@
 #include <QVBoxLayout>
 #include <QWidget>
 
-namespace Gnuitar {
+namespace GnuGuitar {
 
 namespace Qt {
 

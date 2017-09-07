@@ -10,11 +10,6 @@
 class QScrollArea;
 class QVBoxLayout;
 
-// TODO : remove old names
-using Gnuitar::Qt::EffectView;
-using Gnuitar::Qt::MenuBar;
-using Gnuitar::Qt::Rack;
-
 namespace GnuGuitar {
 
 namespace Qt {

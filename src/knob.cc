@@ -1,6 +1,6 @@
 #include <gnu-guitar-qt/knob.h>
 
-namespace Gnuitar {
+namespace GnuGuitar {
 
 namespace Qt {
 

@@ -5,7 +5,7 @@
 
 #include <gnu-guitar-qt/doc-browser.h>
 
-namespace Gnuitar {
+namespace GnuGuitar {
 
 namespace Qt {
 

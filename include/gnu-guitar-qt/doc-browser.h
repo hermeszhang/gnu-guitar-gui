@@ -3,7 +3,7 @@
 
 #include <QTextBrowser>
 
-namespace Gnuitar {
+namespace GnuGuitar {
 
 namespace Qt {
 

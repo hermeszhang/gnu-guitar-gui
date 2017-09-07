@@ -1,33 +1,33 @@
-#ifndef GNUITAR_QT_EFFECT_VIEW_H
-#define GNUITAR_QT_EFFECT_VIEW_H
+#ifndef GNUITAR_QT_EFFECT_VIEW_HPP
+#define GNUITAR_QT_EFFECT_VIEW_HPP
 
-#include <QHBoxLayout>
-#include <QLabel>
 #include <QWidget>
 
-#include <gnu-guitar-qt/knob.h>
+class QHBoxLayout;
+class QLabel;
+class QString;
 
-namespace Gnuitar {
+namespace GnuGuitar {
 
 namespace Qt {
+
+class Knob;
 
 class EffectView final : public QWidget {
   Q_OBJECT
 public:
-  EffectView(const QString &label_text, QWidget *parent = nullptr);
+  EffectView(QWidget *parent = nullptr);
   ~EffectView(void);
-  void add_control(const QString &control_name);
-  const QString &get_label(void) const;
-  void set_label(const QString &label);
+  void addControl(const QString &control_name);
+  QString getLabel(void) const;
+  void setLabel(const QString &label);
 signals:
-  void control_changed(const QString &label, int value);
+  void controlChanged(const QString &label, int value);
 protected:
   void setupColors();
 protected slots:
-  void on_knob_changed(const Knob *knob);
-
+  void onKnobChanged(const Knob &knob);
 private:
-  QString label_text;
   QHBoxLayout *layout;
   QLabel *label;
 }; /* class Effect */
@@ -36,4 +36,4 @@ private:
 
 } /* namespace Gnuitar */
 
-#endif /* GNUITAR_QT_EFFECT_VIEW_H */
+#endif /* GNUITAR_QT_EFFECT_VIEW_HPP */

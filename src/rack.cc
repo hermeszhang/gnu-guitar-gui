@@ -7,7 +7,7 @@
 #include <QLabel>
 #include <QVBoxLayout>
 
-namespace Gnuitar {
+namespace GnuGuitar {
 
 namespace Qt {
 
@@ -18,23 +18,26 @@ Rack::Rack(QWidget *parent) : QWidget(parent) {
   setLayout(layout);
 }
 
-Rack::~Rack(void) {}
+Rack::~Rack() {
 
-void Rack::add_effect(EffectView *effect_view) {
-
-  layout->addWidget(effect_view);
-
-  auto effect_callback = [this, effect_view](const QString &control_name,
-                                             int control_value) {
-    auto effect_label = effect_view->get_label();
-    on_effect_changed(effect_label, control_name, control_value);
-  };
-  connect(effect_view, &EffectView::control_changed, this, effect_callback);
 }
 
-void Rack::on_effect_changed(const QString &effect_name,
-                             const QString &control_name, int control_value) {
-  emit effect_changed(effect_name, control_name, control_value);
+void Rack::addEffect(EffectView *effectView) {
+
+  layout->addWidget(effectView);
+
+  auto effectCallback = [this, effectView](const QString &controlName,
+                                           int controlValue) {
+    auto effectLabel = effectView->getLabel();
+    onEffectChanged(effectLabel, controlName, controlValue);
+  };
+  connect(effectView, &EffectView::controlChanged, this, effectCallback);
+}
+
+void Rack::onEffectChanged(const QString &effectName,
+                           const QString &controlName,
+                           int controlValue) {
+  emit effectChanged(effectName, controlName, controlValue);
 }
 
 void Rack::setupColors() {

@@ -4,7 +4,7 @@
 #include <QVBoxLayout>
 #include <QWidget>
 
-namespace Gnuitar {
+namespace GnuGuitar {
 
 namespace Qt {
 
@@ -15,16 +15,17 @@ class Rack final : public QWidget {
 public:
   Rack(QWidget *parent = nullptr);
   ~Rack(void);
-  void add_effect(EffectView *effect_view);
+  void addEffect(EffectView *effectView);
 signals:
-  void effect_changed(const QString &effect_name, const QString &control_name,
-                      int value);
+  void effectChanged(const QString &effectName,
+                     const QString &controlName,
+                     int value);
 protected slots:
-  void on_effect_changed(const QString &effect_name,
-                         const QString &control_name, int value);
+  void onEffectChanged(const QString &effectName,
+                       const QString &controlName,
+                       int value);
 protected:
   void setupColors();
-
 private:
   QVBoxLayout *layout;
 }; /* class Rack */

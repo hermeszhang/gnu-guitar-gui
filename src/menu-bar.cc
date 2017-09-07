@@ -7,7 +7,7 @@
   "https://github.com/gnu-guitar/gnu-guitar-qt/issues/new"
 #endif /* GNUITAR_ISSUES_LINK */
 
-namespace Gnuitar {
+namespace GnuGuitar {
 
 namespace Qt {
 

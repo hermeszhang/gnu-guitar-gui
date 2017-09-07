@@ -2,7 +2,7 @@
 
 #include <QFile>
 
-namespace Gnuitar {
+namespace GnuGuitar {
 
 namespace Qt {
 

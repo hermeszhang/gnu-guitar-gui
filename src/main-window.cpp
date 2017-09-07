@@ -32,7 +32,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
 
   setMenuBar(menuBar);
 
-  connect(rack, &Rack::effect_changed,
+  connect(rack, &Rack::effectChanged,
           this, &MainWindow::onEffectChanged);
   connect(menuBar, &MenuBar::effect_selected,
           this, &MainWindow::onEffectClicked);
@@ -55,7 +55,7 @@ MainWindow::~MainWindow() {
 }
 
 void MainWindow::addEffect(EffectView *effectView) {
-  rack->add_effect(effectView);
+  rack->addEffect(effectView);
 }
 
 void MainWindow::addEffectChoice(const QString &effectName) {
