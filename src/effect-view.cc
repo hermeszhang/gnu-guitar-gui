@@ -2,6 +2,7 @@
 
 #include <gnu-guitar-qt/knob.h>
 
+#include <QGridLayout>
 #include <QSizePolicy>
 
 namespace GnuGuitar {
@@ -10,17 +11,17 @@ namespace Qt {
 
 EffectView::EffectView(QWidget *parent) : QWidget(parent) {
 
+  columnIndex = 1;
+  rowIndex = 1;
+
   setupColors();
 
   label = new QLabel;
-  label->setTextFormat(::Qt::RichText);
-  label->setAlignment(::Qt::AlignLeft | ::Qt::AlignVCenter);
-  label->setFixedSize(200, 100);
+  label->setAlignment(::Qt::AlignCenter);
   label->setStyleSheet("QLabel { font-weight: bold; color: rgb(255,63,0); }");
 
-  layout = new QHBoxLayout;
-  layout->setAlignment(::Qt::AlignLeft);
-  layout->addWidget(label);
+  layout = new QGridLayout;
+  layout->addWidget(label, 1, 1, 1, 4, ::Qt::AlignCenter);
   setLayout(layout);
 }
 
@@ -38,7 +39,13 @@ void EffectView::addControl(const QString &controlName) {
 
   connect(controlKnob, &Knob::released, this, controlCallback);
 
-  layout->addWidget(controlKnob);
+  layout->addWidget(controlKnob, rowIndex + 1, columnIndex);
+  if (columnIndex >= 4) {
+    columnIndex = 1;
+    rowIndex++;
+  } else {
+    columnIndex++;
+  }
 }
 
 QString EffectView::getLabel(void) const {

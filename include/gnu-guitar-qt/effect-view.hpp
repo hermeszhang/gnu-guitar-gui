@@ -3,9 +3,9 @@
 
 #include <QWidget>
 
-class QHBoxLayout;
 class QLabel;
 class QString;
+class QGridLayout;
 
 namespace GnuGuitar {
 
@@ -25,10 +25,13 @@ signals:
   void controlChanged(const QString &label, int value);
 protected:
   void setupColors();
+  int getCurrentKnobRow();
 protected slots:
   void onKnobChanged(const Knob &knob);
 private:
-  QHBoxLayout *layout;
+  int rowIndex;
+  int columnIndex;
+  QGridLayout *layout;
   QLabel *label;
 }; /* class Effect */
 
