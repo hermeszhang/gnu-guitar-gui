@@ -58,7 +58,6 @@ add_executable("gnu-guitar-qt"
 
 target_link_libraries("gnu-guitar-qt"
   Qt5::Widgets)
-#  ${Qt5Core_QTMAIN_LIBRARIES})
 
 qt5_use_modules("gnu-guitar-qt" Widgets)
 
