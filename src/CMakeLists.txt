@@ -4,7 +4,7 @@ set (CMAKE_CXX_EXTENSIONS OFF)
 
 if(MSVC)
   set(CMAKE_CXX_FLAGS "/W3 /EHsc /std:c++latest")
-else(CMAKE_COMPILER_IS_GNUCXX)
+elseif(CMAKE_COMPILER_IS_GNUCXX)
   set(CMAKE_CXX_FLAGS "-Wall -Wextra -Werror -Wfatal-errors -std=c++17")
 else("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
   set(CMAKE_CXX_FLAGS "-Wall -Wextra -Wno-missing-braces -Werror -Wfatal-errors -std=c++1z")
