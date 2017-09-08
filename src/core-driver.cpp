@@ -1,5 +1,7 @@
 #include <gnu-guitar-qt/core-driver.hpp>
 
+#include <gnu-guitar-qt/ladspa-setup.hpp>
+
 #include <rtaudio/rtaudio.hpp>
 #include <rtaudio/processor-visitor.hpp>
 #include <rtaudio/ladspa-port.hpp>
@@ -129,8 +131,29 @@ void CoreDriver::addEffect(const std::string &effectName) {
   }
   ladspaProcessor->instantiate(48000);
   ladspaProcessor->activate();
-  ladspaProcessor->selectInput("Input");
-  ladspaProcessor->selectOutput("Output");
+
+  LadspaSetup ladspaSetup;
+
+  std::vector<std::string> inputList;
+  ladspaProcessor->listInputs(inputList);
+  for (const auto &input : inputList)
+    ladspaSetup.addInput(input);
+
+  std::vector<std::string> outputList;
+  ladspaProcessor->listOutputs(outputList);
+  for (const auto &output : outputList)
+    ladspaSetup.addOutput(output);
+
+  ladspaSetup.exec();
+
+  if (ladspaSetup.cancelled()) {
+    delete ladspaProcessor;
+    return;
+  }
+
+  ladspaProcessor->selectInput(ladspaSetup.getInputName());
+  ladspaProcessor->selectOutput(ladspaSetup.getOutputName());
+
   processor->append(ladspaProcessor);
 }
 
