@@ -103,7 +103,7 @@ CoreDriver::CoreDriver() {
   ladspaPlugins->addDefaultSearchPaths();
   ladspaPlugins->update();
   processor = new RtAudio::CompositeProcessor;
-  session = new RtAudio::Session(RtAudio::ApiSpecifier::Any);
+  session = new Core::Session(RtAudio::ApiSpecifier::Any);
   session->setProcessor(processor);
 }
 
@@ -193,8 +193,8 @@ void CoreDriver::setEffectControlValue(const std::string &effectName,
 }
 
 void CoreDriver::start() {
-  RtAudio::StreamParameters inputParams;
-  RtAudio::StreamParameters outputParams;
+  Core::DeviceConfig inputParams;
+  Core::DeviceConfig outputParams;
   RtAudio::StreamOptions options;
   unsigned int bufferFrames = 256;
   session->openStream(&outputParams,

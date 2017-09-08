@@ -21,18 +21,23 @@ namespace RtAudio {
 
 class CompositeProcessor;
 class LadspaPlugins;
-class Session;
 
 } // namespace RtAudio
 
 namespace GnuGuitar {
+
+namespace Core {
+
+class Session;
+
+} // namespace Core
 
 namespace Qt {
 
 /// @brief A driver implementation that
 ///  directly uses the GNU Guitar Core library.
 class CoreDriver final : public Driver {
-  RtAudio::Session *session;
+  Core::Session *session;
   RtAudio::LadspaPlugins *ladspaPlugins;
   RtAudio::CompositeProcessor *processor;
 public:
