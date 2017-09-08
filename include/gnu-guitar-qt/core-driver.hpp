@@ -17,25 +17,41 @@
 
 #include <gnu-guitar-qt/driver.hpp>
 
-#include <rtaudio/session.hpp>
-
 namespace RtAudio {
 
 class CompositeProcessor;
+class LadspaPlugins;
+class Session;
 
 } // namespace RtAudio
 
-namespace GnuGuitar::Qt {
+namespace GnuGuitar {
+
+namespace Qt {
 
 /// @brief A driver implementation that
 ///  directly uses the GNU Guitar Core library.
 class CoreDriver final : public Driver {
-  RtAudio::Session session;
-  CompositeProcessor *processor;
+  RtAudio::Session *session;
+  RtAudio::LadspaPlugins *ladspaPlugins;
+  RtAudio::CompositeProcessor *processor;
 public:
   CoreDriver();
   ~CoreDriver();
+  void addEffect(const std::string &effectName) override;
+  void listApis(std::vector<std::string> &apiList) override;
+  void listEffects(std::vector<std::string> &effectList) override;
+  void listEffectControls(const std::string &effectName,
+                          std::vector<std::string> &controlList) override;
+  void setApi(const std::string &api) override;
+  void setEffectControlValue(const std::string &effectName,
+                             const std::string &controlName,
+                             float value) override;
+  void start() override;
+  void stop() override;
 };
 
-} // namespace GnuGuitar::Qt
+} // namespace Qt
+
+} // namespace GnuGuitar
 
