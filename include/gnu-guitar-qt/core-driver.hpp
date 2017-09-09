@@ -17,18 +17,13 @@
 
 #include <gnu-guitar-qt/driver.hpp>
 
-namespace RtAudio {
-
-class CompositeProcessor;
-class LadspaPlugins;
-
-} // namespace RtAudio
-
 namespace GnuGuitar {
 
 namespace Core {
 
 class Session;
+class CompositeProcessor;
+class LadspaPlugins;
 
 } // namespace Core
 
@@ -38,8 +33,8 @@ namespace Qt {
 ///  directly uses the GNU Guitar Core library.
 class CoreDriver final : public Driver {
   Core::Session *session;
-  RtAudio::LadspaPlugins *ladspaPlugins;
-  RtAudio::CompositeProcessor *processor;
+  Core::LadspaPlugins *ladspaPlugins;
+  Core::CompositeProcessor *processor;
 public:
   CoreDriver();
   ~CoreDriver();

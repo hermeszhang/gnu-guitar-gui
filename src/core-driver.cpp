@@ -2,16 +2,19 @@
 
 #include <gnu-guitar-qt/ladspa-setup.hpp>
 
-#include <rtaudio/rtaudio.hpp>
-#include <rtaudio/processor-visitor.hpp>
-#include <rtaudio/ladspa-port.hpp>
+#include <gnu-guitar-core/composite-processor.hpp>
+#include <gnu-guitar-core/ladspa-plugins.hpp>
+#include <gnu-guitar-core/ladspa-port.hpp>
+#include <gnu-guitar-core/ladspa-processor.hpp>
+#include <gnu-guitar-core/processor-visitor.hpp>
+#include <gnu-guitar-core/session.hpp>
 
 #include <sstream>
 #include <ostream>
 
 namespace {
 
-class ControlLister final : public RtAudio::ProcessorVisitor {
+class ControlLister final : public GnuGuitar::Core::ProcessorVisitor {
   bool effectFound;
   std::string effectName;
   std::vector<std::string> &controlList;
@@ -27,13 +30,13 @@ public:
   void setEffectName(const std::string &name) {
     effectName = name;
   }
-  void visit(RtAudio::CompositeProcessor &compositeProcessor) {
+  void visit(GnuGuitar::Core::CompositeProcessor &compositeProcessor) {
     if (effectFound)
       return;
     for (auto processor : compositeProcessor)
       processor->accept(*this);
   }
-  void visit(RtAudio::LadspaProcessor &ladspaProcessor) {
+  void visit(GnuGuitar::Core::LadspaProcessor &ladspaProcessor) {
     if (effectFound)
       return;
     else if (ladspaProcessor.getName() == effectName) {
@@ -43,7 +46,7 @@ public:
   }
 };
 
-class ControlUpdater final : public RtAudio::ProcessorVisitor {
+class ControlUpdater final : public GnuGuitar::Core::ProcessorVisitor {
   /// @brief The name of the control
   ///  to update.
   std::string controlName;
@@ -71,22 +74,22 @@ public:
   void setEffectName(const std::string &name) {
     effectName = name;
   }
-  void visit(RtAudio::CompositeProcessor &processor) {
+  void visit(GnuGuitar::Core::CompositeProcessor &processor) {
     for (auto processor : processor)
       processor->accept(*this);
   }
-  void visit(RtAudio::LadspaProcessor &processor) {
+  void visit(GnuGuitar::Core::LadspaProcessor &processor) {
 
     // TODO : throw exception if a control is not found
 
     if (processor.getName() != effectName)
       return;
 
-    auto functor = [&](RtAudio::LadspaControl &control) {
+    auto functor = [&](GnuGuitar::Core::LadspaControl &control) {
       control.value = controlValue * (control.value_max - control.value_min);
     };
 
-    RtAudio::LadspaControlFinder<decltype(functor)> controlFinder(controlName, functor);
+    GnuGuitar::Core::LadspaControlFinder<decltype(functor)> controlFinder(controlName, functor);
 
     processor.acceptPortVisitor(controlFinder);
   }
@@ -99,11 +102,11 @@ namespace GnuGuitar {
 namespace Qt {
 
 CoreDriver::CoreDriver() {
-  ladspaPlugins = new RtAudio::LadspaPlugins;
+  ladspaPlugins = new Core::LadspaPlugins;
   ladspaPlugins->addDefaultSearchPaths();
   ladspaPlugins->update();
-  processor = new RtAudio::CompositeProcessor;
-  session = new Core::Session(RtAudio::ApiSpecifier::Any);
+  processor = new Core::CompositeProcessor;
+  session = new Core::Session(Core::ApiSpecifier::Any);
   session->setProcessor(processor);
 }
 
@@ -123,7 +126,7 @@ CoreDriver::~CoreDriver() {
 }
 
 void CoreDriver::addEffect(const std::string &effectName) {
-  auto ladspaProcessor = new RtAudio::LadspaProcessor;
+  auto ladspaProcessor = new Core::LadspaProcessor;
   auto findSuccess = ladspaPlugins->find(effectName, *ladspaProcessor);
   if (!findSuccess) {
     // TODO : throw an exception
@@ -158,8 +161,8 @@ void CoreDriver::addEffect(const std::string &effectName) {
 }
 
 void CoreDriver::listApis(std::vector<std::string> &apiList) {
-  std::vector<RtAudio::ApiSpecifier> apiSpecifierList;
-  RtAudio::getCompiledApis(apiSpecifierList);
+  std::vector<Core::ApiSpecifier> apiSpecifierList;
+  Core::listCompiledApis(apiSpecifierList);
   for (auto apiSpecifier : apiSpecifierList) {
     std::stringstream apiName;
     apiName << apiSpecifier;
@@ -193,21 +196,11 @@ void CoreDriver::setEffectControlValue(const std::string &effectName,
 }
 
 void CoreDriver::start() {
-  Core::DeviceConfig inputParams;
-  Core::DeviceConfig outputParams;
-  RtAudio::StreamOptions options;
-  unsigned int bufferFrames = 256;
-  session->openStream(&outputParams,
-                      &inputParams,
-                      RtAudio::Format::Float32,
-                      48000U,
-                      &bufferFrames,
-                      &options);
-  session->startStream();
+  session->start();
 }
 
 void CoreDriver::stop() {
-  session->stopStream();
+  session->stop();
 }
 
 } // namespace Qt
