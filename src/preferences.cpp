@@ -17,6 +17,7 @@ Preferences::Preferences(QWidget *parent) : QDialog(parent) {
   driverPreferences = new DriverPreferences(this);
 
   apiPreferences = new ApiPreferences(this);
+  connect(apiPreferences, &ApiPreferences::apiClicked, this, &Preferences::onApiClicked);
 
   tabWidget = new QTabWidget(this);
   tabWidget->addTab(apiPreferences, "API");
@@ -49,6 +50,14 @@ Preferences::~Preferences() {
 
 void Preferences::addApi(const QString &apiName) {
   apiPreferences->addApi(apiName);
+}
+
+QString Preferences::getSelectedApi() const {
+  return selectedApi;
+}
+
+void Preferences::onApiClicked(const QString &apiName) {
+  selectedApi = apiName;
 }
 
 } // namespace Qt

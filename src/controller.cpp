@@ -97,6 +97,8 @@ void Controller::onPreferencesClicked() {
     preferences.addApi(api.c_str());
 
   preferences.exec();
+
+  driver->setApi(preferences.getSelectedApi().toStdString());
 }
 
 void Controller::onStopClicked() {

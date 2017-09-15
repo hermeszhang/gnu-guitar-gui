@@ -19,7 +19,11 @@ public:
   Preferences(QWidget *parent = nullptr);
   ~Preferences();
   void addApi(const QString &apiName);
+  QString getSelectedApi() const;
+protected slots:
+  void onApiClicked(const QString &apiName);
 private:
+  QString selectedApi;
   QVBoxLayout *layout;
   QTabWidget *tabWidget;
   ApiPreferences *apiPreferences;
