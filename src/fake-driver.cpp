@@ -28,6 +28,12 @@ const std::array<const char *, 6> masterControlList = { {
   "Control #6"
 } };
 
+const std::array<const char *, 3> masterApiControlList = { {
+  "Api Control #1",
+  "Api Control #2",
+  "Api Control #3",
+} };
+
 bool hasControl(const std::string &controlName) {
   for (auto control : masterControlList) {
     if (controlName == control)
@@ -74,6 +80,15 @@ void FakeDriver::listApis(std::vector<std::string> &apiList) {
   apiList.clear();
   for (auto api : masterApiList)
     apiList.push_back(api);
+}
+
+void FakeDriver::listApiControls(const std::string &apiName,
+                                 std::vector<std::string> &controlList) {
+
+  (void) apiName;
+
+  for (const auto control : masterApiControlList)
+    controlList.push_back(control);
 }
 
 void FakeDriver::listEffects(std::vector<std::string> &effectList) {

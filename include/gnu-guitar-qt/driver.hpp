@@ -36,11 +36,9 @@ public:
   virtual void addEffect(const std::string &ladspaEffect) = 0;
   /// @brief Lists the available APIs.
   virtual void listApis(std::vector<std::string> &apis) = 0;
-#if 0
   /// @brief Lists the controls for an API.
   virtual void listApiControls(const std::string &apiName,
                                std::vector<std::string> &apiControls) = 0;
-#endif
   /// @brief Lists the available effects.
   virtual void listEffects(std::vector<std::string> &ladspaEffects) = 0;
   /// @brief Lists the available controls of a certain

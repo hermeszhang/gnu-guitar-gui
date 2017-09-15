@@ -35,6 +35,8 @@ public:
   ~FakeDriver();
   void addEffect(const std::string &effectName) override;
   void listApis(std::vector<std::string> &apis) override;
+  void listApiControls(const std::string &apiName,
+                       std::vector<std::string> &controlList) override;
   void listEffects(std::vector<std::string> &effects) override;
   void listEffectControls(const std::string &effectName,
                           std::vector<std::string> &controlList) override;
