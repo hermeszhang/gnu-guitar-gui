@@ -73,6 +73,7 @@ endif (GNU_GUITAR_QT_WITH_CORE)
 add_executable("gnu-guitar-qt" ${SOURCES})
 
 target_link_libraries("gnu-guitar-qt" Qt5::Widgets)
+target_link_libraries("gnu-guitar-qt" "qaccordion")
 
 if (GNU_GUITAR_QT_WITH_CORE)
   target_link_libraries("gnu-guitar-qt" "gnu-guitar-core")
