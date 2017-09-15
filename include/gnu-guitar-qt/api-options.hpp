@@ -18,6 +18,7 @@ public:
   ~ApiOptions();
   QString getName() const;
   void setName(const QString &name_);
+  void uncheck();
 signals:
   void clicked(const QString &name);
 protected slots:

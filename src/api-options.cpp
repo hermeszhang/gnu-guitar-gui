@@ -35,6 +35,10 @@ void ApiOptions::setName(const QString &name_) {
   label->setText(name_);
 }
 
+void ApiOptions::uncheck() {
+  radioButton->setChecked(false);
+}
+
 void ApiOptions::onClicked() {
   emit clicked(getName());
 }

@@ -29,12 +29,27 @@ void ApiPreferences::addApi(const QString &apiName) {
   auto apiOptions = new ApiOptions(this);
   apiOptions->setName(apiName);
 
+  addApi(apiOptions);
+}
+
+void ApiPreferences::addApi(ApiOptions *apiOptions) {
+
   connect(apiOptions, &ApiOptions::clicked, this, &ApiPreferences::onApiClicked);
 
   layout->addWidget(apiOptions);
+
+  apiList.push_back(apiOptions);
 }
 
 void ApiPreferences::onApiClicked(const QString &apiName) {
+
+  for (auto api : apiList) {
+    if (api->getName() == apiName)
+      continue;
+    else
+      api->uncheck();
+  }
+
   emit apiClicked(apiName);
 }
 
