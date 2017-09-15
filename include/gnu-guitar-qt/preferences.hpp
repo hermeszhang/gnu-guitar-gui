@@ -8,6 +8,12 @@ class QTabWidget;
 
 namespace GnuGuitar {
 
+namespace Gui {
+
+class ApiSettings;
+
+} // namepace Gui
+
 namespace Qt {
 
 class ApiPreferences;
@@ -18,7 +24,7 @@ class Preferences final : public QDialog {
 public:
   Preferences(QWidget *parent = nullptr);
   ~Preferences();
-  void addApi(const QString &apiName);
+  void addApi(const Gui::ApiSettings &apiSettings);
   QString getSelectedApi() const;
 protected slots:
   void onApiClicked(const QString &apiName);

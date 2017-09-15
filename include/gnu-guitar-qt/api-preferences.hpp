@@ -1,33 +1,32 @@
 #ifndef GNU_GUITAR_QT_API_PREFERENCES_HPP
 #define GNU_GUITAR_QT_API_PREFERENCES_HPP
 
-#include <QList>
-#include <QWidget>
+#include <qaccordion/qaccordion.hpp>
 
 class QString;
 class QVBoxLayout;
 
 namespace GnuGuitar {
 
+namespace Gui {
+
+class ApiSettings;
+
+} // namespace Gui
+
 namespace Qt {
 
-class ApiOptions;
-
-class ApiPreferences final : public QWidget {
+class ApiPreferences final : public QAccordion {
   Q_OBJECT
 public:
   ApiPreferences(QWidget *parent = nullptr);
   ~ApiPreferences();
-  void addApi(const QString &name);
-  void addApi(ApiOptions *apiOptions);
+  void addApi(const Gui::ApiSettings &apiSettings);
   QString getSelectedApi() const;
 signals:
   void apiClicked(const QString &apiName);
 protected slots:
   void onApiClicked(const QString &apiName);
-private:
-  QList<ApiOptions *> apiList;
-  QVBoxLayout *layout;
 };
 
 } // namespace Qt

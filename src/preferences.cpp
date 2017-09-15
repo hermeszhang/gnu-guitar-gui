@@ -3,6 +3,8 @@
 #include <gnu-guitar-qt/api-preferences.hpp>
 #include <gnu-guitar-qt/driver-preferences.hpp>
 
+#include <gnu-guitar/gui/api-settings.hpp>
+
 #include <QTabWidget>
 #include <QVBoxLayout>
 
@@ -48,8 +50,8 @@ Preferences::~Preferences() {
   }
 }
 
-void Preferences::addApi(const QString &apiName) {
-  apiPreferences->addApi(apiName);
+void Preferences::addApi(const Gui::ApiSettings &apiSettings) {
+  apiPreferences->addApi(apiSettings);
 }
 
 QString Preferences::getSelectedApi() const {

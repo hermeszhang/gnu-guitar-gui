@@ -12,6 +12,8 @@
 #include <gnu-guitar-qt/fake-driver.hpp>
 #endif // GNU_GUITAR_QT_WITH_CORE
 
+#include <gnu-guitar/gui/api-settings.hpp>
+
 namespace GnuGuitar {
 
 namespace Qt {
@@ -93,8 +95,12 @@ void Controller::onPreferencesClicked() {
   std::vector<std::string> apiList;
   driver->listApis(apiList);
 
-  for (const auto &api : apiList)
-    preferences.addApi(api.c_str());
+  for (const auto &api : apiList) {
+    Gui::ApiSettings apiSettings;
+    apiSettings.setApiName(api);
+
+    preferences.addApi(apiSettings);
+  }
 
   preferences.exec();
 

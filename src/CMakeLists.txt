@@ -24,20 +24,25 @@ find_package(Qt5Gui REQUIRED)
 find_package(Qt5Widgets REQUIRED)
 
 set (INCDIR "${PROJECT_SOURCE_DIR}/include/gnu-guitar-qt")
+set (GUIDIR "${PROJECT_SOURCE_DIR}/include/gnu-guitar/gui")
 set (SRCDIR "${CMAKE_CURRENT_SOURCE_DIR}")
 
 set (SOURCES
   "${SRCDIR}/gnu-guitar-qt.cpp"
-  "${SRCDIR}/api-options.cpp"
-  "${INCDIR}/api-options.hpp"
-  "${SRCDIR}/api-preferences.cpp"
+  "${GUIDIR}/api-settings.hpp"
+  "${SRCDIR}/api-settings.cpp"
   "${INCDIR}/api-preferences.hpp"
-  "${SRCDIR}/audio-panel.cc"
+  "${SRCDIR}/api-preferences.cpp"
   "${INCDIR}/audio-panel.h"
-  "${SRCDIR}/button.cc"
-  "${INCDIR}/button.h"
-  "${SRCDIR}/controller.cpp"
+  "${SRCDIR}/audio-panel.cc"
   "${INCDIR}/controller.hpp"
+  "${SRCDIR}/controller.cpp"
+  "${GUIDIR}/control.hpp"
+  "${SRCDIR}/control.cpp"
+  "${GUIDIR}/control-list.hpp"
+  "${SRCDIR}/control-list.cpp"
+  "${GUIDIR}/control-visitor.hpp"
+  "${SRCDIR}/control-visitor.cpp"
   "${INCDIR}/driver.hpp"
   "${SRCDIR}/driver.cpp"
   "${INCDIR}/driver-preferences.hpp"
@@ -52,16 +57,18 @@ set (SOURCES
   "${SRCDIR}/ladspa-setup.cpp"
   "${SRCDIR}/knob.cc"
   "${INCDIR}/knob.h"
-  "${SRCDIR}/main-window.cpp"
   "${INCDIR}/main-window.hpp"
-  "${SRCDIR}/menu-bar.cc"
+  "${SRCDIR}/main-window.cpp"
   "${INCDIR}/menu-bar.h"
-  "${SRCDIR}/power-button.cpp"
+  "${SRCDIR}/menu-bar.cc"
   "${INCDIR}/power-button.hpp"
-  "${SRCDIR}/preferences.cpp"
+  "${SRCDIR}/power-button.cpp"
   "${INCDIR}/preferences.hpp"
-  "${SRCDIR}/rack.cc"
+  "${SRCDIR}/preferences.cpp"
   "${INCDIR}/rack.h"
+  "${SRCDIR}/rack.cc"
+  "${GUIDIR}/string-control.hpp"
+  "${SRCDIR}/string-control.cpp"
   "resources.qrc")
 
 if (GNU_GUITAR_QT_WITH_CORE)

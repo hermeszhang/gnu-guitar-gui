@@ -1,32 +1,22 @@
 #ifndef GNU_GUITAR_QT_API_OPTIONS_HPP
 #define GNU_GUITAR_QT_API_OPTIONS_HPP
 
-#include <QWidget>
-
-class QHBoxLayout;
-class QLabel;
-class QRadioButton;
+#include <qaccordion/contentpane.hpp>
 
 namespace GnuGuitar {
 
 namespace Qt {
 
-class ApiOptions final : public QWidget {
+class ApiOptions final : public ContentPane {
   Q_OBJECT
 public:
   ApiOptions(QWidget *parent = nullptr);
   ~ApiOptions();
-  QString getName() const;
+  QString getName();
   void setName(const QString &name_);
   void uncheck();
 signals:
   void clicked(const QString &name);
-protected slots:
-  void onClicked();
-private:
-  QRadioButton *radioButton;
-  QLabel *label;
-  QHBoxLayout *layout;
 };
 
 } // namespace Qt

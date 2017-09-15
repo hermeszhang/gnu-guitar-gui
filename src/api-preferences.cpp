@@ -1,55 +1,42 @@
 #include <gnu-guitar-qt/api-preferences.hpp>
 
-#include <gnu-guitar-qt/api-options.hpp>
-
-#include <QVBoxLayout>
+#include <gnu-guitar/gui/api-settings.hpp>
 
 namespace GnuGuitar {
 
 namespace Qt {
 
-ApiPreferences::ApiPreferences(QWidget *parent) : QWidget(parent) {
-  layout = new QVBoxLayout(this);
-  setLayout(layout);
+ApiPreferences::ApiPreferences(QWidget *parent) : QAccordion(parent) {
+
 }
 
 ApiPreferences::~ApiPreferences() {
-  if (layout != nullptr) {
-    delete layout;
-    layout = nullptr;
-  }
+
 }
 
 QString ApiPreferences::getSelectedApi() const {
   return "";
 }
 
-void ApiPreferences::addApi(const QString &apiName) {
+void ApiPreferences::addApi(const Gui::ApiSettings &apiSettings) {
 
-  auto apiOptions = new ApiOptions(this);
-  apiOptions->setName(apiName);
+  std::string apiName;
+  apiSettings.getApiName(apiName);
 
-  addApi(apiOptions);
-}
+  auto contentPane = new ContentPane(apiName.c_str(), this);
 
-void ApiPreferences::addApi(ApiOptions *apiOptions) {
-
-  connect(apiOptions, &ApiOptions::clicked, this, &ApiPreferences::onApiClicked);
-
-  layout->addWidget(apiOptions);
-
-  apiList.push_back(apiOptions);
+  addContentPane(contentPane);
 }
 
 void ApiPreferences::onApiClicked(const QString &apiName) {
-
+#if 0
   for (auto api : apiList) {
     if (api->getName() == apiName)
       continue;
     else
       api->uncheck();
   }
-
+#endif
   emit apiClicked(apiName);
 }
 
