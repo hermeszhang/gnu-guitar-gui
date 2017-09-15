@@ -1,30 +1,54 @@
 #include <gnu-guitar-qt/preferences.hpp>
 
-#include <gnu-guitar-qt/api-preferences-list.hpp>
+#include <gnu-guitar-qt/api-preferences.hpp>
+#include <gnu-guitar-qt/driver-preferences.hpp>
 
-#include <QScrollArea>
+#include <QTabWidget>
+#include <QVBoxLayout>
 
 namespace GnuGuitar {
 
 namespace Qt {
 
 Preferences::Preferences(QWidget *parent) : QDialog(parent) {
+
   setWindowTitle("Preferences");
-  scrollArea = new QScrollArea(this);
-  scrollArea->setWidgetResizable(true);
-  apiPreferencesList = new ApiPreferencesList(this);
-  scrollArea->setWidget(apiPreferencesList);
+
+  driverPreferences = new DriverPreferences(this);
+
+  apiPreferences = new ApiPreferences(this);
+
+  tabWidget = new QTabWidget(this);
+  tabWidget->addTab(apiPreferences, "API");
+  tabWidget->addTab(driverPreferences, "Driver");
+
+  layout = new QVBoxLayout(this);
+  layout->addWidget(tabWidget);
+
+  setLayout(layout);
 }
 
 Preferences::~Preferences() {
-  if (apiPreferencesList != nullptr) {
-    delete apiPreferencesList;
-    apiPreferencesList = nullptr;
+  if (apiPreferences != nullptr) {
+    delete apiPreferences;
+    apiPreferences = nullptr;
   }
-  if (scrollArea != nullptr) {
-    delete scrollArea;
-    scrollArea = nullptr;
+  if (driverPreferences != nullptr) {
+    delete driverPreferences;
+    driverPreferences = nullptr;
   }
+  if (tabWidget != nullptr) {
+    delete tabWidget;
+    tabWidget = nullptr;
+  }
+  if (layout != nullptr) {
+    delete layout;
+    layout = nullptr;
+  }
+}
+
+void Preferences::addApi(const QString &apiName) {
+  apiPreferences->addApi(apiName);
 }
 
 } // namespace Qt

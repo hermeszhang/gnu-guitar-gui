@@ -3,22 +3,27 @@
 
 #include <QDialog>
 
-class QScrollArea;
+class QVBoxLayout;
+class QTabWidget;
 
 namespace GnuGuitar {
 
 namespace Qt {
 
-class ApiPreferencesList;
+class ApiPreferences;
+class DriverPreferences;
 
 class Preferences final : public QDialog {
   Q_OBJECT
 public:
   Preferences(QWidget *parent = nullptr);
   ~Preferences();
+  void addApi(const QString &apiName);
 private:
-  ApiPreferencesList *apiPreferencesList;
-  QScrollArea *scrollArea;
+  QVBoxLayout *layout;
+  QTabWidget *tabWidget;
+  ApiPreferences *apiPreferences;
+  DriverPreferences *driverPreferences;
 };
 
 } // namespace Qt

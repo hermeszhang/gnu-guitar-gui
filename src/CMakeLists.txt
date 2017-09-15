@@ -28,8 +28,10 @@ set (SRCDIR "${CMAKE_CURRENT_SOURCE_DIR}")
 
 set (SOURCES
   "${SRCDIR}/gnu-guitar-qt.cpp"
-  "${SRCDIR}/api-preferences-list.cpp"
-  "${INCDIR}/api-preferences-list.hpp"
+  "${SRCDIR}/api-options.cpp"
+  "${INCDIR}/api-options.hpp"
+  "${SRCDIR}/api-preferences.cpp"
+  "${INCDIR}/api-preferences.hpp"
   "${SRCDIR}/audio-panel.cc"
   "${INCDIR}/audio-panel.h"
   "${SRCDIR}/button.cc"
@@ -38,6 +40,8 @@ set (SOURCES
   "${INCDIR}/controller.hpp"
   "${INCDIR}/driver.hpp"
   "${SRCDIR}/driver.cpp"
+  "${INCDIR}/driver-preferences.hpp"
+  "${SRCDIR}/driver-preferences.cpp"
   "${SRCDIR}/doc-browser.cc"
   "${INCDIR}/doc-browser.h"
   "${SRCDIR}/effect-view.cc"
