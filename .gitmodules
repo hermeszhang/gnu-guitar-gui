@@ -1,0 +1,3 @@
+[submodule "external/qaccordion"]
+	path = external/qaccordion
+	url = https://github.com/gnu-guitar/qaccordion
