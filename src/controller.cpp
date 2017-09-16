@@ -13,6 +13,7 @@
 #endif // GNU_GUITAR_QT_WITH_CORE
 
 #include <gnu-guitar/gui/api-settings.hpp>
+#include <gnu-guitar/gui/string-control.hpp>
 
 namespace GnuGuitar {
 
@@ -95,9 +96,15 @@ void Controller::onPreferencesClicked() {
   std::vector<std::string> apiList;
   driver->listApis(apiList);
 
+  Gui::StringControl stringControl;
+  stringControl.setName("Input PCM");
+  stringControl.addOption("default");
+  stringControl.addOption("plughw:1,0");
+
   for (const auto &api : apiList) {
     Gui::ApiSettings apiSettings;
     apiSettings.setApiName(api);
+    apiSettings.addControl(stringControl);
 
     preferences.addApi(apiSettings);
   }
