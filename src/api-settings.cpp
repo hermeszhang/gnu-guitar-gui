@@ -10,6 +10,12 @@ ApiSettings::ApiSettings() {
   controlList = new ControlList;
 }
 
+ApiSettings::ApiSettings(ApiSettings &&other) {
+  apiName = std::move(other.apiName);
+  controlList = other.controlList;
+  other.controlList = nullptr;
+}
+
 ApiSettings::~ApiSettings() {
   if (controlList != nullptr) {
     delete controlList;
