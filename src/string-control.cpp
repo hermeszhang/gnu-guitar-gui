@@ -12,7 +12,7 @@ StringControl::~StringControl() {
 
 }
 
-void StringControl::accept(ControlVisitor &controlVisitor) {
+void StringControl::accept(ControlVisitor &controlVisitor) const {
   controlVisitor.visit(*this);
 }
 
