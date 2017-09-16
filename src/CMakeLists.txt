@@ -23,26 +23,55 @@ find_package(Qt5Core REQUIRED)
 find_package(Qt5Gui REQUIRED)
 find_package(Qt5Widgets REQUIRED)
 
+macro (ADD_GUI_CLASS VAR HEADER SOURCE)
+  list (APPEND ${VAR}
+    "${PROJECT_SOURCE_DIR}/include/gnu-guitar/gui/${HEADER}"
+    "${PROJECT_SOURCE_DIR}/src/${SOURCE}")
+endmacro (ADD_GUI_CLASS VAR HEADER SOURCE)
+
+macro (ADD_QT_CLASS VAR HEADER SOURCE)
+  list (APPEND ${VAR}
+    "${PROJECT_SOURCE_DIR}/include/gnu-guitar/qt/${HEADER}"
+    "${PROJECT_SOURCE_DIR}/src/${SOURCE}")
+endmacro (ADD_QT_CLASS VAR HEADER SOURCE)
+
+unset (SOURCES)
+
+add_gui_class(SOURCES
+  "api-settings.hpp"
+  "api-settings.cpp")
+
+add_gui_class(SOURCES
+  "control.hpp"
+  "control.cpp")
+
+add_gui_class(SOURCES
+  "control-list.hpp"
+  "control-list.cpp")
+
+add_gui_class(SOURCES
+  "control-visitor.hpp"
+  "control-visitor.cpp")
+
+add_gui_class(SOURCES
+  "string-control.hpp"
+  "string-control.cpp")
+
+add_qt_class(SOURCES
+  "controller.hpp"
+  "controller.cpp")
+
+# Old variables, don't use them.
+# Use add_gui_class or add_qt_class instead.
 set (INCDIR "${PROJECT_SOURCE_DIR}/include/gnu-guitar-qt")
-set (GUIDIR "${PROJECT_SOURCE_DIR}/include/gnu-guitar/gui")
 set (SRCDIR "${CMAKE_CURRENT_SOURCE_DIR}")
 
-set (SOURCES
+list (APPEND SOURCES
   "${SRCDIR}/gnu-guitar-qt.cpp"
-  "${GUIDIR}/api-settings.hpp"
-  "${SRCDIR}/api-settings.cpp"
   "${INCDIR}/api-preferences.hpp"
   "${SRCDIR}/api-preferences.cpp"
   "${INCDIR}/audio-panel.h"
   "${SRCDIR}/audio-panel.cc"
-  "${INCDIR}/controller.hpp"
-  "${SRCDIR}/controller.cpp"
-  "${GUIDIR}/control.hpp"
-  "${SRCDIR}/control.cpp"
-  "${GUIDIR}/control-list.hpp"
-  "${SRCDIR}/control-list.cpp"
-  "${GUIDIR}/control-visitor.hpp"
-  "${SRCDIR}/control-visitor.cpp"
   "${INCDIR}/driver.hpp"
   "${SRCDIR}/driver.cpp"
   "${INCDIR}/driver-preferences.hpp"
@@ -67,8 +96,6 @@ set (SOURCES
   "${SRCDIR}/preferences.cpp"
   "${INCDIR}/rack.h"
   "${SRCDIR}/rack.cc"
-  "${GUIDIR}/string-control.hpp"
-  "${SRCDIR}/string-control.cpp"
   "resources.qrc")
 
 if (GNU_GUITAR_QT_WITH_CORE)

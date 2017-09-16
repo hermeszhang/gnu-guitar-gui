@@ -1,4 +1,4 @@
-#include <gnu-guitar-qt/controller.hpp>
+#include <gnu-guitar/qt/controller.hpp>
 
 #include <gnu-guitar-qt/driver.hpp>
 #include <gnu-guitar-qt/driver.hpp>
