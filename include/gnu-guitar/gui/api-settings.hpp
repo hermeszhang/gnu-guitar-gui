@@ -14,6 +14,8 @@ class ApiSettings final {
   ControlList *controlList;
 public:
   ApiSettings();
+  ApiSettings(const ApiSettings &other) = delete;
+  ApiSettings(ApiSettings &&other);
   ~ApiSettings();
   void addControl(const StringControl &stringControl);
   void getApiName(std::string &apiName) const;
