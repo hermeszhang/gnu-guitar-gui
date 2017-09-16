@@ -23,6 +23,12 @@
 
 namespace GnuGuitar {
 
+namespace Gui {
+
+class ApiSettings;
+
+} // namespace Gui
+
 namespace Qt {
 
 /// @brief This class is designed for binding
@@ -35,7 +41,7 @@ public:
   ///  driver starts streaming the audio.
   virtual void addEffect(const std::string &ladspaEffect) = 0;
   /// @brief Lists the available APIs.
-  virtual void listApis(std::vector<std::string> &apis) = 0;
+  virtual void listApis(std::vector<Gui::ApiSettings> &apis) = 0;
   /// @brief Lists the controls for an API.
   virtual void listApiControls(const std::string &apiName,
                                std::vector<std::string> &apiControls) = 0;

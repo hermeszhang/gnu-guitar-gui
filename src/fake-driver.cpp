@@ -1,5 +1,8 @@
 #include <gnu-guitar-qt/fake-driver.hpp>
 
+#include <gnu-guitar/gui/api-settings.hpp>
+#include <gnu-guitar/gui/string-control.hpp>
+
 #include <array>
 #include <iostream>
 
@@ -76,10 +79,22 @@ void FakeDriver::addEffect(const std::string &effectName) {
   }
 }
 
-void FakeDriver::listApis(std::vector<std::string> &apiList) {
+void FakeDriver::listApis(std::vector<Gui::ApiSettings> &apiList) {
   apiList.clear();
-  for (auto api : masterApiList)
-    apiList.push_back(api);
+  for (auto api : masterApiList) {
+
+    Gui::ApiSettings apiSettings;
+    apiSettings.setApiName(api);
+
+    Gui::StringControl controlOne;
+    controlOne.setName("Control One");
+    controlOne.addOption("Value 1");
+    controlOne.addOption("Value 2");
+    controlOne.addOption("Value 3");
+    apiSettings.addControl(controlOne);
+
+    apiList.push_back(std::move(apiSettings));
+  }
 }
 
 void FakeDriver::listApiControls(const std::string &apiName,
