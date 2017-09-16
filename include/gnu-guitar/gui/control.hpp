@@ -12,7 +12,7 @@ class Control {
 public:
   Control();
   virtual ~Control();
-  virtual void accept(ControlVisitor &controlVisitor) = 0;
+  virtual void accept(ControlVisitor &controlVisitor) const = 0;
   virtual void getName(std::string &name) const;
   virtual void setName(const std::string &name);
 };

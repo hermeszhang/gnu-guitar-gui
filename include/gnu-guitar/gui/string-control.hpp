@@ -13,7 +13,7 @@ class StringControl final : public Control {
 public:
   StringControl();
   ~StringControl();
-  void accept(ControlVisitor &controlVisitor) override;
+  void accept(ControlVisitor &controlVisitor) const override;
   void addOption(const std::string &option);
   void getValue(std::string &value) const;
   void setValue(const std::string &value);
