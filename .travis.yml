@@ -7,8 +7,10 @@ matrix:
       addons:
         apt:
           sources:
+            - ubuntu-toolchain-r-test
             - llvm-toolchain-3.9
           packages:
+            - cmake
             - clang-3.9
       env:
          - MATRIX_EVAL="CC=clang-3.9 && CXX=clang-3.9"
@@ -19,6 +21,7 @@ matrix:
           sources:
             - ubuntu-toolchain-r-test
           packages:
+            - cmake
             - g++-7
       env:
          - MATRIX_EVAL="CC=gcc-7 && CXX=g++-7"
