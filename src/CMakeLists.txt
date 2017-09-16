@@ -69,6 +69,20 @@ add_qt_class(SOURCES
   "form.hpp"
   "form.cpp")
 
+add_gui_class(SOURCES
+  "driver.hpp"
+  "driver.cpp")
+
+add_gui_class(SOURCES
+  "fake-driver.hpp"
+  "fake-driver.cpp")
+
+if (GNU_GUITAR_QT_WITH_CORE)
+  add_gui_class(SOURCES
+    "core-driver.hpp"
+    "core-driver.cpp")
+endif (GNU_GUITAR_QT_WITH_CORE)
+
 # Old variables, don't use them.
 # Use add_gui_class or add_qt_class instead.
 set (INCDIR "${PROJECT_SOURCE_DIR}/include/gnu-guitar-qt")
@@ -80,16 +94,12 @@ list (APPEND SOURCES
   "${SRCDIR}/api-preferences.cpp"
   "${INCDIR}/audio-panel.h"
   "${SRCDIR}/audio-panel.cc"
-  "${INCDIR}/driver.hpp"
-  "${SRCDIR}/driver.cpp"
   "${INCDIR}/driver-preferences.hpp"
   "${SRCDIR}/driver-preferences.cpp"
   "${SRCDIR}/doc-browser.cc"
   "${INCDIR}/doc-browser.h"
   "${SRCDIR}/effect-view.cc"
   "${INCDIR}/effect-view.hpp"
-  "${INCDIR}/fake-driver.hpp"
-  "${SRCDIR}/fake-driver.cpp"
   "${INCDIR}/ladspa-setup.hpp"
   "${SRCDIR}/ladspa-setup.cpp"
   "${SRCDIR}/knob.cc"
@@ -105,12 +115,6 @@ list (APPEND SOURCES
   "${INCDIR}/rack.h"
   "${SRCDIR}/rack.cc"
   "resources.qrc")
-
-if (GNU_GUITAR_QT_WITH_CORE)
-  list (APPEND SOURCES
-    "${SRCDIR}/core-driver.cpp"
-    "${INCDIR}/core-driver.hpp")
-endif (GNU_GUITAR_QT_WITH_CORE)
 
 add_executable("gnu-guitar-qt" ${SOURCES})
 

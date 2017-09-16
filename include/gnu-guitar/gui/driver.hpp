@@ -15,8 +15,8 @@
 //  You should have received a copy of the GNU General Public License
 //  along with GNU Guitar Qt.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef GNU_GUITAR_QT_DRIVER_HPP
-#define GNU_GUITAR_QT_DRIVER_HPP
+#ifndef GNU_GUITAR_GUI_DRIVER_HPP
+#define GNU_GUITAR_GUI_DRIVER_HPP
 
 #include <string>
 #include <vector>
@@ -26,10 +26,6 @@ namespace GnuGuitar {
 namespace Gui {
 
 class ApiSettings;
-
-} // namespace Gui
-
-namespace Qt {
 
 /// @brief This class is designed for binding
 ///  the @ref Controller class to the program logic.
@@ -41,10 +37,7 @@ public:
   ///  driver starts streaming the audio.
   virtual void addEffect(const std::string &ladspaEffect) = 0;
   /// @brief Lists the available APIs.
-  virtual void listApis(std::vector<Gui::ApiSettings> &apis) = 0;
-  /// @brief Lists the controls for an API.
-  virtual void listApiControls(const std::string &apiName,
-                               std::vector<std::string> &apiControls) = 0;
+  virtual void listApis(std::vector<ApiSettings> &apis) = 0;
   /// @brief Lists the available effects.
   virtual void listEffects(std::vector<std::string> &ladspaEffects) = 0;
   /// @brief Lists the available controls of a certain
@@ -65,8 +58,8 @@ public:
   virtual void stop() = 0;
 };
 
-} // namespace Qt
+} // namespace Gui
 
 } // namespace GnuGuitar
 
-#endif // GNU_GUITAR_QT_DRIVER_HPP
+#endif // GNU_GUITAR_GUI_DRIVER_HPP

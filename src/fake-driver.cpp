@@ -1,4 +1,4 @@
-#include <gnu-guitar-qt/fake-driver.hpp>
+#include <gnu-guitar/gui/fake-driver.hpp>
 
 #include <gnu-guitar/gui/api-settings.hpp>
 #include <gnu-guitar/gui/string-control.hpp>
@@ -60,7 +60,7 @@ bool hasEffect(const std::string &effectName) {
 
 namespace GnuGuitar {
 
-namespace Qt {
+namespace Gui {
 
 FakeDriver::FakeDriver() noexcept {
 
@@ -79,7 +79,7 @@ void FakeDriver::addEffect(const std::string &effectName) {
   }
 }
 
-void FakeDriver::listApis(std::vector<Gui::ApiSettings> &apiList) {
+void FakeDriver::listApis(std::vector<ApiSettings> &apiList) {
   apiList.clear();
   for (auto api : masterApiList) {
 
@@ -95,15 +95,6 @@ void FakeDriver::listApis(std::vector<Gui::ApiSettings> &apiList) {
 
     apiList.push_back(std::move(apiSettings));
   }
-}
-
-void FakeDriver::listApiControls(const std::string &apiName,
-                                 std::vector<std::string> &controlList) {
-
-  (void) apiName;
-
-  for (const auto control : masterApiControlList)
-    controlList.push_back(control);
 }
 
 void FakeDriver::listEffects(std::vector<std::string> &effectList) {
@@ -190,6 +181,6 @@ bool FakeDriver::usingEffect(const std::string &effectName) {
   return false;
 }
 
-} // namespace Qt
+} // namespace Gui
 
 } // namespace GnuGuitar

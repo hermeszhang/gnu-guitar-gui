@@ -1,15 +1,15 @@
 #include <gnu-guitar/qt/controller.hpp>
 
-#include <gnu-guitar-qt/driver.hpp>
-#include <gnu-guitar-qt/driver.hpp>
+#include <gnu-guitar/gui/driver.hpp>
+
 #include <gnu-guitar-qt/effect-view.hpp>
 #include <gnu-guitar-qt/main-window.hpp>
 #include <gnu-guitar-qt/preferences.hpp>
 
 #ifdef GNU_GUITAR_QT_WITH_CORE
-#include <gnu-guitar-qt/core-driver.hpp>
+#include <gnu-guitar/gui/core-driver.hpp>
 #else
-#include <gnu-guitar-qt/fake-driver.hpp>
+#include <gnu-guitar/gui/fake-driver.hpp>
 #endif // GNU_GUITAR_QT_WITH_CORE
 
 #include <gnu-guitar/gui/api-settings.hpp>
@@ -39,9 +39,9 @@ Controller::Controller() {
   mainWindow->connect(mainWindow, &MainWindow::quitClicked,
                       this, &Controller::onQuitClicked);
 #ifdef GNU_GUITAR_QT_WITH_CORE
-  driver = new CoreDriver();
+  driver = new Gui::CoreDriver();
 #else
-  driver = new FakeDriver();
+  driver = new Gui::FakeDriver();
 #endif
 
   updateEffectList();

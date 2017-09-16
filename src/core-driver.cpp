@@ -1,4 +1,4 @@
-#include <gnu-guitar-qt/core-driver.hpp>
+#include <gnu-guitar/gui/core-driver.hpp>
 
 #include <gnu-guitar-qt/ladspa-setup.hpp>
 
@@ -99,7 +99,7 @@ public:
 
 namespace GnuGuitar {
 
-namespace Qt {
+namespace Gui {
 
 CoreDriver::CoreDriver() {
   ladspaPlugins = new Core::LadspaPlugins;
@@ -160,13 +160,18 @@ void CoreDriver::addEffect(const std::string &effectName) {
   processor->append(ladspaProcessor);
 }
 
-void CoreDriver::listApis(std::vector<std::string> &apiList) {
+void CoreDriver::listApis(std::vector<ApiSettings> &apiList) {
   std::vector<Core::ApiSpecifier> apiSpecifierList;
   Core::listCompiledApis(apiSpecifierList);
   for (auto apiSpecifier : apiSpecifierList) {
+
     std::stringstream apiName;
     apiName << apiSpecifier;
-    apiList.emplace_back(std::move(apiName.str()));
+
+    ApiSettings apiSettings;
+    apiSettings.setApiName(apiName.str());
+
+    apiList.emplace_back(std::move(apiSettings));
   }
 }
 
@@ -203,7 +208,7 @@ void CoreDriver::stop() {
   session->stop();
 }
 
-} // namespace Qt
+} // namespace Gui
 
 } // namespace GnuGuitar:
 

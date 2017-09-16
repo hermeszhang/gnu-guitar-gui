@@ -5,9 +5,14 @@
 
 namespace GnuGuitar {
 
-namespace Qt {
+namespace Gui {
 
 class Driver;
+
+} // namespace Gui
+
+namespace Qt {
+
 class MainWindow;
 
 class Controller : public QObject {
@@ -27,7 +32,7 @@ protected:
   void addEffect(const QString &name);
   void updateEffectList();
 private:
-  Driver *driver;
+  Gui::Driver *driver;
   MainWindow *mainWindow;
 }; /* class Controller */
 
