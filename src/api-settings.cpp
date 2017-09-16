@@ -23,6 +23,10 @@ ApiSettings::~ApiSettings() {
   }
 }
 
+void ApiSettings::addControl(const BinaryControl &binaryControl) {
+  controlList->add(binaryControl);
+}
+
 void ApiSettings::addControl(const StringControl &stringControl) {
   controlList->add(stringControl);
 }

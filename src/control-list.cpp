@@ -1,5 +1,6 @@
 #include <gnu-guitar/gui/control-list.hpp>
 
+#include <gnu-guitar/gui/binary-control.hpp>
 #include <gnu-guitar/gui/string-control.hpp>
 
 namespace GnuGuitar::Gui {
@@ -15,6 +16,10 @@ ControlList::ControlList(ControlList &&other) {
 ControlList::~ControlList() {
   for (auto control : controls)
     delete control;
+}
+
+void ControlList::add(const BinaryControl &binaryControl) {
+  controls.push_back(new BinaryControl(binaryControl));
 }
 
 void ControlList::add(const StringControl &stringControl) {
