@@ -8,6 +8,10 @@ ControlList::ControlList() {
 
 }
 
+ControlList::ControlList(ControlList &&other) {
+  controls = std::move(other.controls);
+}
+
 ControlList::~ControlList() {
   for (auto control : controls)
     delete control;
