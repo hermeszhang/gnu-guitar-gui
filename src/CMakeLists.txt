@@ -61,6 +61,14 @@ add_qt_class(SOURCES
   "controller.hpp"
   "controller.cpp")
 
+add_qt_class(SOURCES
+  "combo-box.hpp"
+  "combo-box.cpp")
+
+add_qt_class(SOURCES
+  "form.hpp"
+  "form.cpp")
+
 # Old variables, don't use them.
 # Use add_gui_class or add_qt_class instead.
 set (INCDIR "${PROJECT_SOURCE_DIR}/include/gnu-guitar-qt")
