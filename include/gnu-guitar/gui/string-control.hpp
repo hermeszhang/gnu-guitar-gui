@@ -17,6 +17,11 @@ public:
   void addOption(const std::string &option);
   void getValue(std::string &value) const;
   void setValue(const std::string &value);
+  template <typename Callable>
+  void visitOptions(Callable &c) const {
+    for (const auto &option : options)
+      c(option);
+  }
 };
 
 } // namespace GnuGuitar::Gui
