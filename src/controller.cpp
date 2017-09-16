@@ -93,21 +93,11 @@ void Controller::onPreferencesClicked() {
   Preferences preferences;
   preferences.resize(320, 240);
 
-  std::vector<std::string> apiList;
+  std::vector<Gui::ApiSettings> apiList;
   driver->listApis(apiList);
 
-  Gui::StringControl stringControl;
-  stringControl.setName("Input PCM");
-  stringControl.addOption("default");
-  stringControl.addOption("plughw:1,0");
-
-  for (const auto &api : apiList) {
-    Gui::ApiSettings apiSettings;
-    apiSettings.setApiName(api);
-    apiSettings.addControl(stringControl);
-
+  for (const auto &apiSettings : apiList)
     preferences.addApi(apiSettings);
-  }
 
   preferences.exec();
 
