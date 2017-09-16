@@ -16,6 +16,9 @@ public:
   ~FormBuilder() {
 
   }
+  void visit(const GnuGuitar::Gui::BinaryControl &binaryControl) {
+    form->addControl(binaryControl);
+  }
   void visit(const GnuGuitar::Gui::StringControl &stringControl) {
     form->addControl(stringControl);
   }

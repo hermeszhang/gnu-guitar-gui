@@ -9,6 +9,7 @@ namespace GnuGuitar {
 
 namespace Gui {
 
+class BinaryControl;
 class StringControl;
 
 } // namespace Gui
@@ -20,6 +21,7 @@ class Form final : public QFrame {
 public:
   Form(QWidget *parent = nullptr);
   ~Form();
+  void addControl(const Gui::BinaryControl &binaryControl);
   void addControl(const Gui::StringControl &stringControl);
 private:
   QVBoxLayout *layout;
