@@ -124,17 +124,17 @@ list (APPEND SOURCES
   "${SRCDIR}/rack.cc"
   "resources.qrc")
 
-add_executable("gnu-guitar-qt" ${SOURCES})
+add_executable("gnu-guitar-gui" ${SOURCES})
 
-target_link_libraries("gnu-guitar-qt" Qt5::Widgets)
-target_link_libraries("gnu-guitar-qt" "qaccordion")
+target_link_libraries("gnu-guitar-gui" Qt5::Widgets)
+target_link_libraries("gnu-guitar-gui" "qaccordion")
 
 if (GNU_GUITAR_QT_WITH_CORE)
-  target_link_libraries("gnu-guitar-qt" "gnu-guitar-core")
+  target_link_libraries("gnu-guitar-gui" "gnu-guitar-core")
 endif (GNU_GUITAR_QT_WITH_CORE)
 
-qt5_use_modules("gnu-guitar-qt" Widgets)
+qt5_use_modules("gnu-guitar-gui" Widgets)
 
-install(TARGETS "gnu-guitar-qt"
+install(TARGETS "gnu-guitar-gui"
   RUNTIME DESTINATION bin)
 
