@@ -1,10 +1,16 @@
 #include <gnu-guitar/gui/core-driver.hpp>
 
 #include <gnu-guitar/gui/api-settings.hpp>
+#include <gnu-guitar/gui/binary-control.hpp>
+#include <gnu-guitar/gui/string-control.hpp>
 
 #include <gnu-guitar-qt/ladspa-setup.hpp>
 
+#include <gnu-guitar-core/alsa/api.hpp>
+#include <gnu-guitar-core/alsa/device-info.hpp>
 #include <gnu-guitar-core/composite-processor.hpp>
+#include <gnu-guitar-core/device-list.hpp>
+#include <gnu-guitar-core/device-visitor.hpp>
 #include <gnu-guitar-core/ladspa-plugins.hpp>
 #include <gnu-guitar-core/ladspa-port.hpp>
 #include <gnu-guitar-core/ladspa-processor.hpp>
@@ -97,6 +103,72 @@ public:
   }
 };
 
+class DeviceLister final : public GnuGuitar::Core::DeviceVisitor {
+  std::vector<std::string> &list;
+public:
+  DeviceLister(std::vector<std::string> &list_) : list(list_) {
+
+  }
+  ~DeviceLister() {
+
+  }
+  void visit(const GnuGuitar::Core::Alsa::DeviceInfo &deviceInfo) {
+    list.push_back(deviceInfo.getName());
+  }
+  void visit(const GnuGuitar::Core::Jack::DeviceInfo &deviceInfo) {
+    (void) deviceInfo;
+  }
+};
+
+void setAlsaSettings(GnuGuitar::Gui::ApiSettings &apiSettings) {
+
+  GnuGuitar::Core::Alsa::Api alsaApi;
+
+  GnuGuitar::Core::DeviceList inputList;
+  alsaApi.listInputs(inputList);
+
+  std::vector<std::string> inputNameList;
+  DeviceLister inputLister(inputNameList);
+  for (const auto input : inputList)
+    input->accept(inputLister);
+
+  GnuGuitar::Gui::StringControl inputControl;
+  inputControl.setName("Input");
+  for (const auto &inputName : inputNameList)
+    inputControl.addOption(inputName);
+
+  GnuGuitar::Core::DeviceList outputList;
+  alsaApi.listOutputs(outputList);
+
+  std::vector<std::string> outputNameList;
+  DeviceLister outputLister(outputNameList);
+  for (const auto output : outputList)
+    output->accept(outputLister);
+
+  GnuGuitar::Gui::StringControl outputControl;
+  outputControl.setName("Output");
+  for (const auto &outputName : outputNameList)
+    outputControl.addOption(outputName);
+
+  apiSettings.setApiName("ALSA");
+  apiSettings.addControl(inputControl);
+  apiSettings.addControl(outputControl);
+}
+
+void setJackSettings(GnuGuitar::Gui::ApiSettings &apiSettings) {
+
+  // TODO : this should be an edit field
+  GnuGuitar::Gui::StringControl clientNameControl;
+  clientNameControl.setName("Client Name");
+
+  GnuGuitar::Gui::BinaryControl autoStartControl;
+  autoStartControl.setName("Auto Start");
+
+  apiSettings.setApiName("Jack");
+  apiSettings.addControl(clientNameControl);
+  apiSettings.addControl(autoStartControl);
+}
+
 } // namespace
 
 namespace GnuGuitar {
@@ -166,13 +238,17 @@ void CoreDriver::listApis(std::vector<ApiSettings> &apiList) {
   std::vector<Core::ApiSpecifier> apiSpecifierList;
   Core::listCompiledApis(apiSpecifierList);
   for (auto apiSpecifier : apiSpecifierList) {
-
-    std::stringstream apiName;
-    apiName << apiSpecifier;
-
     ApiSettings apiSettings;
-    apiSettings.setApiName(apiName.str());
-
+    switch (apiSpecifier) {
+      case Core::ApiSpecifier::Alsa:
+        setAlsaSettings(apiSettings);
+        break;
+      case Core::ApiSpecifier::Jack:
+        setJackSettings(apiSettings);
+        break;
+      default:
+        continue;
+    }
     apiList.emplace_back(std::move(apiSettings));
   }
 }
