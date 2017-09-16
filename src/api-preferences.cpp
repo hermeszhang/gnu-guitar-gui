@@ -1,6 +1,27 @@
 #include <gnu-guitar-qt/api-preferences.hpp>
 
 #include <gnu-guitar/gui/api-settings.hpp>
+#include <gnu-guitar/gui/control-visitor.hpp>
+
+#include <gnu-guitar/qt/form.hpp>
+
+namespace {
+
+class FormBuilder final : public GnuGuitar::Gui::ControlVisitor {
+  GnuGuitar::Qt::Form *form;
+public:
+  FormBuilder(GnuGuitar::Qt::Form *form_) : form(form_) {
+
+  }
+  ~FormBuilder() {
+
+  }
+  void visit(const GnuGuitar::Gui::StringControl &stringControl) {
+    form->addControl(stringControl);
+  }
+};
+
+} // namespace
 
 namespace GnuGuitar {
 
@@ -23,7 +44,13 @@ void ApiPreferences::addApi(const Gui::ApiSettings &apiSettings) {
   std::string apiName;
   apiSettings.getApiName(apiName);
 
+  auto form = new Form(this);
+
+  ::FormBuilder formBuilder(form);
+  apiSettings.visitControls(formBuilder);
+
   auto contentPane = new ContentPane(apiName.c_str(), this);
+  contentPane->setContentFrame(form);
 
   addContentPane(contentPane);
 }
