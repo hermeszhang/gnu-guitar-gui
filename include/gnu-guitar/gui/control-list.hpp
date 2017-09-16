@@ -13,6 +13,8 @@ class ControlList final {
 public:
   using ConstIterator = std::vector<Control *>::const_iterator;
   ControlList();
+  ControlList(const ControlList &controlList) = delete;
+  ControlList(ControlList &&controlList);
   ~ControlList();
   void add(const StringControl &stringControl);
   ConstIterator begin() const;
