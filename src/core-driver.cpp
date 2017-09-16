@@ -1,5 +1,7 @@
 #include <gnu-guitar/gui/core-driver.hpp>
 
+#include <gnu-guitar/gui/api-settings.hpp>
+
 #include <gnu-guitar-qt/ladspa-setup.hpp>
 
 #include <gnu-guitar-core/composite-processor.hpp>
