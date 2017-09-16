@@ -54,6 +54,10 @@ add_gui_class(SOURCES
   "control-visitor.cpp")
 
 add_gui_class(SOURCES
+  "binary-control.hpp"
+  "binary-control.cpp")
+
+add_gui_class(SOURCES
   "string-control.hpp"
   "string-control.cpp")
 
@@ -64,6 +68,10 @@ add_qt_class(SOURCES
 add_qt_class(SOURCES
   "combo-box.hpp"
   "combo-box.cpp")
+
+add_qt_class(SOURCES
+  "labelled-switch.hpp"
+  "labelled-switch.cpp")
 
 add_qt_class(SOURCES
   "form.hpp"
