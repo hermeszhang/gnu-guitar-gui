@@ -6,6 +6,7 @@
 namespace GnuGuitar::Gui {
 
 class Control;
+class BinaryControl;
 class StringControl;
 
 class ControlList final {
@@ -16,6 +17,7 @@ public:
   ControlList(const ControlList &controlList) = delete;
   ControlList(ControlList &&controlList);
   ~ControlList();
+  void add(const BinaryControl &binaryControl);
   void add(const StringControl &stringControl);
   ConstIterator begin() const;
   ConstIterator end() const;
