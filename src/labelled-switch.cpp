@@ -43,6 +43,10 @@ bool LabelledSwitch::isChecked() const {
   return radioButton->isChecked();
 }
 
+void LabelledSwitch::select() {
+  radioButton->setChecked(true);
+}
+
 void LabelledSwitch::unselect() {
   radioButton->setChecked(false);
 }

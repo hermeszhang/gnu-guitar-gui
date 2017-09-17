@@ -21,6 +21,7 @@ public:
   void accept(FormVisitor &formVisitor) const override;
   void getLabel(QString &labelText) const;
   void setLabel(const QString &labelText);
+  void select();
   void unselect();
   bool isChecked() const;
 signals:

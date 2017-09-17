@@ -126,6 +126,12 @@ void ApiPreferences::addApi(const QString &apiName, ApiForm *apiForm) {
   auto contentPane = new ContentPane(apiName, this);
   contentPane->setContentFrame(apiForm);
 
+  if (forms.size() == 0) {
+    // The first API to be added
+    // will be the default API.
+    apiForm->select();
+  }
+
   forms.push_back(apiForm);
   addContentPane(contentPane);
 }

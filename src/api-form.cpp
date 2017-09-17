@@ -35,6 +35,7 @@ bool ApiForm::selected() const {
 
 void ApiForm::select() {
   isSelected = true;
+  useSwitch->select();
 }
 
 void ApiForm::unselect() {
