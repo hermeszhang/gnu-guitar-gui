@@ -47,7 +47,7 @@ public:
                                   std::vector<std::string> &effectControls) = 0;
   /// @brief Sets the API that the driver will use.
   ///  This API must be one of the APIs listed by @ref listApis.
-  virtual void setApi(const std::string &apiName) = 0;
+  virtual void setApi(const ApiSettings &apiSettings) = 0;
   /// @brief Sets the value of an effect control.
   virtual void setEffectControlValue(const std::string &effectName,
                                      const std::string &controlName,
