@@ -21,6 +21,11 @@ Form::~Form() {
 
 }
 
+void Form::accept(FormVisitor &formVisitor) const {
+  for (auto item : items)
+    item->accept(formVisitor);
+}
+
 void Form::addControl(const Gui::BinaryControl &binaryControl) {
 
   std::string controlName;
@@ -29,7 +34,7 @@ void Form::addControl(const Gui::BinaryControl &binaryControl) {
   auto labelledSwitch = new LabelledSwitch(this);
   labelledSwitch->setLabel(controlName.c_str());
 
-  layout->addWidget(labelledSwitch);
+  add(labelledSwitch);
 }
 
 void Form::addControl(const Gui::StringControl &stringControl) {
@@ -46,7 +51,17 @@ void Form::addControl(const Gui::StringControl &stringControl) {
 
   stringControl.visitOptions(optionVisitor);
 
+  add(comboBox);
+}
+
+void Form::add(ComboBox *comboBox) {
+  items.push_back(comboBox);
   layout->addWidget(comboBox);
+}
+
+void Form::add(LabelledSwitch *labelledSwitch) {
+  items.push_back(labelledSwitch);
+  layout->addWidget(labelledSwitch);
 }
 
 } // namespace Qt
