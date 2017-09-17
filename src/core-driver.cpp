@@ -6,6 +6,7 @@
 #include <gnu-guitar/gui/string-control.hpp>
 
 #include <gnu-guitar-qt/ladspa-setup.hpp>
+#include <gnu-guitar/qt/error-dialog.hpp>
 
 #include <gnu-guitar-core/alsa/api.hpp>
 #include <gnu-guitar-core/alsa/options.hpp>
@@ -13,6 +14,7 @@
 #include <gnu-guitar-core/alsa/device-list.hpp>
 #include <gnu-guitar-core/composite-processor.hpp>
 #include <gnu-guitar-core/device-visitor.hpp>
+#include <gnu-guitar-core/error.hpp>
 #include <gnu-guitar-core/ladspa-plugins.hpp>
 #include <gnu-guitar-core/ladspa-port.hpp>
 #include <gnu-guitar-core/ladspa-processor.hpp>
@@ -311,7 +313,12 @@ void CoreDriver::setEffectControlValue(const std::string &effectName,
 }
 
 void CoreDriver::start() {
-  session->start();
+  try {
+    session->start();
+  } catch (const GnuGuitar::Core::Error &error) {
+    Qt::ErrorDialog errorDialog(error);
+    errorDialog.exec();
+  }
 }
 
 void CoreDriver::stop() {
