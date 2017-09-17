@@ -23,6 +23,12 @@ ApiSettings::~ApiSettings() {
   }
 }
 
+void ApiSettings::accept(ControlVisitor &controlVisitor) const {
+  for (auto control : *controlList) {
+     control->accept(controlVisitor);
+  }
+}
+
 void ApiSettings::addControl(const BinaryControl &binaryControl) {
   controlList->add(binaryControl);
 }
@@ -37,12 +43,6 @@ void ApiSettings::getApiName(std::string &apiName_) const {
 
 void ApiSettings::setApiName(const std::string &apiName_) {
   apiName = apiName_;
-}
-
-void ApiSettings::visitControls(ControlVisitor &controlVisitor) const {
-  for (auto control : *controlList) {
-     control->accept(controlVisitor);
-  }
 }
 
 } // namespace GnuGuitar::Gui
