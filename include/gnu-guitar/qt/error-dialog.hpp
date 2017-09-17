@@ -8,6 +8,7 @@ namespace GnuGuitar {
 namespace Core {
 
 class Error;
+class MissingDevice;
 
 } // namespace Core
 
@@ -17,6 +18,7 @@ class ErrorDialog final : public QMessageBox {
   Q_OBJECT
 public:
   ErrorDialog(const Core::Error &error);
+  ErrorDialog(const Core::MissingDevice &missingDevice);
   ~ErrorDialog();
 };
 

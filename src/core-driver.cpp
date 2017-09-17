@@ -18,6 +18,7 @@
 #include <gnu-guitar-core/ladspa-plugins.hpp>
 #include <gnu-guitar-core/ladspa-port.hpp>
 #include <gnu-guitar-core/ladspa-processor.hpp>
+#include <gnu-guitar-core/missing-device.hpp>
 #include <gnu-guitar-core/processor-visitor.hpp>
 #include <gnu-guitar-core/session.hpp>
 
@@ -315,6 +316,9 @@ void CoreDriver::setEffectControlValue(const std::string &effectName,
 void CoreDriver::start() {
   try {
     session->start();
+  } catch (const GnuGuitar::Core::MissingDevice &missingDevice) {
+    Qt::ErrorDialog errorDialog(missingDevice);
+    errorDialog.exec();
   } catch (const GnuGuitar::Core::Error &error) {
     Qt::ErrorDialog errorDialog(error);
     errorDialog.exec();
