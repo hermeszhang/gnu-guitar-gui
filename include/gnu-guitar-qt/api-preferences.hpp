@@ -16,17 +16,20 @@ class ApiSettings;
 
 namespace Qt {
 
+class ApiForm;
+
 class ApiPreferences final : public QAccordion {
   Q_OBJECT
 public:
   ApiPreferences(QWidget *parent = nullptr);
   ~ApiPreferences();
   void addApi(const Gui::ApiSettings &apiSettings);
-  QString getSelectedApi() const;
-signals:
-  void apiClicked(const QString &apiName);
+  void addApi(const QString &apiName, ApiForm *apiForm);
+  void getSelectedApi(Gui::ApiSettings &apiSettings) const;
 protected slots:
-  void onApiClicked(const QString &apiName);
+  void onApiSelected(ApiForm *apiForm);
+private:
+  std::vector<ApiForm *> forms;
 };
 
 } // namespace Qt
