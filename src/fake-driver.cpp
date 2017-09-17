@@ -1,6 +1,8 @@
 #include <gnu-guitar/gui/fake-driver.hpp>
 
 #include <gnu-guitar/gui/api-settings.hpp>
+#include <gnu-guitar/gui/binary-control.hpp>
+#include <gnu-guitar/gui/control-visitor.hpp>
 #include <gnu-guitar/gui/string-control.hpp>
 
 #include <array>
@@ -55,6 +57,42 @@ bool hasEffect(const std::string &effectName) {
   }
   return found;
 }
+
+class ControlPrinter final : public GnuGuitar::Gui::ControlVisitor {
+  std::ostream &out;
+public:
+  ControlPrinter(std::ostream &out_) : out(out_) {
+
+  }
+  ~ControlPrinter() {
+
+  }
+  void visit(const GnuGuitar::Gui::BinaryControl &binaryControl) {
+
+    std::string name;
+    bool value;
+
+    binaryControl.getName(name);
+
+    value = binaryControl.on();
+
+    out << "Binary control:" << std::endl;
+    out << "  Name: " << name << std::endl;
+    out << "  State: " << value << std::endl;
+  }
+  void visit(const GnuGuitar::Gui::StringControl &stringControl) {
+
+    std::string name;
+    std::string value;
+
+    stringControl.getName(name);
+    stringControl.getValue(value);
+
+    out << "String control:" << std::endl;
+    out << "  Name: " << name << std::endl;
+    out << "  Value: " << value << std::endl;
+  }
+};
 
 } // namespace
 
@@ -116,25 +154,30 @@ void FakeDriver::listEffectControls(const std::string &effectName,
     controlList.push_back(control);
 }
 
-void FakeDriver::setApi(const std::string &apiName) {
+void FakeDriver::setApi(const ApiSettings &apiSettings) {
+
+  std::string apiName;
+  apiSettings.getApiName(apiName);
 
   auto found = false;
-
   for (auto api_ : masterApiList) {
     if (apiName == api_) {
       found = true;
       break;
     }
   }
-
   if (!found) {
     // THROW
     return;
   }
 
-  api = apiName;
-
   std::cout << "Setting API (" << apiName << ")" << std::endl;
+
+  ::ControlPrinter controlPrinter(std::cout);
+
+  apiSettings.accept(controlPrinter);
+
+  api = apiName;
 }
 
 void FakeDriver::setEffectControlValue(const std::string &effectName,
