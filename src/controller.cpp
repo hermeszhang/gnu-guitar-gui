@@ -101,7 +101,10 @@ void Controller::onPreferencesClicked() {
 
   preferences.exec();
 
-  driver->setApi(preferences.getSelectedApi().toStdString());
+  Gui::ApiSettings apiSettings;
+  preferences.getSelectedApi(apiSettings);
+
+  driver->setApi(apiSettings);
 }
 
 void Controller::onStopClicked() {
