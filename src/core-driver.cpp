@@ -10,8 +10,8 @@
 #include <gnu-guitar-core/alsa/api.hpp>
 #include <gnu-guitar-core/alsa/options.hpp>
 #include <gnu-guitar-core/alsa/device-info.hpp>
+#include <gnu-guitar-core/alsa/device-list.hpp>
 #include <gnu-guitar-core/composite-processor.hpp>
-#include <gnu-guitar-core/device-list.hpp>
 #include <gnu-guitar-core/device-visitor.hpp>
 #include <gnu-guitar-core/ladspa-plugins.hpp>
 #include <gnu-guitar-core/ladspa-port.hpp>
@@ -153,31 +153,21 @@ void setAlsaSettings(GnuGuitar::Gui::ApiSettings &apiSettings) {
 
   GnuGuitar::Core::Alsa::Api alsaApi;
 
-  GnuGuitar::Core::DeviceList inputList;
-  alsaApi.listInputs(inputList);
-
-  std::vector<std::string> inputNameList;
-  DeviceLister inputLister(inputNameList);
-  for (const auto input : inputList)
-    input->accept(inputLister);
-
   GnuGuitar::Gui::StringControl inputControl;
   inputControl.setName("Input");
-  for (const auto &inputName : inputNameList)
-    inputControl.addOption(inputName);
 
-  GnuGuitar::Core::DeviceList outputList;
+  GnuGuitar::Core::Alsa::DeviceList inputList;
+  alsaApi.listInputs(inputList);
+  for (const auto input : inputList)
+    inputControl.addOption(input.getName());
+
+  GnuGuitar::Core::Alsa::DeviceList outputList;
   alsaApi.listOutputs(outputList);
-
-  std::vector<std::string> outputNameList;
-  DeviceLister outputLister(outputNameList);
-  for (const auto output : outputList)
-    output->accept(outputLister);
 
   GnuGuitar::Gui::StringControl outputControl;
   outputControl.setName("Output");
-  for (const auto &outputName : outputNameList)
-    outputControl.addOption(outputName);
+  for (const auto &output : outputList)
+    outputControl.addOption(output.getName());
 
   apiSettings.setApiName("ALSA");
   apiSettings.addControl(inputControl);
