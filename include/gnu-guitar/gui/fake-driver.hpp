@@ -38,7 +38,7 @@ public:
   void listEffects(std::vector<std::string> &effects) override;
   void listEffectControls(const std::string &effectName,
                           std::vector<std::string> &controlList) override;
-  void setApi(const std::string &api) override;
+  void setApi(const ApiSettings &api) override;
   void setEffectControlValue(const std::string &effectName,
                              const std::string &controlName,
                              float value) override;
