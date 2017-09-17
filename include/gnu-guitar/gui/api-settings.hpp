@@ -18,11 +18,11 @@ public:
   ApiSettings(const ApiSettings &other) = delete;
   ApiSettings(ApiSettings &&other);
   ~ApiSettings();
+  void accept(ControlVisitor &controlVisitor) const;
   void addControl(const BinaryControl &binaryControl);
   void addControl(const StringControl &stringControl);
   void getApiName(std::string &apiName) const;
   void setApiName(const std::string &apiName);
-  void visitControls(ControlVisitor &controlVisitor) const;
 };
 
 } // namespace GnuGuitar::Gui
