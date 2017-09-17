@@ -39,6 +39,10 @@ void LabelledSwitch::setLabel(const QString &labelText) {
   label->setText(labelText);
 }
 
+bool LabelledSwitch::isChecked() const {
+  return radioButton->isChecked();
+}
+
 void LabelledSwitch::unselect() {
   radioButton->setChecked(false);
 }
