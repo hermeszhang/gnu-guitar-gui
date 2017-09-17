@@ -2,11 +2,13 @@
 
 #include <gnu-guitar/gui/api-settings.hpp>
 #include <gnu-guitar/gui/binary-control.hpp>
+#include <gnu-guitar/gui/control-visitor.hpp>
 #include <gnu-guitar/gui/string-control.hpp>
 
 #include <gnu-guitar-qt/ladspa-setup.hpp>
 
 #include <gnu-guitar-core/alsa/api.hpp>
+#include <gnu-guitar-core/alsa/options.hpp>
 #include <gnu-guitar-core/alsa/device-info.hpp>
 #include <gnu-guitar-core/composite-processor.hpp>
 #include <gnu-guitar-core/device-list.hpp>
@@ -117,6 +119,33 @@ public:
   }
   void visit(const GnuGuitar::Core::Jack::DeviceInfo &deviceInfo) {
     (void) deviceInfo;
+  }
+};
+
+class AlsaOptionBuilder final : public GnuGuitar::Gui::ControlVisitor {
+  GnuGuitar::Core::Alsa::Options &options;
+public:
+  AlsaOptionBuilder(GnuGuitar::Core::Alsa::Options &options_) : options(options_) {
+
+  }
+  ~AlsaOptionBuilder() {
+
+  }
+  void visit(const GnuGuitar::Gui::BinaryControl &binaryControl) {
+    (void) binaryControl;
+  }
+  void visit(const GnuGuitar::Gui::StringControl &stringControl) {
+    std::string controlName;
+    stringControl.getName(controlName);
+    if (controlName == "Input") {
+      std::string controlValue;
+      stringControl.getValue(controlValue);
+      options.setInput(controlValue);
+    } else if (controlName == "Output") {
+      std::string controlValue;
+      stringControl.getValue(controlValue);
+      options.setOutput(controlValue);
+    }
   }
 };
 
@@ -264,8 +293,21 @@ void CoreDriver::listEffectControls(const std::string &effectName,
   controlLister.visit(*processor);
 }
 
-void CoreDriver::setApi(const std::string &api) {
-  (void) api;
+void CoreDriver::setApi(const ApiSettings &apiSettings) {
+
+  std::string apiName;
+  apiSettings.getApiName(apiName);
+
+  if (apiName == "ALSA") {
+
+    GnuGuitar::Core::Alsa::Options alsaOptions;
+
+    AlsaOptionBuilder optionBuilder(alsaOptions);
+
+    apiSettings.accept(optionBuilder);
+
+    session->setOptions(alsaOptions);
+  }
 }
 
 void CoreDriver::setEffectControlValue(const std::string &effectName,
