@@ -61,6 +61,20 @@ add_gui_class(SOURCES
   "string-control.hpp"
   "string-control.cpp")
 
+add_gui_class(SOURCES
+  "driver.hpp"
+  "driver.cpp")
+
+add_gui_class(SOURCES
+  "fake-driver.hpp"
+  "fake-driver.cpp")
+
+if (GNU_GUITAR_QT_WITH_CORE)
+  add_gui_class(SOURCES
+    "core-driver.hpp"
+    "core-driver.cpp")
+endif (GNU_GUITAR_QT_WITH_CORE)
+
 add_qt_class(SOURCES
   "controller.hpp"
   "controller.cpp")
@@ -77,19 +91,17 @@ add_qt_class(SOURCES
   "form.hpp"
   "form.cpp")
 
-add_gui_class(SOURCES
-  "driver.hpp"
-  "driver.cpp")
+add_qt_class(SOURCES
+  "form-item.hpp"
+  "form-item.cpp")
 
-add_gui_class(SOURCES
-  "fake-driver.hpp"
-  "fake-driver.cpp")
+add_qt_class(SOURCES
+  "form-visitor.hpp"
+  "form-visitor.cpp")
 
-if (GNU_GUITAR_QT_WITH_CORE)
-  add_gui_class(SOURCES
-    "core-driver.hpp"
-    "core-driver.cpp")
-endif (GNU_GUITAR_QT_WITH_CORE)
+add_qt_class(SOURCES
+  "api-form.hpp"
+  "api-form.cpp")
 
 # Old variables, don't use them.
 # Use add_gui_class or add_qt_class instead.
