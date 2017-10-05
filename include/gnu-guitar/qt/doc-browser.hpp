@@ -20,6 +20,8 @@
 
 #include <QWidget>
 
+class QHBoxLayout;
+class QPushButton;
 class QTextBrowser;
 class QVBoxLayout;
 
@@ -27,18 +29,35 @@ namespace GnuGuitar {
 
 namespace Qt {
 
+class DocNavBar : public QWidget {
+  Q_OBJECT
+public:
+  DocNavBar(QWidget *parent = nullptr);
+  ~DocNavBar();
+signals:
+  void homeRequested();
+protected slots:
+  void onHomeButtonClicked();
+private:
+  QHBoxLayout *layout;
+  QPushButton *homeButton;
+}; /* class DocNavBar */
+
 class DocBrowser : public QWidget {
   Q_OBJECT
 public:
   DocBrowser(QWidget *parent = nullptr);
   ~DocBrowser(void);
+protected slots:
+  void openHome();
 private:
-  QVBoxLayout *layout;
+  DocNavBar *navBar;
   QTextBrowser *textBrowser;
+  QVBoxLayout *layout;
 }; /* class DocBrowser */
 
 } /* namespace Qt */
 
 } /* namespace GnuGuitar */
 
-#endif /* GNUITAR_qT_DOC_BROWSER_HPP */
+#endif /* GNUITAR_QT_DOC_BROWSER_HPP */

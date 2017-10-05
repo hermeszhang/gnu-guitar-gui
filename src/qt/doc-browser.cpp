@@ -17,6 +17,7 @@
 
 #include <gnu-guitar/qt/doc-browser.hpp>
 
+#include <QPushButton>
 #include <QTextBrowser>
 #include <QVBoxLayout>
 
@@ -24,7 +25,30 @@ namespace GnuGuitar {
 
 namespace Qt {
 
+DocNavBar::DocNavBar(QWidget *parent) {
+
+  homeButton = new QPushButton(this);
+  homeButton->setText("Home");
+
+  connect(homeButton, &QPushButton::clicked,
+          this, &DocNavBar::onHomeButtonClicked);
+
+  layout = new QHBoxLayout(this);
+  layout->addWidget(homeButton);
+  setLayout(layout);
+}
+
+DocNavBar::~DocNavBar() {
+
+}
+
+void DocNavBar::onHomeButtonClicked() {
+  emit homeRequested();
+}
+
 DocBrowser::DocBrowser(QWidget *parent) : QWidget(parent) {
+
+  setWindowTitle("GNU Guitar Documentation");
 
   textBrowser = new QTextBrowser(this);
   textBrowser->setOpenLinks(true);
@@ -32,7 +56,13 @@ DocBrowser::DocBrowser(QWidget *parent) : QWidget(parent) {
   textBrowser->setSearchPaths(QStringList() << ":/docs");
   textBrowser->setSource(QString("index.html"));
 
+  navBar = new DocNavBar(this);
+
+  connect(navBar, &DocNavBar::homeRequested,
+          this, &DocBrowser::openHome);
+
   layout = new QVBoxLayout(this);
+  layout->addWidget(navBar);
   layout->addWidget(textBrowser);
 
   setLayout(layout);
@@ -40,6 +70,10 @@ DocBrowser::DocBrowser(QWidget *parent) : QWidget(parent) {
 
 DocBrowser::~DocBrowser(void) {
 
+}
+
+void DocBrowser::openHome() {
+  textBrowser->setSource(QString("index.html"));
 }
 
 } /* namespace Qt */
