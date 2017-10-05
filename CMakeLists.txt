@@ -8,13 +8,6 @@ set (GNU_GUITAR_GUI_VERSION_PATCH 0)
 set (GNU_GUITAR_GUI_VERSION "0.4.0")
 
 include_directories("include")
-include_directories("external/qaccordion/include")
-include_directories("${CMAKE_CURRENT_BINARY_DIR}/external/qaccordion/src")
-
-if (GNU_GUITAR_QT_WITH_CORE)
-  find_package(RtAudio REQUIRED)
-  include_directories(${RTAUDIO_INCLUDE_DIRS})
-endif (GNU_GUITAR_QT_WITH_CORE)
 
 add_subdirectory("external")
 add_subdirectory("src")
