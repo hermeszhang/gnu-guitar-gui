@@ -141,7 +141,11 @@ list (APPEND SOURCES
   "${SRCDIR}/rack.cc"
   "resources.qrc")
 
-add_executable("gnu-guitar-gui" ${SOURCES})
+if (WIN32)
+  list (APPEND SOURCES "${SRCDIR}/gnu-guitar-gui.rc")
+endif (WIN32)
+
+add_executable("gnu-guitar-gui" WIN32 ${SOURCES})
 
 target_link_libraries("gnu-guitar-gui" Qt5::Widgets)
 target_link_libraries("gnu-guitar-gui" "qaccordion")
