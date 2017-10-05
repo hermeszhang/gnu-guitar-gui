@@ -1,12 +1,13 @@
 platform: x64
 configuration: Release
+environment:
+    Qt5Core_DIR: C:\Qt\5.9.1\msvc2015_64
+    Qt5Gui_DIR: C:\Qt\5.9.1\msvc2015_64
+    Qt5Widgets_DIR: C:\Qt\5.9.1\msvc2015_64
 before_build:
   - git submodule update --init --recursive
   - mkdir "build"
   - cd "build"
-  - cmake .. "-DCMAKE_BUILD_TYPE=Release" \
-             "-DQt5Core_DIR=C:\Qt\5.9.1\msvc2015_64" \
-             "-DQt5Widgets_DIR=C:\Qt\5.9.1\msvc2015_64" \
-             "-DQt5Gui_DIR=C:\Qt\5.9.1\msvc2015_64"
+  - cmake .. "-DCMAKE_BUILD_TYPE=Release"
 build:
   project: build/ALL_BUILD.vcxproj
