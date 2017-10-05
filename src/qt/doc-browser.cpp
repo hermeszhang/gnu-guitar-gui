@@ -17,16 +17,25 @@
 
 #include <gnu-guitar/qt/doc-browser.hpp>
 
+#include <QTextBrowser>
+#include <QVBoxLayout>
+
 namespace GnuGuitar {
 
 namespace Qt {
 
-DocBrowser::DocBrowser(QWidget *parent) : QTextBrowser(parent) {
-  resize(640, 480);
-  setOpenLinks(true);
-  setOpenExternalLinks(true);
-  setSearchPaths(QStringList() << ":/docs");
-  setSource(QString("index.html"));
+DocBrowser::DocBrowser(QWidget *parent) : QWidget(parent) {
+
+  textBrowser = new QTextBrowser(this);
+  textBrowser->setOpenLinks(true);
+  textBrowser->setOpenExternalLinks(true);
+  textBrowser->setSearchPaths(QStringList() << ":/docs");
+  textBrowser->setSource(QString("index.html"));
+
+  layout = new QVBoxLayout(this);
+  layout->addWidget(textBrowser);
+
+  setLayout(layout);
 }
 
 DocBrowser::~DocBrowser(void) {

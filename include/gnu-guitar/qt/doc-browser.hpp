@@ -18,17 +18,23 @@
 #ifndef GNUITAR_QT_DOC_BROWSER_HPP
 #define GNUITAR_QT_DOC_BROWSER_HPP
 
-#include <QTextBrowser>
+#include <QWidget>
+
+class QTextBrowser;
+class QVBoxLayout;
 
 namespace GnuGuitar {
 
 namespace Qt {
 
-class DocBrowser : public QTextBrowser {
+class DocBrowser : public QWidget {
   Q_OBJECT
 public:
   DocBrowser(QWidget *parent = nullptr);
   ~DocBrowser(void);
+private:
+  QVBoxLayout *layout;
+  QTextBrowser *textBrowser;
 }; /* class DocBrowser */
 
 } /* namespace Qt */
