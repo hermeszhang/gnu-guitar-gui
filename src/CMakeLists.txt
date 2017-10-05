@@ -1,5 +1,8 @@
 cmake_minimum_required(VERSION 2.6)
 
+cmake_policy(SET CMP0020 NEW)
+cmake_policy(SET CMP0043 NEW)
+
 set (CMAKE_CXX_EXTENSIONS OFF)
 
 if(MSVC)
@@ -9,10 +12,6 @@ elseif(CMAKE_COMPILER_IS_GNUCXX)
 elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
   set(CMAKE_CXX_FLAGS "-Wall -Wextra -Wno-missing-braces -Werror -Wfatal-errors -std=c++1z")
 endif(MSVC)
-
-if (GNU_GUITAR_QT_WITH_CORE)
-  add_definitions(-DGNU_GUITAR_QT_WITH_CORE=1)
-endif (GNU_GUITAR_QT_WITH_CORE)
 
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOMOC ON)
@@ -146,6 +145,7 @@ target_link_libraries("gnu-guitar-gui" Qt5::Widgets)
 target_link_libraries("gnu-guitar-gui" "qaccordion")
 
 if (GNU_GUITAR_QT_WITH_CORE)
+  target_compile_definitions("gnu-guitar-gui" PRIVATE -DGNU_GUITAR_QT_WITH_CORE=1)
   target_link_libraries("gnu-guitar-gui" "gnu-guitar-core")
 endif (GNU_GUITAR_QT_WITH_CORE)
 
