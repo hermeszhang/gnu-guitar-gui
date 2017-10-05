@@ -158,5 +158,20 @@ endif (GNU_GUITAR_QT_WITH_CORE)
 qt5_use_modules("gnu-guitar-gui" Widgets)
 
 install(TARGETS "gnu-guitar-gui"
-  RUNTIME DESTINATION bin)
+  RUNTIME DESTINATION bin
+  ARCHIVE DESTINATION lib
+  LIBRARY DESTINATION lib)
 
+if (WIN32)
+  if(Qt5Core_VERSION VERSION_LESS 5.3)
+    message(WARNING "Cannot use windeployqt in Qt 5.2 and earlier")
+  else(Qt5Core_VERSION VERSION_LESS 5.3)
+    include(WinDeployQt)
+    WinDeployQt(TARGET "gnu-guitar-gui"
+                COMPILER_RUNTIME
+                INCLUDE_MODULES Qt5::Widgets Qt5::Gui Qt5::Core
+                EXCLUDE_MODULES webkit webkit2)
+    install(DIRECTORY "${PROJECT_BINARY_DIR}/windeployqt/"
+            DESTINATION "bin")
+  endif(Qt5Core_VERSION VERSION_LESS 5.3)
+endif (WIN32)
