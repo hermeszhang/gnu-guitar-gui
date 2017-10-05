@@ -9,4 +9,4 @@ before_build:
              "-DQt5Widgets_DIR=C:\Qt\5.9.1\msvc2015_64" \
              "-DQt5Gui_DIR=C:\Qt\5.9.1\msvc2015_64"
 build:
-  project: "build\ALL_BUILD.vcxproj"
+  project: build/ALL_BUILD.vcxproj
