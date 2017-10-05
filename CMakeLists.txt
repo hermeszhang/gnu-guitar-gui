@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.1.0)
 
-project("gnu-guitar-gui")
+project("GNU Guitar GUI")
 
 set (GNU_GUITAR_GUI_VERSION_MAJOR 0)
 set (GNU_GUITAR_GUI_VERSION_MINOR 4)

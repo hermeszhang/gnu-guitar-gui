@@ -1,7 +1,7 @@
 GNU Guitar GUI
 ==============
 
-[![Travis Badge](https://travis-ci.org/gnu-guitar/gnu-guitar-qt.svg?branch=master)](https://travis-ci.org/gnu-guitar/gnu-guitar-qt)
+[![Travis Badge](https://travis-ci.org/gnu-guitar/gui.svg?branch=master)](https://travis-ci.org/gnu-guitar/gui)
 
 The graphical interface of the GNU Guitar project.
 
