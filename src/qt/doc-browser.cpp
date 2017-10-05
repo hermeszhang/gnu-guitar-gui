@@ -25,7 +25,7 @@ namespace GnuGuitar {
 
 namespace Qt {
 
-DocNavBar::DocNavBar(QWidget *parent) {
+DocNavBar::DocNavBar(QWidget *parent) : QWidget(parent) {
 
   homeButton = new QPushButton(this);
   homeButton->setText("Home");

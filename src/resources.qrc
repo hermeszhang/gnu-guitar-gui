@@ -3,7 +3,7 @@
   <qresource prefix="/icons">
     <file alias="power-button-on.png">../icons/power-button/on.png</file>
     <file alias="power-button-off.png">../icons/power-button/off.png</file>
-    <file alias="logo.png">../icons/gnuitar.png</file>
+    <file alias="logo.png">../icons/gnu-guitar.png</file>
   </qresource>
   <qresource prefix="/docs">
     <file alias="index.html">../docs/index.html</file>

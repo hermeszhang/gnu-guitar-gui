@@ -2,7 +2,6 @@ GNU Guitar GUI
 ==============
 
 [![Travis Badge](https://travis-ci.org/gnu-guitar/gui.svg?branch=master)](https://travis-ci.org/gnu-guitar/gui)
-
 [![Build status](https://ci.appveyor.com/api/projects/status/daqojo4qeng5e9kn?svg=true)](https://ci.appveyor.com/project/tholberton/gui)
 
 The graphical interface of the GNU Guitar project.

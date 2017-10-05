@@ -1,5 +1,8 @@
 cmake_minimum_required(VERSION 3.1.0)
 
+list (APPEND CMAKE_MODULE_PATH
+      "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+
 project("GNU Guitar GUI")
 
 set (GNU_GUITAR_GUI_VERSION_MAJOR 0)
