@@ -2,6 +2,8 @@
 
 #include <QDesktopServices>
 
+#include <gnu-guitar/qt/doc-browser.hpp>
+
 #ifndef GNUITAR_ISSUES_LINK
 #define GNUITAR_ISSUES_LINK                                                    \
   "https://github.com/gnu-guitar/gnu-guitar-qt/issues/new"

@@ -31,7 +31,7 @@ endmacro (ADD_GUI_CLASS VAR HEADER SOURCE)
 macro (ADD_QT_CLASS VAR HEADER SOURCE)
   list (APPEND ${VAR}
     "${PROJECT_SOURCE_DIR}/include/gnu-guitar/qt/${HEADER}"
-    "${PROJECT_SOURCE_DIR}/src/${SOURCE}")
+    "${PROJECT_SOURCE_DIR}/src/qt/${SOURCE}")
 endmacro (ADD_QT_CLASS VAR HEADER SOURCE)
 
 unset (SOURCES)
@@ -103,6 +103,10 @@ add_qt_class(SOURCES
   "api-form.cpp")
 
 add_qt_class(SOURCES
+  "doc-browser.hpp"
+  "doc-browser.cpp")
+
+add_qt_class(SOURCES
   "error-dialog.hpp"
   "error-dialog.cpp")
 
@@ -119,8 +123,6 @@ list (APPEND SOURCES
   "${SRCDIR}/audio-panel.cc"
   "${INCDIR}/driver-preferences.hpp"
   "${SRCDIR}/driver-preferences.cpp"
-  "${SRCDIR}/doc-browser.cc"
-  "${INCDIR}/doc-browser.h"
   "${SRCDIR}/effect-view.cc"
   "${INCDIR}/effect-view.hpp"
   "${INCDIR}/ladspa-setup.hpp"
