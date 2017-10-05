@@ -1,0 +1,8 @@
+platform: x64
+configuration: Release
+before_build:
+  - mkdir build
+  - cd build
+  - cmake .. -DCMAKE_BUILD_TYPE=Release
+build:
+  project: build\ALL_BUILD.vcxproj
