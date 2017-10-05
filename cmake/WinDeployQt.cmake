@@ -42,7 +42,10 @@ function(WinDeployQt)
   endforeach()
 
   find_program(windeploy_PROGRAM windeployqt
-    PATHS $ENV{QTDIR}/bin/)
+    PATHS $ENV{QTDIR}/bin/
+          $ENV{Q5Core_DIR}/bin/
+          $ENV{Q5Gui_DIR}/bin/
+          $ENV{Q5Widgets_DIR}/bin/)
   if(windeploy_PROGRAM)
     message(STATUS "Found ${windeploy_PROGRAM}")
   else()
