@@ -1,6 +1,7 @@
 #include <gnu-guitar-qt/menu-bar.h>
 
 #include <QDesktopServices>
+#include <QUrl>
 
 #include <gnu-guitar/qt/doc-browser.hpp>
 
