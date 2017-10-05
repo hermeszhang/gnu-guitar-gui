@@ -7,12 +7,21 @@ namespace GnuGuitar {
 namespace Qt {
 
 DocBrowser::DocBrowser(QWidget *parent) : QTextBrowser(parent) {
-  QFile index_file(":/docs/index.html");
+  resize(640, 480);
+  setOpenLinks(true);
+  setOpenExternalLinks(true);
+  setSearchPaths(QStringList() << ":/docs");
+  setSource(QString("index.html"));
+#if 0
+  QFile index_file("index.html");
   if (index_file.open(QIODevice::ReadOnly))
     setHtml(index_file.readAll());
+#endif
 }
 
-DocBrowser::~DocBrowser(void) {}
+DocBrowser::~DocBrowser(void) {
+
+}
 
 } /* namespace Qt */
 
