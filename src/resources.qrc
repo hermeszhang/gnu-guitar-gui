@@ -8,6 +8,8 @@
   <qresource prefix="/docs">
     <file alias="index.html">../docs/index.html</file>
     <file alias="readme.html">../docs/readme.html</file>
+    <file alias="faq.html">../docs/faq.html</file>
+    <file alias="install.html">../docs/install.html</file>
   </qresource>
 </RCC>
 
