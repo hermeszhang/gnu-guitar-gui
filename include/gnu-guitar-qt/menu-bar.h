@@ -3,11 +3,11 @@
 
 #include <QMenuBar>
 
-#include <gnu-guitar-qt/doc-browser.h>
-
 namespace GnuGuitar {
 
 namespace Qt {
+
+class DocBrowser;
 
 class MenuBar final : public QMenuBar {
   Q_OBJECT

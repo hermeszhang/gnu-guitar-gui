@@ -1,6 +1,9 @@
 #include <gnu-guitar-qt/menu-bar.h>
 
 #include <QDesktopServices>
+#include <QUrl>
+
+#include <gnu-guitar/qt/doc-browser.hpp>
 
 #ifndef GNUITAR_ISSUES_LINK
 #define GNUITAR_ISSUES_LINK                                                    \
