@@ -2,8 +2,11 @@ platform: x64
 configuration: Release
 before_build:
   - git submodule update --init --recursive
-  - mkdir build
-  - cd build
-  - cmake .. -DCMAKE_BUILD_TYPE=Release
+  - mkdir "build"
+  - cd "build"
+  - cmake .. "-DCMAKE_BUILD_TYPE=Release" \
+             "-DQt5Core_DIR=C:\Qt\5.9.1\msvc2015_64" \
+             "-DQt5Widgets_DIR=C:\Qt\5.9.1\msvc2015_64" \
+             "-DQt5Gui_DIR=C:\Qt\5.9.1\msvc2015_64"
 build:
-  project: build\ALL_BUILD.vcxproj
+  project: "build\ALL_BUILD.vcxproj"
