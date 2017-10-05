@@ -21,8 +21,6 @@ Knob::Knob(const QString &name, QWidget *parent) : QWidget(parent) {
   layout->addWidget(label);
 
   setLayout(layout);
-
-  setFixedSize(150, 100);
 }
 
 Knob::~Knob(void) {}
