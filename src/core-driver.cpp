@@ -99,7 +99,9 @@ public:
       return;
 
     auto functor = [&](GnuGuitar::Core::LadspaControl &control) {
-      control.value = (controlValue * (control.value_max - control.value_min)) + control.value_min;
+      auto valueMax = control.getValueMax();
+      auto valueMin = control.getValueMin();
+      control.setValue((controlValue * (valueMax - valueMin)) + valueMin);
     };
 
     GnuGuitar::Core::LadspaControlFinder<decltype(functor)> controlFinder(controlName, functor);
